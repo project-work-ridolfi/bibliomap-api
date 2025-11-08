@@ -1,29 +1,30 @@
 quarkus:
   http:
-    cors:
-      # Abilita il supporto CORS
-      enabled: true
-      # Specifica le origini Vue/Vite (localhost:5173)
-      origins:
-        - "http://localhost:5173"
-        - "http://127.0.0.1:5173"
+    cors: true
   log:
-    level: DEBUG 
+    level: INFO
+    category:
+      "it.unipegaso":
+        level: DEBUG
   mongodb:
     connection-string: mongodb+srv://adrianaridolfi91_db_user:Sk7pqSWAGz4J5wBg@bibliomap.vhw9x8v.mongodb.net/
     database: bibliomap
-  
+
+  redis:
+    hosts: redis://localhost:6379
+
   # CONFIGURAZIONE SERVIZI DI AUTENTICAZIONE
   auth:
     otp:
-      mock-enabled: true # Imposta a 'false' per inviare email reali
+      duration-minutes: 5
+      debug-mode: true # Se true, l'OTP viene restituito nella risposta HTTP invece di essere inviato via email.
       from: "bibliomap@noreply.it"
 
   # CONFIGURAZIONE QUARKUS MAILER (SMTP)
   mailer:
-    host: smtp.gmail.com 
-    port: 587 
-    ssl: true
+    from: "bibliomap@noreply.it"
+    host: smtp.gmail.com
+    port: 587
     username: adriana.ridolfi@studenti.unipegaso.it 
     password: cevn vrbe vvgs jvte  
-    start-tls: required 
+    start-tls: required
