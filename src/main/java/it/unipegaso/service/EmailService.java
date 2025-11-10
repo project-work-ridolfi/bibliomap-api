@@ -1,12 +1,12 @@
 package it.unipegaso.service;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.jboss.logging.Logger;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
-import io.quarkus.mailer.Mailer; 
-import io.quarkus.mailer.Mail; 
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject; 
 
 @ApplicationScoped
 public class EmailService {

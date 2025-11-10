@@ -1,15 +1,16 @@
 package it.unipegaso.database;
 
+import org.bson.Document;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
+
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import org.bson.Document;
-import org.jboss.logging.Logger;
-
 import jakarta.inject.Inject; 
-import org.eclipse.microprofile.config.inject.ConfigProperty; 
 
 @ApplicationScoped
 public class MongoProducer {

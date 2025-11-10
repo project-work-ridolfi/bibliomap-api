@@ -7,8 +7,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import io.quarkus.redis.datasource.RedisDataSource;
+import io.quarkus.redis.datasource.keys.KeyCommands;
 import io.quarkus.redis.datasource.value.ValueCommands;
-import io.quarkus.redis.datasource.keys.KeyCommands; 
 import it.unipegaso.service.otp.CalculatedSecretKeyStrategy;
 import it.unipegaso.service.otp.CounterStrategy;
 import it.unipegaso.service.otp.DecodingException;
