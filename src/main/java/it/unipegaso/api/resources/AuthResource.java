@@ -1,14 +1,19 @@
 package it.unipegaso.api.resources;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
+import io.quarkus.elytron.security.common.BcryptUtil;
+import it.unipegaso.api.dto.ErrorResponse;
+import it.unipegaso.api.dto.MessageResponse;
 import it.unipegaso.api.dto.RegistrationFinalDTO;
 import it.unipegaso.api.dto.RegistrationInitDTO;
 import it.unipegaso.api.dto.VerificationDTO;
 import it.unipegaso.database.UserRepository;
+import it.unipegaso.database.model.User;
 import it.unipegaso.service.OtpService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -120,18 +125,65 @@ public class AuthResource {
     }
 
 
-    /**
-     * POST /api/auth/register
-     * Fase 3: Completa la registrazione dopo la verifica OTP.
-     */
     @POST
     @Path("/register")
     public Response register(RegistrationFinalDTO registrationDto) {
-        // TODO: Aggiungere qui il controllo per verificare se l'email è stata verificata in /register-verify
-        // TODO: Salvare l'utente nel DB (dopo aver hashato la password) + consensi
-        return Response.status(Response.Status.CREATED)
-                .entity("{\"message\": \"User created (TODO)\"}")
-                .build();
+        
+        // CONTROLLO DI SICUREZZA: Accettazione Termini
+        if (!registrationDto.acceptTerms()) {
+            LOG.errorf("Tentativo di registrazione senza accettare i termini da: %s", registrationDto.email());
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(new ErrorResponse("TERMS_REQUIRED", "Devi accettare i termini e condizioni per proseguire."))
+                           .build();
+        }
+
+        // HASHING DELLA PASSWORD
+        String hashedPassword = BcryptUtil.bcryptHash(registrationDto.password());
+
+        // MAPPATURA (DTO -> Modello User)
+        User newUser = new User();
+        
+        // Campi obbligatori e di sicurezza
+        newUser.username = registrationDto.username();
+        newUser.email = registrationDto.email();
+        newUser.hashedPassword = hashedPassword;
+        newUser.acceptedTerms = registrationDto.acceptTerms();
+        newUser.createdAt = LocalDateTime.now(); 
+        Response response;
+
+        try {
+            // SALVATAGGIO UTENTE nel DB
+            boolean success = userRepository.createUser(newUser);
+
+            if (success) {
+                // L'inserimento ha avuto successo, risponde 201 Created.
+                response = Response.status(Response.Status.CREATED)
+                                   .entity(new MessageResponse("User created successfully."))
+                                   .build();
+            } else {
+                // fallimento logico non coperto
+                LOG.errorf("Salvataggio utente fallito silenziosamente per %s. (Motivo non specificato).", registrationDto.email());
+                 response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                                   .entity(new ErrorResponse("DB_FAILURE_SILENT", "Creazione utente fallita senza eccezione specifica."))
+                                   .build();
+            }
+        
+        } catch (IllegalArgumentException e) {
+            // Cattura chiavi uniche duplicate (username/email)
+            LOG.warnf("Tentativo di inserimento utente duplicato fallito: %s", e.getMessage());
+            response = Response.status(Response.Status.CONFLICT)
+                               .entity(new ErrorResponse("ALREADY_EXISTS", "L'username o l'email esistono già nel database."))
+                               .build();
+                               
+        } catch (RuntimeException e) {
+            // Cattura tutti gli altri errori di DB/runtime
+            LOG.errorf(e, "Errore generico durante il salvataggio dell'utente %s.", registrationDto.email());
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                               .entity(new ErrorResponse("DB_SAVE_FAILURE", "Impossibile completare la registrazione a causa di un errore interno."))
+                               .build();
+        }
+        
+        return response;
     }
 
     /**

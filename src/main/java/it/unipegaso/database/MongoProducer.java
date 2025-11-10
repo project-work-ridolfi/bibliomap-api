@@ -1,6 +1,5 @@
 package it.unipegaso.database;
 
-import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -8,6 +7,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import it.unipegaso.database.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject; 
@@ -25,12 +25,15 @@ public class MongoProducer {
     String databaseName;
 
     @Produces
-    public MongoCollection<Document> users() {
+    public MongoCollection<User> users() { 
         
         MongoDatabase database = mongoClient.getDatabase(databaseName); 
-        MongoCollection<Document> collection = database.getCollection("users");
-        LOG.infof("Producer creato per la collection: %s.%s", database.getName(), collection.getNamespace().getCollectionName());
+        
+        MongoCollection<User> collection = database.getCollection("users", User.class);
+        
+        LOG.infof("Producer creato per la collection tipizzata: %s.%s", database.getName(), collection.getNamespace().getCollectionName());
         
         return collection;
     }
+    
 }
