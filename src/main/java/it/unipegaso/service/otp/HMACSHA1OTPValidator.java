@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class HMACSHA1OTPValidator {
 
-    private static final int DEFAULT_CODE_DIGITS = 8;
+    private static final int DEFAULT_CODE_DIGITS = 6;
     private static final boolean DEFAULT_ADD_CHECKSUM = false;
     private static final int DEFAULT_TRUNCATION_OFFSET = 16;
 

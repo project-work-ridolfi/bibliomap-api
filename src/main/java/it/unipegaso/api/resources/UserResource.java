@@ -2,7 +2,9 @@ package it.unipegaso.api.resources;
 
 import org.jboss.logging.Logger;
 
+import it.unipegaso.api.dto.CheckExistsResponse;
 import it.unipegaso.database.UserRepository;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -35,15 +37,14 @@ public class UserResource {
 	 */
 	@GET
 	@Path("/check-exists/{username}")
+	@PermitAll 
 	public Response checkUsernameExists(@PathParam("username") String username) {
 
-		// Poiché findByUsername ritorna Optional, usiamo isPresent() per avere un booleano.
-		boolean exists = userRepository.findByUsername(username).isPresent();
+	    boolean exists = userRepository.findByUsername(username).isPresent();
 
-		LOG.infof("DB Check username '%s' (Esiste: %b)", username, exists);
+	    LOG.infof("DB Check username '%s' (Esiste: %b)", username, exists);
 
-		// Ritorna il booleano 'true' o 'false' in formato JSON. 
-		return Response.ok(exists).build();
+	    return Response.ok(new CheckExistsResponse(exists)).build();
 	}
 	
 	/**

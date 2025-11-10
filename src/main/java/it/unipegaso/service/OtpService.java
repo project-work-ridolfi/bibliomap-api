@@ -66,8 +66,13 @@ public class OtpService {
             if (otpDebugMode) {
                 return otp;
             } else {
-                emailService.sendOtpEmail(email, otp);
-                return null;
+                boolean success = emailService.sendOtpEmail(email, otp);
+                LOG.info("SEND EMAIL " + success);
+                if (success) {
+                    return ""; // Restituisce una stringa vuota o un segnale di successo (non null)
+                } else {
+                    return null; // Solo se l'invio è fallito, restituisce null
+                }
             }
         } catch (InvalidKeyException | NoSuchAlgorithmException | DecodingException e) {
             LOG.error("Failed to generate OTP", e);

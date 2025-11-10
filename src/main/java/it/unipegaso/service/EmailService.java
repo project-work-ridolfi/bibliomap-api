@@ -31,10 +31,6 @@ public class EmailService {
      * @return true se l'email è stata processata (mock o inviata), false in caso di errore SMTP.
      */
     public boolean sendOtpEmail(String recipientEmail, String otpCode) {
-        if (mockOtpEnabled) {
-            LOG.infof("[MOCK MODE] Simulata l'invio OTP: '%s' a %s", otpCode, recipientEmail);
-            return true;
-        }
 
         try {
             mailer.send(Mail.withText(

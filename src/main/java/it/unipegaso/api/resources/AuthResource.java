@@ -110,9 +110,7 @@ public class AuthResource {
         if (otpService.verifyOtp(verificationData.email(), verificationData.otp())) {
             
             // L'OTP è valido. L'utente può procedere.
-            // (Qui potresti salvare un flag nel DB o Redis che l'email è verificata)
-            return Response.ok("{\"message\": \"OTP verificato con successo.\"}")
-                           .build();
+            return Response.noContent().build();
         } else {
             // L'OTP non è valido, scaduto o già usato (o max retry raggiunto nella logica futura)
             return Response.status(Response.Status.UNAUTHORIZED)
