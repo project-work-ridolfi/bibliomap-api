@@ -1,10 +1,13 @@
 # bibliomap-api
 
 ## TODO
- - [ ] controllo su click multiplo per get otp
+ - [x] controllo su click multiplo per get otp
  - [ ] accedi
- - [ ] controllo visualizzazione messaggio mock
- - [ ] email fatta meglio
+ - [x] controllo visualizzazione messaggio mock
+ - [x] email fatta meglio 
+    - [ ] aggiungi css coerente al fe alla mail
+- [ ] reinvio otp
+- [ ] salvataggio dati location
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 

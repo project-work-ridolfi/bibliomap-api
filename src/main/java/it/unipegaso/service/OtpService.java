@@ -2,6 +2,8 @@ package it.unipegaso.service;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -21,14 +23,19 @@ import jakarta.inject.Inject;
 public class OtpService {
 
     private static final Logger LOG = Logger.getLogger(OtpService.class);
+    
+    private static final String RETRY_FIELD_NAME = "otp_retries"; 
+    private static final int CODE_DIGITS = 6;
+    private static final boolean ADD_CHECKSUM = false;
+    private static final int TRUNCATION_OFFSET = 16;
 
     @Inject
     RedisDataSource ds; 
-
-    // Per i comandi di valore (GET, SETEX)
-    private ValueCommands<String, String> valueCommands; 
     
-    // Per i comandi sulle chiavi (DEL)
+    @Inject
+    SessionDataService sessionDataService; 
+
+    private ValueCommands<String, String> valueCommands; 
     private KeyCommands<String> keyCommands;
 
     @Inject
@@ -36,9 +43,13 @@ public class OtpService {
 
     @ConfigProperty(name = "quarkus.auth.otp.duration-minutes", defaultValue = "5")
     long otpDurationMinutes;
+    
+    @ConfigProperty(name = "quarkus.auth.otp.max-retries", defaultValue = "3")
+    long maxRetriesConfig; 
 
     @ConfigProperty(name = "quarkus.auth.otp.debug-mode", defaultValue = "false")
     boolean otpDebugMode;
+
 
     private final HMACSHA1OTPValidator otpValidator = new HMACSHA1OTPValidator();
     private final CounterStrategy counterStrategy = new CounterStrategy();
@@ -54,24 +65,37 @@ public class OtpService {
     	return otpDebugMode;
     }
 
-    public String generateAndSendOtp(String email, String sessionId) {
+    public String generateAndSendOtp(String email, String sessionId, String username) {
+        
         String secret = secretKeyStrategy.load(email + sessionId);
-        long counter = counterStrategy.getCounter();
+        long counter = counterStrategy.getCounter(); 
+        
         try {
-            String otp = otpValidator.generatePassword(secret, counter);
+            String otp = otpValidator.generatePassword(
+                secret, 
+                counter, 
+                CODE_DIGITS, 
+                ADD_CHECKSUM, 
+                TRUNCATION_OFFSET
+            );
+            
             long expiration = otpDurationMinutes * 60; 
             
+            // salva OTP su Redis 
             valueCommands.setex(email, expiration, otp); 
+            
+            sessionDataService.updateLong(sessionId, RETRY_FIELD_NAME, maxRetriesConfig);
             
             if (otpDebugMode) {
                 return otp;
             } else {
-                boolean success = emailService.sendOtpEmail(email, otp);
+                boolean success = emailService.sendOtpEmail(email, otp, username);
                 LOG.info("SEND EMAIL " + success);
                 if (success) {
-                    return ""; // Restituisce una stringa vuota o un segnale di successo (non null)
+                    return otp; 
                 } else {
-                    return null; // Solo se l'invio è fallito, restituisce null
+                    keyCommands.del(email);
+                    return null; 
                 }
             }
         } catch (InvalidKeyException | NoSuchAlgorithmException | DecodingException e) {
@@ -80,16 +104,79 @@ public class OtpService {
         }
     }
 
-    public boolean verifyOtp(String email, String otp) {
 
-    	String storedOtp = valueCommands.get(email); 
+
+    /**
+     * Tenta la verifica OTP, ritorna lo stato completo (inclusi i tentativi).
+     * @return Una mappa con lo stato: {"valid": true/false, "retriesRemaining": X, "isBlocked": true/false}
+     */
+    public Map<String, Object> verifyOtp(String email, String otpCode, String sessionId) {
+
+        //recupera i tentativi rimanenti 
+        Optional<Long> retriesOpt = sessionDataService.getLong(sessionId, RETRY_FIELD_NAME);
+        long retriesRemaining = retriesOpt.orElse(maxRetriesConfig); // Default se non trovato
+        boolean isBlocked = retriesRemaining <= 0;
         
-        if (storedOtp != null && storedOtp.equals(otp)) {
-            // Rimuove l'OTP per garantirne l'uso singolo
-            keyCommands.del(email); 
-            return true;
-        } else {
-            return false;
+        // Controllo preliminare di blocco
+        if (retriesRemaining <= 0) {
+            return buildResult(false, 0, true, "Account temporaneamente bloccato. Richiedi un nuovo codice.");
         }
+        
+        // VALIDAZIONE: Ricostruisce OTP atteso per confronto
+        String secret = secretKeyStrategy.load(email + sessionId);
+        long counter = counterStrategy.getCounter(); 
+        
+        String expectedOtp;
+        try {
+            expectedOtp = otpValidator.generatePassword(
+                secret, 
+                counter, 
+                CODE_DIGITS, 
+                ADD_CHECKSUM, 
+                TRUNCATION_OFFSET
+            );
+        } catch (Exception e) {
+            LOG.error("Failed to reconstruct OTP for verification.", e);
+            return buildResult(false, retriesRemaining, false, "Errore di sistema nella verifica OTP.");
+        }
+        
+        // Verifica l'uguaglianza e la scadenza (verificando la chiave su Redis)
+        boolean isExpired = valueCommands.get(email) == null;
+        boolean isCodeMatch = expectedOtp.equals(otpCode);
+        
+        if (isCodeMatch && !isExpired) {
+            // OTP VALIDO: Rimuovi l'OTP (uso singolo) e il contatore.
+            keyCommands.del(email); 
+            sessionDataService.deleteField(sessionId, RETRY_FIELD_NAME); // Pulisci contatore sessione
+            
+            return buildResult(true, maxRetriesConfig, false, "Verifica OTP riuscita.");
+
+        } else {
+            // FALLIMENTO: Codice sbagliato o scaduto
+            // decremento atomico del contatore dei retry
+            retriesRemaining = sessionDataService.incrementBy(sessionId, RETRY_FIELD_NAME, -1);
+            isBlocked = retriesRemaining <= 0;
+
+            String message;
+            if (isExpired) {
+                 message = "Codice OTP scaduto. Richiedi un nuovo codice.";
+            } else if (retriesRemaining <= 0) {
+                message = "Tentativi esauriti. Richiedi un nuovo codice.";
+            } else {
+                message = "Codice non valido. Riprova.";
+            }
+            
+            return buildResult(false, retriesRemaining, isBlocked, message);
+        }
+    }
+    
+    // Helper per costruire la risposta
+    private Map<String, Object> buildResult(boolean valid, long retries, boolean blocked, String message) {
+        return Map.of(
+            "valid", valid,
+            "retriesRemaining", retries,
+            "isBlocked", blocked,
+            "message", message
+        );
     }
 }

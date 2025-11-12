@@ -1,7 +1,9 @@
 package it.unipegaso.api.resources;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -12,9 +14,11 @@ import it.unipegaso.api.dto.MessageResponse;
 import it.unipegaso.api.dto.RegistrationFinalDTO;
 import it.unipegaso.api.dto.RegistrationInitDTO;
 import it.unipegaso.api.dto.VerificationDTO;
+import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UserRepository;
 import it.unipegaso.database.model.User;
 import it.unipegaso.service.OtpService;
+import it.unipegaso.service.RegistrationFlowService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -23,7 +27,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 /**
  * Endpoint per autenticazione e gestione account.
@@ -35,8 +41,6 @@ import jakarta.ws.rs.core.Response;
 public class AuthResource {
 
     private static final Logger LOG = Logger.getLogger(AuthResource.class);
-    private static final String SESSION_ID_HEADER = "X-Session-Id";
-    private static final String DEFAULT_SESSION_ID = "NO_SESSION";
 
     @Inject
     UserRepository userRepository; 
@@ -47,79 +51,123 @@ public class AuthResource {
     @ConfigProperty(name = "quarkus.auth.otp.debug-mode", defaultValue = "false")
     boolean otpDebugMode; 
 
+    @Inject
+    RegistrationFlowService registrationFlowService;
 
     /**
      * POST /api/auth/register-init
      * Inizia il processo di registrazione, genera OTP e invia email.
-     * Ritorna: 202 Accepted + (OTP se debug=true) | 409 Conflict | 500 Internal Error
+     * Ritorna: 200 OK + Cookie Sessione (+ OTP se debug=true) | 409 Conflict | 500 Internal Error
      */
     @POST
     @Path("/register-init")
-    public Response registerInit(RegistrationInitDTO registrationData, @Context HttpHeaders headers) {
-        
+    public Response registerInit(RegistrationInitDTO registrationData, @Context HttpHeaders headers, 
+                                 @Context UriInfo uriInfo) {
+
         LOG.infof("Tentativo di inizio registrazione per email: %s", registrationData.email());
 
-        // Controllo email nel DB
+        // Recupera sid dal Cookie o ne genera uno nuovo se è la prima richiesta.
+        String sessionId = SessionIDProvider.getSessionId(headers).orElse(UUID.randomUUID().toString());
+        
+        // controlla non ci sia l'email nel db
         if (userRepository.findByEmail(registrationData.email()).isPresent()) {
             LOG.warnf("Tentativo di registrazione con email già esistente: %s", registrationData.email());
-            
-            // 409 se l'email esiste già
-            return Response.status(Response.Status.CONFLICT) 
-                           .entity("{\"error\": \"EMAIL_EXISTS\", \"message\": \"Email già registrata.\"}")
-                           .build();
+
+            Map<String, String> error = Map.of(
+                "error", "EMAIL_EXISTS",
+                "message", "Email già registrata."
+            );
+            return Response.status(Response.Status.CONFLICT).entity(error).build(); // 409 Conflict
         }
 
-        // Recupera l'ID Sessione per legare l'OTP (Chiave di sicurezza HOTP)
-        String sessionId = Optional.ofNullable(headers.getRequestHeader(SESSION_ID_HEADER))
-                                   .flatMap(list -> list.stream().findFirst())
-                                   .orElse(DEFAULT_SESSION_ID);
-                           
-        // Genera e Salva OTP in Redis, poi invia l'email.
-        // mockOtp contiene il codice solo se otpDebugMode è TRUE.
-        String mockOtp = otpService.generateAndSendOtp(registrationData.email(), sessionId);
+        // Salva email e username in sessione
+        registrationFlowService.saveInitialData(sessionId, registrationData.email(), registrationData.username());
+       
         
-        // Gestione risposta
+        // Genera e invia OTP
+        String mockOtp = otpService.generateAndSendOtp(registrationData.email(), sessionId, registrationData.username());
+
+        
+        // fallimento invio email
         if (mockOtp == null && !otpDebugMode) {
-            // Se non siamo in debug, null significa che c'è stato un fallimento (es. SMTP_FAILURE)
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("{\"error\": \"SMTP_FAILURE\", \"message\": \"Impossibile inviare l'email di verifica.\"}")
-                           .build();
+            LOG.errorf("Fallimento nell'invio email per %s. Controllare configurazione SMTP.", registrationData.email());
+            
+            Map<String, String> error = Map.of(
+                "error", "SMTP_FAILURE",
+                "message", "Impossibile inviare l'email di verifica. Riprovare o contattare l'assistenza."
+            );
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build(); // 500 Internal Error
+        }
+
+
+        // risposta di successo (200)
+        Map<String, String> responseData;
+        
+        if (otpDebugMode) {
+            // debug include il mockOtp nel body
+            responseData = Map.of(
+                "message", "OTP inviato (Debug Mode).",
+                "mockOtp", mockOtp
+            );
+        } else {
+            responseData = Collections.singletonMap(
+                "message", "Email di verifica inviata con successo."
+            );
         }
         
-        // Successo: Restituisce l'OTP solo in modalità debug/mock
-        String otpValue = otpDebugMode ? mockOtp : "OTP inviato (solo visibile in debug mode)";
+        // Determina se il flag 'Secure' deve essere TRUE (solo se connessione HTTPS).
+        boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+        NewCookie sessionCookie = SessionIDProvider.createSessionCookie(sessionId, isSecure);
+
         
-        String responseBody = String.format(
-            "{\"message\": \"OTP inviato.\", \"mockOtp\": \"%s\"}", 
-            otpValue
-        );
-        
-        return Response.status(Response.Status.ACCEPTED) // 202 Accepted
-                       .entity(responseBody)
+        return Response.ok(responseData) // 200 OK
+                       .cookie(sessionCookie) 
                        .build();
     }
-
 
     /**
      * POST /api/auth/register-verify
      * Fase 2: Verifica l'OTP fornito dall'utente.
-     * Ritorna: 200 OK | 401 Unauthorized
+     * Ritorna: 204 No Content (OK) | 403 Forbidden (Fallimento con dettagli retry)
      */
     @POST
     @Path("/register-verify")
-    public Response registerVerify(VerificationDTO verificationData) {
+    public Response registerVerify(VerificationDTO verificationData, @Context HttpHeaders headers) {
         
         LOG.infof("Tentativo di verifica OTP per email: %s", verificationData.email());
 
-        // Verifica l'OTP in Redis (controlla validità/scadenza e garantisce uso singolo)
-        if (otpService.verifyOtp(verificationData.email(), verificationData.otp())) {
+        // recupera la sid dal Cookie
+        String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+        if (sessionId == null) {
+            LOG.errorf("Tentativo di verifica OTP fallito: Session ID mancante per %s.", verificationData.email());
             
+            Map<String, String> error = Map.of(
+                "error", "MISSING_SESSION",
+                "message", "La sessione di verifica non è valida o è scaduta. Richiedi un nuovo codice."
+            );
+            return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+        }
+
+        // tenta la verifica e ottiene lo stato completo (inclusi retry)
+        Map<String, Object> result = otpService.verifyOtp(
+            verificationData.email(), 
+            verificationData.otp(), 
+            sessionId
+        );
+
+        boolean isValid = (boolean) result.getOrDefault("valid", false);
+
+        if (isValid) {
             // L'OTP è valido. L'utente può procedere.
-            return Response.noContent().build();
+            // NOTA: La logica di pulizia OTP/Retry è già nel service.
+            
+            return Response.noContent().build(); // 204 No Content
         } else {
-            // L'OTP non è valido, scaduto o già usato (o max retry raggiunto nella logica futura)
-            return Response.status(Response.Status.UNAUTHORIZED)
-                           .entity("{\"error\": \"INVALID_OTP\", \"message\": \"Codice OTP non valido o scaduto.\"}")
+            
+            // Ritorniamo 403 Forbidden con il corpo JSON strutturato
+            return Response.status(Response.Status.FORBIDDEN)
+                           .entity(result) 
                            .build();
         }
     }
