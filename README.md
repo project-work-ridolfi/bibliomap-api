@@ -8,6 +8,12 @@
     - [ ] aggiungi css coerente al fe alla mail
 - [ ] reinvio otp
 - [ ] salvataggio dati location
+- [ ] riorganizza registration dto, usa solo uno con valori nullable
+- [ ] usa error message sempre nei casi di errore (no mappa)
+- [ ] crea oggetti model per Books, Copies, Locations e Libraries
+- [ ] definisci flusso di ricerca
+- [ ] definisci flusso di prestito
+- [ ] documentazione
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
