@@ -15,7 +15,7 @@ import it.unipegaso.api.dto.RegistrationFinalDTO;
 import it.unipegaso.api.dto.RegistrationInitDTO;
 import it.unipegaso.api.dto.VerificationDTO;
 import it.unipegaso.api.util.SessionIDProvider;
-import it.unipegaso.database.UserRepository;
+import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.User;
 import it.unipegaso.service.OtpService;
 import it.unipegaso.service.RegistrationFlowService;
@@ -43,7 +43,7 @@ public class AuthResource {
     private static final Logger LOG = Logger.getLogger(AuthResource.class);
 
     @Inject
-    UserRepository userRepository; 
+    UsersRepository userRepository; 
 
     @Inject
     OtpService otpService; 
@@ -127,7 +127,7 @@ public class AuthResource {
 
     /**
      * POST /api/auth/register-verify
-     * Fase 2: Verifica l'OTP fornito dall'utente.
+     * Verifica l'OTP fornito dall'utente.
      * Ritorna: 204 No Content (OK) | 403 Forbidden (Fallimento con dettagli retry)
      */
     @POST
@@ -196,7 +196,6 @@ public class AuthResource {
         newUser.email = registrationDto.email();
         newUser.hashedPassword = hashedPassword;
         newUser.acceptedTerms = registrationDto.acceptTerms();
-        newUser.createdAt = LocalDateTime.now(); 
         Response response;
 
         try {

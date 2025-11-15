@@ -12,9 +12,11 @@ public class User {
     public String username;
     public String email;
     public String hashedPassword;
-    public boolean acceptedTerms; // False di default
-    public LocalDateTime createdAt = LocalDateTime.now(); // Inizializzato
-
+    public boolean acceptedTerms; 
+    public LocalDateTime createdAt; 
+    public LocalDateTime modifiedAt;
     public String locationId; 
+    public String visibility; //all, logged-in, no one
+    public int blurRadius;
     public List<String> collections;
 }
