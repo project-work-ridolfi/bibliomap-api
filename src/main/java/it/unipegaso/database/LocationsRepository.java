@@ -3,7 +3,6 @@ package it.unipegaso.database;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.bson.types.ObjectId;
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
@@ -13,8 +12,10 @@ import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.result.InsertOneResult;
 
 import it.unipegaso.database.model.Location;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class LocationsRepository {
 
 	private static final Logger LOG = Logger.getLogger(LocationsRepository.class);

@@ -3,13 +3,13 @@ package it.unipegaso.database;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 
@@ -22,8 +22,8 @@ public class UsersRepository {
 
     private static final Logger LOG = Logger.getLogger(UsersRepository.class);
 
-    private final String USERNAME = "username";
-    private final String EMAIL = "email";
+    public static final String USERNAME = "username";
+    public static final String EMAIL = "email";
     
     @Inject
     MongoCollection<User> users; // Iniettiamo MongoCollection<User>
@@ -131,4 +131,37 @@ public class UsersRepository {
             throw new RuntimeException("Errore DB durante l'aggiornamento utente.", e);
         }
     }
+
+    /**
+     * Rimuove un utente dal database a partire da uno dei valori univoci.
+     * @param key chiave (nome del campo) univoco
+     * @param value valore effettivo del campo 
+     * @return true se un documento è stato rimosso
+     */
+    public boolean delete(String key, String value) {
+    	  if (value == null || value.trim().isEmpty()) {
+              LOG.warn("Tentativo di eliminazione con un valore nullo o vuoto.");
+              return false;
+          }
+          
+          // Esegue l'eliminazione filtrando per il campo 
+          DeleteResult result = users.deleteOne(Filters.eq(key, value));
+
+          if (result.wasAcknowledged()) {
+              if (result.getDeletedCount() > 0) {
+                  LOG.infof("Utente con '%s' '%s' eliminato con successo.", key, value);
+                  return true;
+              } else {
+                  LOG.warnf("Nessun utente trovato con '%s' '%s'.", key, value);
+                  //ritorno sempre true perche' comunque l'utente non esiste piu' che e' il risultato desiderato
+                  return true;
+              }
+          } else {
+              LOG.errorf("Eliminazione dell'utente con '%s' '%s' non riconosciuta dal database.", key, value);
+              return false;
+          }
+    }
+    
+    
+	
 }
