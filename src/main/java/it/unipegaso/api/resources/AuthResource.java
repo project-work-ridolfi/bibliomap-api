@@ -73,11 +73,9 @@ public class AuthResource {
         if (userRepository.findByEmail(registrationData.email()).isPresent()) {
             LOG.warnf("Tentativo di registrazione con email già esistente: %s", registrationData.email());
 
-            Map<String, String> error = Map.of(
-                "error", "EMAIL_EXISTS",
-                "message", "Email già registrata."
-            );
-            return Response.status(Response.Status.CONFLICT).entity(error).build(); // 409 Conflict
+            return Response.status(Response.Status.CONFLICT) // 409 Conflict
+                    .entity(new ErrorResponse("EMAIL_EXISTS", "Email già registrata."))
+                    .build();
         }
 
         // Salva email e username in sessione
@@ -92,11 +90,10 @@ public class AuthResource {
         if (mockOtp == null && !otpDebugMode) {
             LOG.errorf("Fallimento nell'invio email per %s. Controllare configurazione SMTP.", registrationData.email());
             
-            Map<String, String> error = Map.of(
-                "error", "SMTP_FAILURE",
-                "message", "Impossibile inviare l'email di verifica. Riprovare o contattare l'assistenza."
-            );
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build(); // 500 Internal Error
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR) // 500 Internal Error
+                    .entity(new ErrorResponse("SMTP_FAILURE", "Impossibile inviare l'email di verifica. Riprovare o contattare l'assistenza."))
+                    .build();
+            
         }
 
 
@@ -142,11 +139,9 @@ public class AuthResource {
         if (sessionId == null) {
             LOG.errorf("Tentativo di verifica OTP fallito: Session ID mancante per %s.", verificationData.email());
             
-            Map<String, String> error = Map.of(
-                "error", "MISSING_SESSION",
-                "message", "La sessione di verifica non è valida o è scaduta. Richiedi un nuovo codice."
-            );
-            return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+            return Response.status(Response.Status.BAD_REQUEST) 
+                    .entity(new ErrorResponse("MISSING_SESSION", "La sessione di verifica non è valida o è scaduta. Richiedi un nuovo codice."))
+                    .build();
         }
 
         // tenta la verifica e ottiene lo stato completo (inclusi retry)
