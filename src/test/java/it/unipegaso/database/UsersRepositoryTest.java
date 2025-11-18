@@ -51,27 +51,27 @@ public class UsersRepositoryTest {
 
     @Test
     public void testCreateUser_Success() {
-        assertTrue(usersRepository.createUser(testUser), "La creazione utente deve avere successo.");
+        assertTrue(usersRepository.create(testUser) != null, "La creazione utente deve avere successo.");
         assertNotNull(testUser.createdAt, "La data di creazione deve essere impostata.");
     }
 
     @Test
     public void testCreateUser_DuplicateEmail() {
         // Crea l'utente la prima volta (dovrebbe funzionare)
-        usersRepository.createUser(testUser); 
+        usersRepository.create(testUser); 
         
         // Tenta di creare lo stesso utente una seconda volta
         User duplicateUser = createBaseUser(); 
         
         // Ci aspettiamo un'eccezione IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () -> {
-            usersRepository.createUser(duplicateUser);
+            usersRepository.create(duplicateUser);
         }, "Creazione duplicata deve lanciare IllegalArgumentException.");
     }
     
     @Test
     public void testFindByEmail_Found() {
-        usersRepository.createUser(testUser);
+        usersRepository.create(testUser);
         assertTrue(usersRepository.findByEmail(TEST_EMAIL).isPresent(), "L'utente deve essere trovato tramite email.");
     }
     

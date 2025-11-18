@@ -123,7 +123,7 @@ public class AuthResourceTest {
         existingUser.username = TEST_USERNAME;
         existingUser.hashedPassword = "somehash";
         existingUser.acceptedTerms = true;
-        usersRepository.createUser(existingUser);
+        usersRepository.create(existingUser);
 
         RestAssured.given()
             .contentType(MediaType.APPLICATION_JSON)

@@ -19,7 +19,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class UsersRepository {
+public class UsersRepository implements IRepository<User>{
 
     private static final Logger LOG = Logger.getLogger(UsersRepository.class);
 
@@ -66,14 +66,18 @@ public class UsersRepository {
     /**
      * Salva il nuovo utente nel database.
      * @param newUser L'oggetto User mappato e hashato.
-     * @return true se l'utente è stato creato con successo.
+     * @return id se l'utente è stato creato con successo, stringa vuota altrimenti.
      * @throws IllegalArgumentException se fallisce un vincolo di univocità (username/email).
      */
-    public boolean createUser(User newUser) {
+    public String create(User newUser) {
         try {
         	
+        	String id = UUID.randomUUID().toString();
+        	
         	if (newUser.id == null) {
-                newUser.id = UUID.randomUUID().toString();
+                newUser.id = id;
+            }else {
+            	id = newUser.id;
             }
         	LocalDateTime now = LocalDateTime.now();
             newUser.createdAt = now;
@@ -84,10 +88,10 @@ public class UsersRepository {
             // Controlla se l'inserimento ha avuto successo (acknowledge) e se ha generato un ID
             if (result.wasAcknowledged() && result.getInsertedId() != null) {
                 // l'operazione è considerata un successo.
-                return true;
+                return id;
             } else {
                 LOG.error("Inserimento utente non confermato dal database.");
-                return false; 
+                return null; 
             }
 
         } catch (MongoWriteException e) {

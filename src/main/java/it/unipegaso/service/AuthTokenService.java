@@ -16,6 +16,7 @@ public class AuthTokenService {
     @Inject
     @ConfigProperty(name = "quarkus.auth.jwt.issuer", defaultValue = "https://default-issuer.dev")
     String ISSUER;
+    
     /**
      * Genera un token JWT per l'utente appena registrato.
      * @param user L'oggetto User appena creato.

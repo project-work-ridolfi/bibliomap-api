@@ -42,7 +42,7 @@ public class LocationService {
 		String id = null;
 		
 		try {
-			id = locationRepository.createLocation(newLocation);
+			id = locationRepository.create(newLocation);
 			
 		}catch(Exception e) {
 	        LOG.error("Impossibile inserire location nel database");

@@ -16,7 +16,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class LocationsRepository {
+public class LocationsRepository implements IRepository<Location>{
 
 	private static final Logger LOG = Logger.getLogger(LocationsRepository.class);
 
@@ -42,13 +42,8 @@ public class LocationsRepository {
 		return Optional.ofNullable(point);
 	}
 
-	/*
-	 * inserisce una nuova location nel db
-	 * @param newLocation l'oggetto location
-	 * @return l'id con la quale e' stata inserita la location nel db
-	 * @throws MongoWriteException in caso qualcosa non sia andato bene
-	 */
-	public String createLocation(Location newLocation) throws MongoWriteException {
+	@Override
+	public String create(Location newLocation) throws MongoWriteException {
 	    
 	    // Assegna l'ID come Stringa UUID generata da Java
 	    newLocation.id = UUID.randomUUID().toString();
@@ -64,6 +59,8 @@ public class LocationsRepository {
 	    // L'ID è stato assegnato prima dell'inserimento ed è garantito non nullo.
 	    return newLocation.id; 
 	}
+
+
 
 
 }

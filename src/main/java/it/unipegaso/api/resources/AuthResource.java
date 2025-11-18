@@ -210,7 +210,9 @@ public class AuthResource {
 
         try {
             // SALVATAGGIO UTENTE nel DB
-            boolean success = userRepository.createUser(newUser);
+        	
+        	String id = userRepository.create(newUser);
+            boolean success = id != null;
 
             if (success) {
             	// Genera il Token JWT per l'accesso automatico
