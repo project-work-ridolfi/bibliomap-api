@@ -2,6 +2,7 @@ package it.unipegaso.database;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
@@ -71,6 +72,9 @@ public class UsersRepository {
     public boolean createUser(User newUser) {
         try {
         	
+        	if (newUser.id == null) {
+                newUser.id = UUID.randomUUID().toString();
+            }
         	LocalDateTime now = LocalDateTime.now();
             newUser.createdAt = now;
             newUser.modifiedAt = now;

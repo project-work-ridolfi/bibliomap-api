@@ -1,6 +1,5 @@
 package it.unipegaso.api.resources;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
