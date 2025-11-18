@@ -9,13 +9,12 @@ import org.jboss.logging.Logger;
 
 import io.quarkus.elytron.security.common.BcryptUtil;
 import it.unipegaso.api.dto.ErrorResponse;
-import it.unipegaso.api.dto.MessageResponse;
-import it.unipegaso.api.dto.RegistrationFinalDTO;
-import it.unipegaso.api.dto.RegistrationInitDTO;
+import it.unipegaso.api.dto.RegistrationDTO;
 import it.unipegaso.api.dto.VerificationDTO;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.User;
+import it.unipegaso.service.AuthTokenService;
 import it.unipegaso.service.OtpService;
 import it.unipegaso.service.RegistrationFlowService;
 import jakarta.inject.Inject;
@@ -41,17 +40,20 @@ public class AuthResource {
 
     private static final Logger LOG = Logger.getLogger(AuthResource.class);
 
+    @ConfigProperty(name = "quarkus.auth.otp.debug-mode", defaultValue = "false")
+    boolean otpDebugMode; 
+
     @Inject
     UsersRepository userRepository; 
 
     @Inject
     OtpService otpService; 
-    
-    @ConfigProperty(name = "quarkus.auth.otp.debug-mode", defaultValue = "false")
-    boolean otpDebugMode; 
 
     @Inject
     RegistrationFlowService registrationFlowService;
+    
+    @Inject
+    AuthTokenService authTokenService;
 
     /**
      * POST /api/auth/register-init
@@ -60,8 +62,13 @@ public class AuthResource {
      */
     @POST
     @Path("/register-init")
-    public Response registerInit(RegistrationInitDTO registrationData, @Context HttpHeaders headers, 
-                                 @Context UriInfo uriInfo) {
+    public Response registerInit(RegistrationDTO registrationData, @Context HttpHeaders headers,  @Context UriInfo uriInfo) {
+    	
+    	if(!validRegistration(registrationData)) {
+    		return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Email e Username sono obbligatori per l'inizio della registrazione."))
+                    .build();
+    	}
 
         LOG.infof("Tentativo di inizio registrazione per email: %s", registrationData.email());
 
@@ -121,7 +128,14 @@ public class AuthResource {
                        .build();
     }
 
-    /**
+    private boolean validRegistration(RegistrationDTO request) {
+    	boolean invalid = request.email() == null || request.email().isEmpty() || 
+    	        request.username() == null || request.username().isEmpty();
+    	
+		return !invalid;
+	}
+
+	/**
      * POST /api/auth/register-verify
      * Verifica l'OTP fornito dall'utente.
      * Ritorna: 204 No Content (OK) | 403 Forbidden (Fallimento con dettagli retry)
@@ -129,6 +143,7 @@ public class AuthResource {
     @POST
     @Path("/register-verify")
     public Response registerVerify(VerificationDTO verificationData, @Context HttpHeaders headers) {
+    	
         
         LOG.infof("Tentativo di verifica OTP per email: %s", verificationData.email());
 
@@ -169,27 +184,28 @@ public class AuthResource {
 
     @POST
     @Path("/register")
-    public Response register(RegistrationFinalDTO registrationDto) {
-        
-        // CONTROLLO DI SICUREZZA: Accettazione Termini
-        if (!registrationDto.acceptTerms()) {
-            LOG.errorf("Tentativo di registrazione senza accettare i termini da: %s", registrationDto.email());
+    public Response register(RegistrationDTO request) {
+    	
+    	// CONTROLLO DI SICUREZZA: tutti i valori devono essere presenti
+    	if (request.password() == null || request.password().isEmpty() || !request.acceptTerms() || !request.acceptPrivacy()) {
+            
             return Response.status(Response.Status.BAD_REQUEST)
-                           .entity(new ErrorResponse("TERMS_REQUIRED", "Devi accettare i termini e condizioni per proseguire."))
+                           .entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Password e accettazione termini sono obbligatori per la registrazione finale."))
                            .build();
         }
+        
 
         // HASHING DELLA PASSWORD
-        String hashedPassword = BcryptUtil.bcryptHash(registrationDto.password());
+        String hashedPassword = BcryptUtil.bcryptHash(request.password());
 
         // MAPPATURA (DTO -> Modello User)
         User newUser = new User();
         
         // Campi obbligatori e di sicurezza
-        newUser.username = registrationDto.username();
-        newUser.email = registrationDto.email();
+        newUser.username = request.username();
+        newUser.email = request.email();
         newUser.hashedPassword = hashedPassword;
-        newUser.acceptedTerms = registrationDto.acceptTerms();
+        newUser.acceptedTerms = request.acceptTerms();
         Response response;
 
         try {
@@ -197,13 +213,23 @@ public class AuthResource {
             boolean success = userRepository.createUser(newUser);
 
             if (success) {
-                // L'inserimento ha avuto successo, risponde 201 Created.
-                response = Response.status(Response.Status.CREATED)
-                                   .entity(new MessageResponse("User created successfully."))
-                                   .build();
+            	// Genera il Token JWT per l'accesso automatico
+                String token = authTokenService.generateJwt(newUser); 
+
+                // 2. Costruisci la risposta di successo con il token
+                Map<String, String> responseBody = Map.of(
+                    "message", "User created and authenticated.",
+                    "token", token,
+                    "userId", newUser.id // Utile per il frontend
+                );
+
+                // 3. Ritorna 201 Created con il corpo contenente il token
+                return Response.status(Response.Status.CREATED)
+                               .entity(responseBody)
+                               .build();
             } else {
                 // fallimento logico non coperto
-                LOG.errorf("Salvataggio utente fallito silenziosamente per %s. (Motivo non specificato).", registrationDto.email());
+                LOG.errorf("Salvataggio utente fallito silenziosamente per %s. (Motivo non specificato).", request.email());
                  response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                                    .entity(new ErrorResponse("DB_FAILURE_SILENT", "Creazione utente fallita senza eccezione specifica."))
                                    .build();
@@ -218,7 +244,7 @@ public class AuthResource {
                                
         } catch (RuntimeException e) {
             // Cattura tutti gli altri errori di DB/runtime
-            LOG.errorf(e, "Errore generico durante il salvataggio dell'utente %s.", registrationDto.email());
+            LOG.errorf(e, "Errore generico durante il salvataggio dell'utente %s.", request.email());
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                                .entity(new ErrorResponse("DB_SAVE_FAILURE", "Impossibile completare la registrazione a causa di un errore interno."))
                                .build();
