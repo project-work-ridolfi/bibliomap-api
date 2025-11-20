@@ -14,9 +14,8 @@ public class RegistrationFlowService {
     
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_USERNAME = "username";
-
-    //TODO da capire se servono altre chiavi
-    
+    private static final String FIELD_USER_ID = "userId"; 
+    private static final int OTP_SESSION_DURATION_SECONDS = 5 * 60; // 5 minuti per OTP    
     
     /**
      * @param sessionId L'ID della sessione.
@@ -24,14 +23,13 @@ public class RegistrationFlowService {
      * @param username L'username fornito.
      */
     public void saveInitialData(String sessionId, String email, String username) {
-        
-        // Creiamo la mappa dei dati da salvare nell'Hash di Redis
         Map<String, String> initialData = Map.of(
             FIELD_EMAIL, email,
             FIELD_USERNAME, username
         );
         
-        sessionDataService.save(sessionId, initialData);
+        // Salvataggio con scadenza breve per il flusso OTP
+        sessionDataService.save(sessionId, initialData, OTP_SESSION_DURATION_SECONDS); 
     }
     
 
@@ -49,5 +47,16 @@ public class RegistrationFlowService {
      */
     public void deleteSession(String sessionId) {
         sessionDataService.delete(sessionId);
+    }
+
+
+    public void saveAuthenticatedUser(String sessionId, String userId, String username, int maxAgeSeconds) {
+        Map<String, String> authData = Map.of(
+            FIELD_USER_ID, userId,
+            FIELD_USERNAME, username
+        );
+        
+        // Salvataggio con scadenza lunga per l'autenticazione
+        sessionDataService.save(sessionId, authData, maxAgeSeconds); 
     }
 }

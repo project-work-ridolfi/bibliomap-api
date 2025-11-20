@@ -16,7 +16,6 @@ import it.unipegaso.api.dto.VerificationDTO;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.User;
-import it.unipegaso.service.AuthTokenService;
 import it.unipegaso.service.OtpService;
 import it.unipegaso.service.RegistrationFlowService;
 import jakarta.inject.Inject;
@@ -32,7 +31,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
 /**
- * Endpoint per autenticazione e gestione account.
+ * Endpoint di autenticazione
  * Gestisce il flusso di registrazione tramite verifica OTP.
  */
 @Path("/api/auth")
@@ -43,19 +42,23 @@ public class AuthResource {
     private static final Logger LOG = Logger.getLogger(AuthResource.class);
 
     @ConfigProperty(name = "quarkus.auth.otp.debug-mode", defaultValue = "false")
-    boolean otpDebugMode; 
+    boolean otpDebugMode;
+
+    @ConfigProperty(name = "quarkus.session.duration-minutes", defaultValue = "120")
+    int sessionDurationMinutes;
+    
+    @Inject
+    UsersRepository userRepository;
 
     @Inject
-    UsersRepository userRepository; 
-
-    @Inject
-    OtpService otpService; 
+    OtpService otpService;
 
     @Inject
     RegistrationFlowService registrationFlowService;
-    
-    @Inject
-    AuthTokenService authTokenService;
+
+    @Context
+    UriInfo uriInfo;
+
 
     /**
      * POST /api/auth/register-init
@@ -64,13 +67,13 @@ public class AuthResource {
      */
     @POST
     @Path("/register-init")
-    public Response registerInit(RegistrationDTO registrationData, @Context HttpHeaders headers,  @Context UriInfo uriInfo) {
-    	
-    	if(!validRegistration(registrationData)) {
-    		return Response.status(Response.Status.BAD_REQUEST)
+    public Response registerInit(RegistrationDTO registrationData, @Context HttpHeaders headers) {
+        
+        if(!validRegistration(registrationData)) {
+            return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Email e Username sono obbligatori per l'inizio della registrazione."))
                     .build();
-    	}
+        }
 
         LOG.infof("Tentativo di inizio registrazione per email: %s", registrationData.email());
 
@@ -88,7 +91,7 @@ public class AuthResource {
 
         // Salva email e username in sessione
         registrationFlowService.saveInitialData(sessionId, registrationData.email(), registrationData.username());
-       
+        
         
         // Genera e invia OTP
         String mockOtp = otpService.generateAndSendOtp(registrationData.email(), sessionId, registrationData.username());
@@ -103,7 +106,6 @@ public class AuthResource {
                     .build();
             
         }
-
 
         // risposta di successo (200)
         Map<String, String> responseData;
@@ -122,7 +124,8 @@ public class AuthResource {
         
         // Determina se il flag 'Secure' deve essere TRUE (solo se connessione HTTPS).
         boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
-        NewCookie sessionCookie = SessionIDProvider.createSessionCookie(sessionId, isSecure);
+        // Cookie a breve durata per il flusso OTP
+        NewCookie sessionCookie = SessionIDProvider.createSessionCookie(sessionId, isSecure); 
 
         
         return Response.ok(responseData) // 200 OK
@@ -131,13 +134,13 @@ public class AuthResource {
     }
 
     private boolean validRegistration(RegistrationDTO request) {
-    	boolean invalid = request.email() == null || request.email().isEmpty() || 
-    	        request.username() == null || request.username().isEmpty();
-    	
-		return !invalid;
-	}
+        boolean invalid = request.email() == null || request.email().isEmpty() || 
+                request.username() == null || request.username().isEmpty();
+        
+        return !invalid;
+    }
 
-	/**
+    /**
      * POST /api/auth/register-verify
      * Verifica l'OTP fornito dall'utente.
      * Ritorna: 204 No Content (OK) | 403 Forbidden (Fallimento con dettagli retry)
@@ -145,7 +148,7 @@ public class AuthResource {
     @POST
     @Path("/register-verify")
     public Response registerVerify(VerificationDTO verificationData, @Context HttpHeaders headers) {
-    	
+        
         
         LOG.infof("Tentativo di verifica OTP per email: %s", verificationData.email());
 
@@ -171,7 +174,6 @@ public class AuthResource {
 
         if (isValid) {
             // L'OTP è valido. L'utente può procedere.
-            // NOTA: La logica di pulizia OTP/Retry è già nel service.
             
             return Response.noContent().build(); // 204 No Content
         } else {
@@ -184,23 +186,26 @@ public class AuthResource {
     }
 
 
+    /**
+     * POST /api/auth/register
+     * Completa la registrazione e imposta il Cookie di Sessione a Lunga Durata (Autenticazione).
+     */
     @POST
     @Path("/register")
     public Response register(RegistrationDTO request) {
-    	
-    	// CONTROLLO DI SICUREZZA: tutti i valori devono essere presenti
-    	if (request.password() == null || request.password().isEmpty() || !request.acceptTerms() || !request.acceptPrivacy()) {
+        
+        // CONTROLLO DI SICUREZZA: tutti i valori devono essere presenti
+        if (request.password() == null || request.password().isEmpty() || !request.acceptTerms() || !request.acceptPrivacy()) {
             
             return Response.status(Response.Status.BAD_REQUEST)
-                           .entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Password e accettazione termini sono obbligatori per la registrazione finale."))
-                           .build();
+                            .entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Password e accettazione termini sono obbligatori per la registrazione finale."))
+                            .build();
         }
         
 
         // HASHING DELLA PASSWORD
         String hashedPassword = BcryptUtil.bcryptHash(request.password());
 
-        // MAPPATURA (DTO -> Modello User)
         User newUser = new User();
         
         // Campi obbligatori e di sicurezza
@@ -212,37 +217,39 @@ public class AuthResource {
 
         try {
             // SALVATAGGIO UTENTE nel DB
-        	
-        	String id = userRepository.create(newUser);
+            
+            String id = userRepository.create(newUser);
             boolean success = id != null;
 
             if (success) {
-            	// genera jwt
-                String token = authTokenService.generateJwt(newUser); 
                 
-                //  parametri del Cookie HttpOnly
-                int maxAgeSeconds = 900; // 15 minuti
-
-                // crea il Cookie HTTP-Only e Secure
-                NewCookie authCookie = new NewCookie.Builder("access_token") // Nome del cookie
-                        .value(token)
-                        .path("/") // Accessibile da tutta l'applicazione
-                        .maxAge(maxAgeSeconds) 
-                        .secure(false) //TODO mettere a true per https 
-                        .httpOnly(true) // Impedisce l'accesso tramite JavaScript (Protezione XSS)
-                        .sameSite(NewCookie.SameSite.LAX) 
-                        .build();
+                // genera ID di sessione a lunga durata 
+                String authenticatedSessionId = UUID.randomUUID().toString(); 
+                
+                // salva lo stato autenticato in Redis (userId e username)
+                registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, newUser.id, newUser.username, sessionDurationMinutes * 60); 
+                
+                // determina se il flag 'Secure' deve essere TRUE
+                boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+                
+                // crea e imposta il cookie SESSION_ID a LUNGO TERMINE (es. 120 minuti)
+                NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
+                    authenticatedSessionId, 
+                    isSecure, 
+                    sessionDurationMinutes * 60 // MaxAge in secondi
+                ); 
 
                 Map<String, String> responseBody = Map.of(
                     "message", "User created and authenticated.",
                     "userId", newUser.id 
                 );
 
-                // 4. Ritorna 201 Created con il corpo e il Cookie nell'header
+                // ritorna la risposta con il nuovo Cookie SESSION_ID 
                 return Response.status(Response.Status.CREATED)
                                .entity(responseBody)
-                               .cookie(authCookie) // <--- IMPOSTA IL COOKIE NELLA RISPOSTA
+                               .cookie(authCookie) 
                                .build();
+                
             } else {
                 // fallimento logico non coperto
                 LOG.errorf("Salvataggio utente fallito silenziosamente per %s. (Motivo non specificato).", request.email());
@@ -271,14 +278,13 @@ public class AuthResource {
 
     /**
      * POST /api/auth/login
-     * Autentica l'utente tramite credenziali.
-     * Ritorna: 200 OK + Cookie access_token | 401 Unauthorized
+     * Autentica l'utente tramite credenziali e imposta il Cookie di Sessione a Lunga Durata.
      */
     @POST
     @Path("/login")
     public Response login(LoginDTO credentials) {
         
-        if (credentials.username() == null || credentials.username().isEmpty() ||
+        if (credentials.email() == null || credentials.email().isEmpty() ||
             credentials.password() == null || credentials.password().isEmpty()) {
             
             return Response.status(Response.Status.BAD_REQUEST)
@@ -286,14 +292,14 @@ public class AuthResource {
                            .build();
         }
         
-        LOG.infof("Tentativo di login per: %s", credentials.username());
+        LOG.infof("Tentativo di login per: %s", credentials.email());
 
-        // cerca l'utente per id
-        Optional<User> userOptional = userRepository.findByUsername(credentials.username());
+        // cerca l'utente 
+        Optional<User> userOptional = userRepository.findByEmail(credentials.email());
         
         if (userOptional.isEmpty()) {
-            // se non lo trova
-            return Response.status(Response.Status.UNAUTHORIZED) // 401 Unauthorized
+            // senza specificare se l'utente esiste o no 
+            return Response.status(Response.Status.UNAUTHORIZED) 
                            .entity(new ErrorResponse("INVALID_CREDENTIALS", "Credenziali non valide."))
                            .build();
         }
@@ -304,24 +310,29 @@ public class AuthResource {
         boolean isPasswordValid = BcryptUtil.matches(credentials.password(), user.hashedPassword);
 
         if (!isPasswordValid) {
-            return Response.status(Response.Status.UNAUTHORIZED) // 401 Unauthorized
+            return Response.status(Response.Status.UNAUTHORIZED) 
                            .entity(new ErrorResponse("INVALID_CREDENTIALS", "Credenziali non valide."))
                            .build();
         }
 
-        // se l'utente è valido: genera JWT e imposta il Cookie HttpOnly
-        String token = authTokenService.generateJwt(user); 
-        
-        int maxAgeSeconds = 900; // Access Token: 15 minuti
 
-        NewCookie authCookie = new NewCookie.Builder("access_token") 
-                .value(token)
-                .path("/")
-                .maxAge(maxAgeSeconds)
-                .secure(true) // Assumi HTTPS
-                .httpOnly(true)
-                .sameSite(NewCookie.SameSite.LAX)
-                .build();
+        // session id a lunga durata
+        String authenticatedSessionId = UUID.randomUUID().toString(); 
+        
+        
+        int durationSeconds =  sessionDurationMinutes * 60;
+        // salva lo stato autenticato in Redis
+        registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, user.id, user.username, durationSeconds); 
+        
+        // determina se il flag 'Secure' deve essere TRUE
+        boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+        
+        // crea e imposta il cookie SESSION_ID a LUNGO TERMINE
+        NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
+            authenticatedSessionId, 
+            isSecure, 
+            durationSeconds
+        ); 
 
         // risposta di successo
         Map<String, String> responseBody = Map.of(
@@ -330,29 +341,28 @@ public class AuthResource {
         );
 
         return Response.ok(responseBody) // 200 OK
-                       .cookie(authCookie)
+                       .cookie(authCookie) // Imposta il SESSION_ID
                        .build();
     }
     
     /**
      * POST /api/auth/logout
-     * Cancella il cookie di autenticazione 'access_token' forzando il logout.
-     * Ritorna: 204 No Content.
+     * Cancella il cookie di autenticazione SESSION_ID forzando il logout e pulisce Redis.
      */
     @POST
     @Path("/logout")
-    public Response logout() {
+    public Response logout(@Context HttpHeaders headers) {
         LOG.info("Tentativo di logout utente.");
 
-        // crea un nuovo cookie con lo stesso nome, ma con Max-Age=0
-        NewCookie expiredCookie = new NewCookie.Builder("access_token")
-                .value("")
-                .path("/")
-                .maxAge(0) // Imposta la scadenza immediata (cancellazione)
-                .secure(true) 
-                .httpOnly(true)
-                .sameSite(NewCookie.SameSite.LAX)
-                .build();
+        String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+        if (sessionId != null) {
+            // cancella lo stato di autenticazione da Redis (se l'utente era loggato)
+            registrationFlowService.deleteSession(sessionId); 
+        }
+
+        // cancella il cookie nel browser (Max-Age=0)
+        NewCookie expiredCookie = SessionIDProvider.createExpiredSessionCookie(sessionId); 
         
         return Response.noContent() // 204 No Content
                        .cookie(expiredCookie)
@@ -361,13 +371,11 @@ public class AuthResource {
 
     /**
      * POST /api/auth/refresh
-     * Headers: Authorization: Bearer <refresh-token>
-     * Response: { "token": "new-jwt" }
+     * Endpoint non necessario per l'autenticazione basata su Session ID.
      */
     @POST
     @Path("/refresh")
     public Response refreshToken() {
-        // TODO: validare refresh token + generare nuovo JWT
-        return Response.ok("{\"token\": \"new-fake-jwt\"}").build();
+        return Response.status(Response.Status.NOT_FOUND).build(); 
     }
 }

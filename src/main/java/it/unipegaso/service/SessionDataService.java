@@ -21,9 +21,6 @@ public class SessionDataService {
 	private HashCommands<String, String, Long> hashLongCommands;
 	private KeyCommands<String> keyCommands;
 
-	@ConfigProperty(name = "quarkus.session.duration-minutes", defaultValue = "120")
-	long sessionDurationMinutes;
-
 	@Inject
 	void setCommands() {
 		this.hashCommands = ds.hash(String.class);
@@ -35,12 +32,12 @@ public class SessionDataService {
 	 * Salva tutti i dati di una mappa come campi hash sotto l'unica chiave sessionId in Redis.
 	 * @param sessionId L'ID della sessione (la chiave principale in Redis).
 	 * @param data La mappa contenente tutti i dati (es. {"email": "a", "username": "b"}).
+	 * @param expirationSeconds la durata in secondi della sessione
 	 */
-	public void save(String sessionId, Map<String, String> data) {
+	public void save(String sessionId, Map<String, String> data, int expirationSeconds) {
 
 		String redisKey = redisKey(sessionId);
 
-		long expirationSeconds = sessionDurationMinutes * 60; 
 
 		// salva i campi della mappa
 		hashCommands.hset(redisKey, data); 
