@@ -1,6 +1,7 @@
 package it.unipegaso.database.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
@@ -20,4 +21,6 @@ public class Library {
     public String locationId; 
     public String visibility; //all, logged-in, no one
     public int blurRadius;
+    public String notes; //anche vuoto
+    public List<String> tags; //anche vuoto
 }

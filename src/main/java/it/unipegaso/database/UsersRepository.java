@@ -14,6 +14,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 
+import it.unipegaso.database.model.Location;
 import it.unipegaso.database.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -169,6 +170,18 @@ public class UsersRepository implements IRepository<User>{
               return false;
           }
     }
+
+
+	@Override
+	public Optional<User> get(String id) {
+
+		if(id == null || id.trim().isEmpty()) {
+			LOG.error("ID VUOTO");
+			return Optional.empty();
+		}
+		
+		return Optional.ofNullable(users.find(Filters.eq(ID, id)).first());
+	}
     
     
 	

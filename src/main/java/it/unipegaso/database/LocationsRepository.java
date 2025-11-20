@@ -11,6 +11,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.result.InsertOneResult;
 
+import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.Location;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -20,7 +21,6 @@ public class LocationsRepository implements IRepository<Location>{
 
 	private static final Logger LOG = Logger.getLogger(LocationsRepository.class);
 
-	private final String ID = "_id";
 
 	@Inject
 	MongoCollection<Location> locations;
@@ -61,6 +61,16 @@ public class LocationsRepository implements IRepository<Location>{
 	}
 
 
+	@Override
+	public Optional<Location> get(String id) {
+
+		if(id == null || id.trim().isEmpty()) {
+			LOG.error("ID VUOTO");
+			return Optional.empty();
+		}
+		
+		return Optional.ofNullable(locations.find(Filters.eq(ID, id)).first());
+	}
 
 
 }

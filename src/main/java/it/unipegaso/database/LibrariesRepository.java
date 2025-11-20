@@ -1,11 +1,13 @@
 package it.unipegaso.database;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 
 import it.unipegaso.database.model.Library;
@@ -20,7 +22,6 @@ public class LibrariesRepository implements IRepository<Library> {
 	private static final Logger LOG = Logger.getLogger(LibrariesRepository.class);
 
 	
-	private final String ID = "_id";
 	
 	@Inject
 	MongoCollection<Library> libraries;
@@ -46,5 +47,17 @@ public class LibrariesRepository implements IRepository<Library> {
 
 	    // L'ID è stato assegnato prima dell'inserimento ed è garantito non nullo.
 	    return newLibrary.id; 
+	}
+	
+
+	@Override
+	public Optional<Library> get(String id) {
+
+		if(id == null || id.trim().isEmpty()) {
+			LOG.error("ID VUOTO");
+			return Optional.empty();
+		}
+		
+		return Optional.ofNullable(libraries.find(Filters.eq(ID, id)).first());
 	}
 }
