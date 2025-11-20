@@ -14,7 +14,7 @@ import java.util.Collections;
 public class AuthTokenService {
 
     @Inject
-    @ConfigProperty(name = "quarkus.auth.jwt.issuer", defaultValue = "https://default-issuer.dev")
+    @ConfigProperty(name = "jwt.issuer", defaultValue = "https://default-issuer.dev")
     String ISSUER;
     
     /**
@@ -29,7 +29,6 @@ public class AuthTokenService {
         
         // Costruisce e firma il token
         return Jwt.issuer(ISSUER)
-                .upn(user.email) // Principal Name (UPN)
                 .groups(Collections.singleton("user")) // Ruolo base
                 .subject(user.id) // ID utente come Subject
                 .expiresAt(expirationTime)

@@ -1,9 +1,11 @@
 package it.unipegaso.api.resources;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import it.unipegaso.api.dto.CheckExistsResponse;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.SetLocationDTO;
@@ -44,6 +46,9 @@ public class UserResource {
 	
 	@Inject
 	SessionDataService sessionDataService;
+	
+	@Inject
+    JsonWebToken jwt;
 	
 	/**
 	 * GET /api/users/check-exists/{username}
@@ -153,6 +158,53 @@ public class UserResource {
 		}
 	}
 
+	
+	/**
+     * GET /api/users/me
+     * Recupera il profilo dell'utente autenticato (owner).
+     * Auth: Richiede un token JWT valido (tramite Cookie HttpOnly).
+     */
+	@GET
+    @Path("/me")
+    @RolesAllowed("user") 
+    public Response getUserMe() {
+        
+        // estrae l'id utente dal jwt (il 'sub' o 'upn')
+        String userId = jwt.getName(); 
+        
+        if (userId == null) {
+            // errore se il token non ha un subject valido 
+            return Response.status(Response.Status.UNAUTHORIZED)
+                           .entity(new ErrorResponse("auth_missing", "token jwt mancante o malformato."))
+                           .build();
+        }
+
+        LOG.infof("tentativo di recupero profilo per user id: %s", userId);
+        
+        // recupera l'utente completo dal database
+        Optional<User> userOpt = userRepository.get(userId); 
+        
+        if (userOpt.isEmpty()) {
+            LOG.errorf("user id trovato nel jwt ma non nel db: %s", userId);
+            // forza il logout nel fe in quanto la sessione è inconsistente
+            return Response.status(Response.Status.UNAUTHORIZED) 
+                           .entity(new ErrorResponse("user_inconsistent", "utente non trovato nel db, sessione inconsistente."))
+                           .build();
+        }
+
+        User user = userOpt.get();
+        
+        // mappa l'oggetto user a un dto sicuro per il frontend (solo id, username, email)
+        Map<String, String> responseBody = Map.of(
+            "id", user.id, 
+            "username", user.username,
+            "email", user.email 
+        );
+        
+        LOG.infof("profilo caricato con successo per: %s", user.username);
+
+        return Response.ok(responseBody).build();
+    }
 
 	/**
 	 * PUT /api/users/{id}/privacy

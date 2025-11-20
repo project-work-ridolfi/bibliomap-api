@@ -2,6 +2,7 @@ package it.unipegaso.api.resources;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -9,6 +10,7 @@ import org.jboss.logging.Logger;
 
 import io.quarkus.elytron.security.common.BcryptUtil;
 import it.unipegaso.api.dto.ErrorResponse;
+import it.unipegaso.api.dto.LoginDTO;
 import it.unipegaso.api.dto.RegistrationDTO;
 import it.unipegaso.api.dto.VerificationDTO;
 import it.unipegaso.api.util.SessionIDProvider;
@@ -215,19 +217,31 @@ public class AuthResource {
             boolean success = id != null;
 
             if (success) {
-            	// Genera il Token JWT per l'accesso automatico
+            	// genera jwt
                 String token = authTokenService.generateJwt(newUser); 
+                
+                //  parametri del Cookie HttpOnly
+                int maxAgeSeconds = 900; // 15 minuti
 
-                // 2. Costruisci la risposta di successo con il token
+                // crea il Cookie HTTP-Only e Secure
+                NewCookie authCookie = new NewCookie.Builder("access_token") // Nome del cookie
+                        .value(token)
+                        .path("/") // Accessibile da tutta l'applicazione
+                        .maxAge(maxAgeSeconds) 
+                        .secure(true) 
+                        .httpOnly(true) // Impedisce l'accesso tramite JavaScript (Protezione XSS)
+                        .sameSite(NewCookie.SameSite.LAX) 
+                        .build();
+
                 Map<String, String> responseBody = Map.of(
                     "message", "User created and authenticated.",
-                    "token", token,
-                    "userId", newUser.id // Utile per il frontend
+                    "userId", newUser.id 
                 );
 
-                // 3. Ritorna 201 Created con il corpo contenente il token
+                // 4. Ritorna 201 Created con il corpo e il Cookie nell'header
                 return Response.status(Response.Status.CREATED)
                                .entity(responseBody)
+                               .cookie(authCookie) // <--- IMPOSTA IL COOKIE NELLA RISPOSTA
                                .build();
             } else {
                 // fallimento logico non coperto
@@ -257,14 +271,92 @@ public class AuthResource {
 
     /**
      * POST /api/auth/login
-     * Body: { "username": "...", "password": "..." }
-     * Response: { "token": "eyJ...", "refreshToken": "..." }
+     * Autentica l'utente tramite credenziali.
+     * Ritorna: 200 OK + Cookie access_token | 401 Unauthorized
      */
     @POST
     @Path("/login")
-    public Response login(Object loginDto) {
-        // TODO: validare credenziali + generare JWT
-        return Response.ok("{\"token\": \"fake-jwt-token\"}").build();
+    public Response login(LoginDTO credentials) {
+        
+        if (credentials.username() == null || credentials.username().isEmpty() ||
+            credentials.password() == null || credentials.password().isEmpty()) {
+            
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Identificatore (username/email) e password sono obbligatori."))
+                           .build();
+        }
+        
+        LOG.infof("Tentativo di login per: %s", credentials.username());
+
+        // cerca l'utente per id
+        Optional<User> userOptional = userRepository.findByUsername(credentials.username());
+        
+        if (userOptional.isEmpty()) {
+            // se non lo trova
+            return Response.status(Response.Status.UNAUTHORIZED) // 401 Unauthorized
+                           .entity(new ErrorResponse("INVALID_CREDENTIALS", "Credenziali non valide."))
+                           .build();
+        }
+        
+        User user = userOptional.get();
+
+        // verifica la password
+        boolean isPasswordValid = BcryptUtil.matches(credentials.password(), user.hashedPassword);
+
+        if (!isPasswordValid) {
+            return Response.status(Response.Status.UNAUTHORIZED) // 401 Unauthorized
+                           .entity(new ErrorResponse("INVALID_CREDENTIALS", "Credenziali non valide."))
+                           .build();
+        }
+
+        // se l'utente è valido: genera JWT e imposta il Cookie HttpOnly
+        String token = authTokenService.generateJwt(user); 
+        
+        int maxAgeSeconds = 900; // Access Token: 15 minuti
+
+        NewCookie authCookie = new NewCookie.Builder("access_token") 
+                .value(token)
+                .path("/")
+                .maxAge(maxAgeSeconds)
+                .secure(true) // Assumi HTTPS
+                .httpOnly(true)
+                .sameSite(NewCookie.SameSite.LAX)
+                .build();
+
+        // risposta di successo
+        Map<String, String> responseBody = Map.of(
+            "message", "Accesso effettuato con successo.",
+            "userId", user.id 
+        );
+
+        return Response.ok(responseBody) // 200 OK
+                       .cookie(authCookie)
+                       .build();
+    }
+    
+    /**
+     * POST /api/auth/logout
+     * Cancella il cookie di autenticazione 'access_token' forzando il logout.
+     * Ritorna: 204 No Content.
+     */
+    @POST
+    @Path("/logout")
+    public Response logout() {
+        LOG.info("Tentativo di logout utente.");
+
+        // crea un nuovo cookie con lo stesso nome, ma con Max-Age=0
+        NewCookie expiredCookie = new NewCookie.Builder("access_token")
+                .value("")
+                .path("/")
+                .maxAge(0) // Imposta la scadenza immediata (cancellazione)
+                .secure(true) 
+                .httpOnly(true)
+                .sameSite(NewCookie.SameSite.LAX)
+                .build();
+        
+        return Response.noContent() // 204 No Content
+                       .cookie(expiredCookie)
+                       .build();
     }
 
     /**
