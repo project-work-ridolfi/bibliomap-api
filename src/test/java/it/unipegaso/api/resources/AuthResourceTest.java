@@ -1,11 +1,11 @@
 package it.unipegaso.api.resources;
 
+import static io.quarkus.elytron.security.common.BcryptUtil.bcryptHash;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static io.quarkus.elytron.security.common.BcryptUtil.bcryptHash; 
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach; 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;

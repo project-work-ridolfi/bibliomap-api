@@ -11,7 +11,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.result.InsertOneResult;
 
-import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.Location;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

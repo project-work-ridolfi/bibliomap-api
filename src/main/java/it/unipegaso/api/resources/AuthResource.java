@@ -228,7 +228,7 @@ public class AuthResource {
                         .value(token)
                         .path("/") // Accessibile da tutta l'applicazione
                         .maxAge(maxAgeSeconds) 
-                        .secure(true) 
+                        .secure(false) //TODO mettere a true per https 
                         .httpOnly(true) // Impedisce l'accesso tramite JavaScript (Protezione XSS)
                         .sameSite(NewCookie.SameSite.LAX) 
                         .build();

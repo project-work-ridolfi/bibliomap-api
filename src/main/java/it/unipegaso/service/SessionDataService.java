@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.quarkus.redis.datasource.RedisDataSource;
-import io.quarkus.redis.datasource.hash.HashCommands; 
+import io.quarkus.redis.datasource.hash.HashCommands;
 import io.quarkus.redis.datasource.keys.KeyCommands;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

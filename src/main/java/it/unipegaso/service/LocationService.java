@@ -2,7 +2,6 @@ package it.unipegaso.service;
 
 import org.jboss.logging.Logger;
 
-import com.mongodb.MongoWriteException;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 

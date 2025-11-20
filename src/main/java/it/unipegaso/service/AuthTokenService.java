@@ -1,14 +1,15 @@
 package it.unipegaso.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import io.smallrye.jwt.build.Jwt;
 import it.unipegaso.database.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 
 @ApplicationScoped
 public class AuthTokenService {
