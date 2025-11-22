@@ -1,5 +1,8 @@
 package it.unipegaso.api.resources;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jboss.logging.Logger;
@@ -9,7 +12,9 @@ import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.SetLocationDTO;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UsersRepository;
+import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
+import it.unipegaso.service.LibraryService;
 import it.unipegaso.service.LocationService;
 import it.unipegaso.service.SessionDataService;
 import it.unipegaso.service.UserService;
@@ -50,6 +55,10 @@ public class UserResource {
 
 	@Inject
 	SessionDataService sessionDataService;
+	
+	@Inject
+	LibraryService libraryService;
+
 
 	/**
 	 * GET /api/users/check-exists/{username}
@@ -157,6 +166,47 @@ public class UserResource {
 		// Nota: Non è più necessario il controllo "errorResponse != null"
 	}
 
+
+	@GET
+	@Path("/me/libraries")
+	public Response getUserLibraries(@Context HttpHeaders headers) {
+
+	    LOG.info("GET LIBRARIES");
+
+	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+	    try {
+	        User user = userService.getUserFromSession(sessionId); 
+
+	        String userId = user.id;
+
+	        List<Library> userLibraries = libraryService.getUserLibraries(userId); 
+	        
+	        List<Map<String, String>> librariesDTO = new ArrayList<>();
+	        
+	        for(Library lib : userLibraries) {
+	        	
+	        	Map<String, String> namesIdsMap = new HashMap<>();
+	        	namesIdsMap.put("id", lib.id);
+	        	namesIdsMap.put("name", lib.name);
+	        	librariesDTO.add(namesIdsMap);
+	        	
+	        }
+
+	        // Se la lista è vuota (0 librerie), lo stato è comunque 200 OK
+	        return Response.ok(Map.of("libraries", librariesDTO, "count", librariesDTO.size())).build();
+	    
+	    }catch(NotAuthorizedException e) {
+	        // Errore di autenticazione/sessione (401)
+	        return e.getResponse();
+	    } catch (Exception e) {
+	        // Errore grave (es. fallimento del database)
+	        LOG.error("errore sconosciuto durante il recupero delle librerie", e);
+	        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+	                .entity(new ErrorResponse("SERVER_ERROR", "errore interno durante il recupero delle librerie."))
+	                .build();
+	    }
+	}
 
 	/**
 	 * PUT /api/users/{id}/privacy

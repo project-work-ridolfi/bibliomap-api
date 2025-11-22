@@ -2,17 +2,18 @@
 
 ## TODO
  - [x] controllo su click multiplo per get otp
- - [ ] accedi
+ - [x] accedi
  - [x] controllo visualizzazione messaggio mock
  - [x] email fatta meglio 
     - [ ] aggiungi css coerente al fe alla mail
 - [ ] reinvio otp
-- [ ] salvataggio dati location
-- [ ] riorganizza registration dto, usa solo uno con valori nullable
-- [ ] usa error message sempre nei casi di errore (no mappa)
+- [x] salvataggio dati location
+- [x] riorganizza registration dto, usa solo uno con valori nullable
+- [x] usa error message sempre nei casi di errore (no mappa)
 - [ ] crea oggetti model per Books, Copies, Locations e Libraries
 - [ ] definisci flusso di ricerca
 - [ ] definisci flusso di prestito
+- [ ] gestione libri, sposta da libreria a libreria, duplica
 - [ ] documentazione
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.

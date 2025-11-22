@@ -1,8 +1,12 @@
 package it.unipegaso.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 import org.jboss.logging.Logger;
+
+import com.mongodb.client.FindIterable;
 
 import it.unipegaso.api.dto.LibraryDTO;
 import it.unipegaso.database.LibrariesRepository;
@@ -33,15 +37,10 @@ public class LibraryService {
 	 * @param libraryDTO dati libreria
 	 * @return id libreria creata
 	 */
-	public String createNewLibrary(String userId, LibraryDTO libraryDTO) {
+	public String createNewLibrary(User user, LibraryDTO libraryDTO) {
 
-		LOG.info("create new library init");
-
-		// RECUPERO UTENTE 
-		User user = usersRepository.get(userId).orElseThrow(() -> new IllegalStateException("utente non trovato db"));
-
-
-		LOG.info("username: " + user.username);
+		LOG.debug("create new library init");
+		LOG.debug("username: " + user.username);
 
 		Library newLibrary = new Library();
 		newLibrary.name = libraryDTO.name();
@@ -53,7 +52,7 @@ public class LibraryService {
 		// collegamento della posizione del profilo
 		if ("user_default".equals(libraryDTO.locationType()) && user.locationId != null) {
 
-			LOG.info("user default");
+			LOG.debug("user default");
 			newLibrary.locationId = user.locationId;
 		} 
 		// TODO: Gestire "new_location" navigando a un altro endpoint di creazione posizione.
@@ -64,10 +63,24 @@ public class LibraryService {
 
 		try {
 
-			LOG.info("create library");
+			LOG.debug("create library");
 			return librariesRepository.create(newLibrary);
 		} catch (Exception e) {
 			throw new RuntimeException("fallimento creazione libreria db", e);
 		}
+	}
+	
+	public List<Library> getUserLibraries(String userId){
+	    LOG.debug("get user libraries");
+	    
+	    FindIterable<Library> found = librariesRepository.getAll(userId);
+	    
+	    if (found == null) {
+	        LOG.warnf("Il repository ha restituito un risultato nullo per userId: %s. Ritorno lista vuota.", userId);
+	        return Collections.emptyList();
+	    }
+	    
+	    // conversione da FindIterable a List se e' vuoto, restituisce una lista vuota
+	    return found.into(new java.util.ArrayList<>());
 	}
 }

@@ -36,7 +36,7 @@ public class LibraryResource {
 
 	@Inject
 	LibraryService libraryService;
-	
+
 	@Inject 
 	UserService userService;
 
@@ -44,15 +44,13 @@ public class LibraryResource {
 	public Response createLibrary(LibraryDTO request, @Context HttpHeaders headers) {
 
 		LOG.info("CREATE LIBRARY ");
-		
+
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
 
 		try {
 			User user = userService.getUserFromSession(sessionId);
 
-			String userId = user.id;
-			
-			String libraryId = libraryService.createNewLibrary(userId, request);
+			String libraryId = libraryService.createNewLibrary(user, request);
 
 			if (libraryId == null) {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -79,72 +77,74 @@ public class LibraryResource {
 					.build();
 		}
 	}
-	
-	  /**
-     * GET /api/libraries
-     * Ricerca con multipli filtri opzionali.
-     * 
-     * Query params:
-     * - near: lat,lon (es: "41.9028,12.4964")
-     * - radius: metri (default: 5000)
-     * - bbox: lon1,lat1,lon2,lat2
-     * - tags: "storia,arte"
-     * - q: ricerca testuale titolo/autore
-     */
-    @GET
-    public Response searchLibraries(
-            @QueryParam("near") String near,
-            @QueryParam("radius") @DefaultValue("5000") int radius,
-            @QueryParam("bbox") String bbox,
-            @QueryParam("tags") String tags,
-            @QueryParam("q") String textQuery,
-            @QueryParam("limit") @DefaultValue("50") int limit,
-            @QueryParam("offset") @DefaultValue("0") int offset) {
-        
-        // TODO: costruire query MongoDB con:
-        // - $nearSphere se near presente
-        // - $geoWithin se bbox presente
-        // - $text se q presente
-        // - match su tags se presente
-        // TODO: filtrare utenti con locationMode=none
-        
-        return Response.ok("{\"results\": [], \"total\": 0, \"message\": \"TODO - geospatial query\"}").build();
-    }
-    
-    
 
-    /**
-     * GET /api/libraries/{id}
-     * Dettaglio collezione con lista libri.
-     */
-    @GET
-    @Path("/{id}")
-    public Response getLibrary(@PathParam("id") String libraryId) {
-        // TODO: fetch collezione + populate items
-        return Response.ok("{\"id\": \"" + libraryId + "\", \"title\": \"TODO\"}").build();
-    }
 
-    /**
-     * PUT /api/collections/{id}
-     * Aggiorna collezione (solo owner).
-     */
-    @PUT
-    @Path("/{id}")
-    public Response updateLibrary(
-            @PathParam("id") String libraryId,
-            Object libraryDto) {
-        // TODO: verificare ownership + aggiornare
-        return Response.ok("{\"message\": \"Collection updated (TODO)\"}").build();
-    }
 
-    /**
-     * DELETE /api/libraries/{id}
-     * Elimina collezione (solo owner, non elimina i libri).
-     */
-    @DELETE
-    @Path("/{id}")
-    public Response deleteLibrary(@PathParam("id") String libraryId) {
-        // TODO: verificare ownership + delete
-        return Response.noContent().build();
-    }
+	/**
+	 * GET /api/libraries
+	 * Ricerca con multipli filtri opzionali.
+	 * 
+	 * Query params:
+	 * - near: lat,lon (es: "41.9028,12.4964")
+	 * - radius: metri (default: 5000)
+	 * - bbox: lon1,lat1,lon2,lat2
+	 * - tags: "storia,arte"
+	 * - q: ricerca testuale titolo/autore
+	 */
+	@GET
+	public Response searchLibraries(
+			@QueryParam("near") String near,
+			@QueryParam("radius") @DefaultValue("5000") int radius,
+			@QueryParam("bbox") String bbox,
+			@QueryParam("tags") String tags,
+			@QueryParam("q") String textQuery,
+			@QueryParam("limit") @DefaultValue("50") int limit,
+			@QueryParam("offset") @DefaultValue("0") int offset) {
+
+		// TODO: costruire query MongoDB con:
+		// - $nearSphere se near presente
+		// - $geoWithin se bbox presente
+		// - $text se q presente
+		// - match su tags se presente
+		// TODO: filtrare utenti con locationMode=none
+
+		return Response.ok("{\"results\": [], \"total\": 0, \"message\": \"TODO - geospatial query\"}").build();
+	}
+
+
+
+	/**
+	 * GET /api/libraries/{id}
+	 * Dettaglio collezione con lista libri.
+	 */
+	@GET
+	@Path("/{id}")
+	public Response getLibrary(@PathParam("id") String libraryId) {
+		// TODO: fetch collezione + populate items
+		return Response.ok("{\"id\": \"" + libraryId + "\", \"title\": \"TODO\"}").build();
+	}
+
+	/**
+	 * PUT /api/collections/{id}
+	 * Aggiorna collezione (solo owner).
+	 */
+	@PUT
+	@Path("/{id}")
+	public Response updateLibrary(
+			@PathParam("id") String libraryId,
+			Object libraryDto) {
+		// TODO: verificare ownership + aggiornare
+		return Response.ok("{\"message\": \"Collection updated (TODO)\"}").build();
+	}
+
+	/**
+	 * DELETE /api/libraries/{id}
+	 * Elimina collezione (solo owner, non elimina i libri).
+	 */
+	@DELETE
+	@Path("/{id}")
+	public Response deleteLibrary(@PathParam("id") String libraryId) {
+		// TODO: verificare ownership + delete
+		return Response.noContent().build();
+	}
 }

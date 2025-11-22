@@ -1,11 +1,14 @@
 package it.unipegaso.database;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
@@ -20,7 +23,8 @@ public class LibrariesRepository implements IRepository<Library> {
 	
 	private static final Logger LOG = Logger.getLogger(LibrariesRepository.class);
 
-	
+	private static final String OWNER_ID = "ownerId";
+
 	
 	@Inject
 	MongoCollection<Library> libraries;
@@ -58,5 +62,16 @@ public class LibrariesRepository implements IRepository<Library> {
 		}
 		
 		return Optional.ofNullable(libraries.find(Filters.eq(ID, id)).first());
+	}
+	
+	
+	public FindIterable<Library> getAll(String userId){
+		
+		if(userId == null || userId.trim().isEmpty()) {
+			LOG.error("USERID VUOTO");
+			return null;
+		}
+		
+		return libraries.find(Filters.eq(OWNER_ID, userId));
 	}
 }
