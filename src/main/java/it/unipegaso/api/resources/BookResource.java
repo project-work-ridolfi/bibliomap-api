@@ -1,8 +1,13 @@
 package it.unipegaso.api.resources;
 
+import java.util.List;
+
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
+import it.unipegaso.api.dto.BookMapDTO;
+import it.unipegaso.service.BookService;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.FormParam;
@@ -12,24 +17,48 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-/**
- * Endpoint per gestione libri (items).
- */
-@Path("/api/items")
+@Path("/api/books")
 @Produces(MediaType.APPLICATION_JSON)
 public class BookResource {
-
-    /**
-     * POST /api/items
-     * Crea nuovo libro (con eventuale upload copertina).
-     * Content-Type: multipart/form-data
+	
+	@Inject
+    BookService bookService;
+	
+	
+	/**
+     * GET /api/books/nearby
+     * Ricerca geospaziale libri/copie.
      */
+    @GET
+    @Path("/nearby")
+    public Response getNearbyBooks(
+            @QueryParam("lat") Double lat, 
+            @QueryParam("lng") Double lng, 
+            @QueryParam("radius") Double radius,
+            @QueryParam("visibility") String visibility) {
+        
+        // Default values se mancano i parametri
+        if (lat == null || lng == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("{\"message\": \"Latitude and Longitude are required\"}")
+                           .build();
+        }
+        if (radius == null) radius = 5.0; // 5km default
+        if (visibility == null) visibility = "public";
+
+        List<BookMapDTO> books = bookService.findNearbyBooks(lat, lng, radius, visibility);
+        
+        return Response.ok(books).build();
+    }
+
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @RolesAllowed("user")
+    @Path("/add-copy")
     public Response createBook(
             @FormParam("title") String title,
             @FormParam("authors") String authors,

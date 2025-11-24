@@ -81,7 +81,7 @@ public class LibraryResource {
 
 
 	/**
-	 * GET /api/libraries
+	 * GET /api/libraries/search
 	 * Ricerca con multipli filtri opzionali.
 	 * 
 	 * Query params:
@@ -92,6 +92,7 @@ public class LibraryResource {
 	 * - q: ricerca testuale titolo/autore
 	 */
 	@GET
+	@Path("/search")
 	public Response searchLibraries(
 			@QueryParam("near") String near,
 			@QueryParam("radius") @DefaultValue("5000") int radius,
