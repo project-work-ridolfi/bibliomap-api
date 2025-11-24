@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
+import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
 import it.unipegaso.service.BookService;
 import jakarta.annotation.security.RolesAllowed;
@@ -26,7 +27,7 @@ import jakarta.ws.rs.core.Response;
 public class BookResource {
 	
 	@Inject
-    BookService bookGeoService;
+    BookService bookService;
 	
 	
 	@GET
@@ -48,8 +49,7 @@ public class BookResource {
         if (visibility == null) visibility = "public";
         if (sortBy == null) sortBy = "distance"; // Default sorting
 
-        // Chiamata al nuovo servizio dedicato
-        List<BookMapDTO> books = bookGeoService.searchBooks(lat, lng, radius, visibility, excludeUserId, searchText, sortBy);
+        List<BookMapDTO> books = bookService.searchBooks(lat, lng, radius, visibility, excludeUserId, searchText, sortBy);
         
         return Response.ok(books).build();
     }
@@ -73,14 +73,21 @@ public class BookResource {
     }
 
     /**
-     * GET /api/items/{id}
-     * Dettaglio libro con disponibilità.
+     * GET /api/books/{id}
+     * dettaglio copia specifico per pagina view
      */
     @GET
     @Path("/{id}")
-    public Response getBook(@PathParam("id") String bookId) {
-        // TODO: fetch book + owner info (rispettando privacy)
-        return Response.ok("{\"id\": \"" + bookId + "\", \"title\": \"TODO\"}").build();
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBook(@PathParam("id") String copyId) {
+        
+        BookDetailDTO detail = bookService.getBookDetails(copyId);
+
+        if (detail == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
+        return Response.ok(detail).build();
     }
 
     /**

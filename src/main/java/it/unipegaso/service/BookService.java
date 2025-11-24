@@ -16,6 +16,7 @@ import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 
+import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
 import it.unipegaso.database.LocationsRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,8 +25,8 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class BookService {
 
-	
-    private static final Logger LOG = Logger.getLogger(BookService.class);
+
+	private static final Logger LOG = Logger.getLogger(BookService.class);
 
 	@Inject
 	LocationsRepository locationsRepository;
@@ -190,5 +191,84 @@ public class BookService {
 		}
 
 		return results;
+	}
+
+	public BookDetailDTO getBookDetails(String copyId) {
+
+		MongoCollection<Document> copiesCol = mongoClient.getDatabase("bibliomap").getCollection("copies");
+		List<Bson> pipeline = new ArrayList<>();
+
+		// 1. Trova la copia specifica
+		pipeline.add(Aggregates.match(Filters.eq("_id", copyId)));
+
+		// 2. Join con Tabella Libri (per titolo, autore, cover...)
+		pipeline.add(new Document("$lookup", new Document()
+				.append("from", "books")
+				.append("localField", "book_isbn")
+				.append("foreignField", "_id")
+				.append("as", "bookInfo")));
+		pipeline.add(new Document("$unwind", "$bookInfo"));
+
+		// 3. Join con Tabella Librerie (per nome libreria e ownerId)
+		pipeline.add(new Document("$lookup", new Document()
+				.append("from", "libraries")
+				.append("localField", "libraryId")
+				.append("foreignField", "_id")
+				.append("as", "libraryInfo")));
+		pipeline.add(new Document("$unwind", "$libraryInfo"));
+
+		// 4. Join con Utenti (per prendere lo username del proprietario)
+		pipeline.add(new Document("$lookup", new Document()
+				.append("from", "users")
+				.append("localField", "libraryInfo.ownerId")
+				.append("foreignField", "_id")
+				.append("as", "ownerInfo")));
+
+		// Unwind "safe": se l'utente non esiste più, non rompe tutto
+		pipeline.add(new Document("$unwind", new Document("path", "$ownerInfo").append("preserveNullAndEmptyArrays", true)));
+
+		// Esecuzione Query
+		Document result = copiesCol.aggregate(pipeline).first();
+
+		if (result == null) return null;
+
+		return mapToDetailDTO(result);
+	}
+
+	private BookDetailDTO mapToDetailDTO(Document doc) {
+		// Estrazione sottodocumenti
+		Document book = doc.get("bookInfo", Document.class);
+		Document lib = doc.get("libraryInfo", Document.class);
+		Document owner = doc.get("ownerInfo", Document.class);
+
+		// Gestione Cover (se è base64 puro aggiungiamo header, se ha già header lo teniamo)
+		String rawCover = book.getString("cover");
+		String finalCover = null;
+		if (rawCover != null && !rawCover.isEmpty()) {
+			finalCover = rawCover.startsWith("data:") ? rawCover : "data:image/jpeg;base64," + rawCover;
+		}
+
+		// Gestione Username
+		String username = (owner != null) ? owner.getString("username") : "Utente Sconosciuto";
+
+		return new BookDetailDTO(
+				doc.getString("_id"),
+				book.getString("_id"),
+				book.getString("title"),
+				book.getString("author"),
+				finalCover,
+				book.getInteger("pubblication_year", 0), // default 0 se null
+				book.getString("language"),
+
+				lib.getString("name"),
+				lib.getString("_id"),
+				lib.getString("ownerId"),
+				username,
+
+				doc.getString("condition"),
+				doc.getString("status"),
+				doc.getString("owner_notes"),
+				doc.getList("tags", String.class)
+				);
 	}
 }
