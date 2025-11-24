@@ -26,31 +26,30 @@ import jakarta.ws.rs.core.Response;
 public class BookResource {
 	
 	@Inject
-    BookService bookService;
+    BookService bookGeoService;
 	
 	
-	/**
-     * GET /api/books/nearby
-     * Ricerca geospaziale libri/copie.
-     */
-    @GET
+	@GET
     @Path("/nearby")
     public Response getNearbyBooks(
             @QueryParam("lat") Double lat, 
             @QueryParam("lng") Double lng, 
             @QueryParam("radius") Double radius,
-            @QueryParam("visibility") String visibility) {
+            @QueryParam("visibility") String visibility,
+            @QueryParam("exclude_user") String excludeUserId,
+            @QueryParam("search") String searchText,
+            @QueryParam("sort") String sortBy
+    ) {
         
-        // Default values se mancano i parametri
         if (lat == null || lng == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                           .entity("{\"message\": \"Latitude and Longitude are required\"}")
-                           .build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("{\"message\": \"Coordinate mancanti\"}").build();
         }
-        if (radius == null) radius = 5.0; // 5km default
+        if (radius == null) radius = 10.0; // Aumentiamo un po' il default a 10km
         if (visibility == null) visibility = "public";
+        if (sortBy == null) sortBy = "distance"; // Default sorting
 
-        List<BookMapDTO> books = bookService.findNearbyBooks(lat, lng, radius, visibility);
+        // Chiamata al nuovo servizio dedicato
+        List<BookMapDTO> books = bookGeoService.searchBooks(lat, lng, radius, visibility, excludeUserId, searchText, sortBy);
         
         return Response.ok(books).build();
     }

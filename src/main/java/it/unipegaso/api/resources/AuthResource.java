@@ -292,7 +292,7 @@ public class AuthResource {
                            .build();
         }
         
-        LOG.infof("Tentativo di login per: %s", credentials.email());
+        LOG.debugf("Tentativo di login per: %s", credentials.email());
 
         // cerca l'utente 
         Optional<User> userOptional = userRepository.findByEmail(credentials.email());
