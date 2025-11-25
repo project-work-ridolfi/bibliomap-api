@@ -10,10 +10,23 @@
 - [x] salvataggio dati location
 - [x] riorganizza registration dto, usa solo uno con valori nullable
 - [x] usa error message sempre nei casi di errore (no mappa)
-- [ ] crea oggetti model per Books, Copies, Locations e Libraries
+- [x] crea oggetti model per Books, Copies, Locations e Libraries
 - [ ] definisci flusso di ricerca
 - [ ] definisci flusso di prestito
+- [ ] pagina aggiunta libro (da finire e testare), deve avere:
+ - [ ] controllo su openlibrary
+ - [ ] inserimento isbn
+ - [ ] sblocco camera per isbn
+ - [ ] condizione opzionale ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
+ - [ ] caricamento copertina (drag or choose, cerca su google, camera??, scegli icona)
+ - [ ] lista di tag (si può scegliere da una lista fissa, alcuni suggeriti dal libro stesso, oppure inserire un tag nuovo)
+- [ ] pagina libro per proprietario con modifiche abilitate (gestione copia/libro, modificabili solo proprietà della copia, la copertina forse diventa proprietà della copia)
 - [ ] gestione libri, sposta da libreria a libreria, duplica
+- [ ] pagina libro per utente che la vede, bottone per richiedere il prestito -> manda email
+- [ ] libreria da aggiungere la gestione di una location sua
+- [ ] libreria va messa la possibilità di una visibilità diversa da quella dell'utente
+- [ ] fuzzy level (da ricontrollare se è vero)
+- [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
 - [ ] documentazione
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
