@@ -1,5 +1,86 @@
 # bibliomap-api
 
+Questo progetto contiene il backend dell'applicazione Bibliomap. Il codice è sviluppato in Java e utilizza il framework Quarkus per esporre le API necessarie al funzionamento del client.
+
+## INDEX
+ - [Documentazione API](#documentazione-api)
+ - [Quarkus](#sviluppo-con-quarkus)
+ - [Dipendenze](#dipendenze-e-tecnologie)
+ - [TODO](#todo)
+
+## Documentazione API
+
+La specifica tecnica delle API è disponibile visualizzando il file [swagger.yaml](swagger.yaml).
+
+## Sviluppo con Quarkus
+
+Questo progetto utilizza Quarkus. Per approfondimenti visitare il sito ufficiale https://quarkus.io/
+
+### Esecuzione in modalità sviluppo
+
+È possibile avviare l'applicazione in modalità sviluppo per abilitare il live coding con il comando:
+  
+   ```shell
+    ./mvnw quarkus:dev
+   ```
+
+La Dev UI è disponibile solo in questa modalità all'indirizzo http://localhost:8080/q/dev/
+
+### Compilazione e pacchettizzazione
+
+L'applicazione può essere impacchettata usando:
+
+   ```shell
+    ./mvnw package
+   ```
+
+Questo comando produce il file `quarkus-run.jar` nella directory `target/quarkus-app/`.
+Le dipendenze vengono copiate nella directory `target/quarkus-app/lib/`.
+
+Per avviare l'applicazione usare il comando:
+
+   ```shell
+    java -jar target/quarkus-app/quarkus-run.jar
+   ```
+
+Se si desidera costruire un über-jar (un singolo file contenente tutto) eseguire:
+
+   ```shell
+    ./mvnw package -Dquarkus.package.jar.type=uber-jar
+   ```
+
+L'applicazione sarà avviabile con `java -jar target/*-runner.jar`.
+
+
+## Dipendenze e Guide correlate
+
+Il progetto fa uso delle seguenti estensioni e tecnologie:
+
+* **REST**
+  Implementazione Jakarta REST con elaborazione a tempo di compilazione basata su Vert.x.
+* **MongoDB client**
+  Connettore per database MongoDB in stile imperativo o reattivo.
+* **Micrometer Registry Prometheus**
+  Abilita il supporto Prometheus per la raccolta metriche con Micrometer.
+* **Hibernate Validator**
+  Validazione delle proprietà degli oggetti e dei parametri dei metodi.
+* **SmallRye OpenAPI**
+  Documentazione delle API REST (include Swagger UI).
+* **SmallRye Fault Tolerance**
+  Libreria per la gestione della tolleranza ai guasti nei servizi di rete.
+* **RESTEasy Classic Multipart**
+  Supporto per le richieste Multipart.
+* **YAML Configuration**
+  Permette l'uso di file YAML per la configurazione dell'applicazione.
+* **SmallRye JWT**
+  Sicurezza delle applicazioni tramite JSON Web Token.
+* **SmallRye Health**
+  Monitoraggio dello stato di salute del servizio.
+* **SmallRye Metrics**
+  Esposizione delle metriche di servizio.
+* **SmallRye JWT Build**
+  API per la creazione e firma di token JWT.
+  
 ## TODO
  - [x] controllo su click multiplo per get otp
  - [x] accedi
@@ -29,98 +110,3 @@
 - [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
 - [ ] documentazione
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
-
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
-
-## Running the application in dev mode
-
-You can run your application in dev mode that enables live coding using:
-
-```shell script
-./mvnw quarkus:dev
-```
-
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
-
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./mvnw package
-```
-
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/bibliomap-api-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- MongoDB client ([guide](https://quarkus.io/guides/mongodb)): Connect to MongoDB in either imperative or reactive style
-- Micrometer Registry Prometheus ([guide](https://quarkus.io/guides/micrometer)): Enable Prometheus support for Micrometer
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, Jakarta Persistence)
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- SmallRye Fault Tolerance ([guide](https://quarkus.io/guides/smallrye-fault-tolerance)): Build fault-tolerant network services
-- RESTEasy Classic Multipart ([guide](https://quarkus.io/guides/rest-json#multipart-support)): Multipart support for RESTEasy Classic
-- YAML Configuration ([guide](https://quarkus.io/guides/config-yaml)): Use YAML to configure your Quarkus application
-- SmallRye JWT ([guide](https://quarkus.io/guides/security-jwt)): Secure your applications with JSON Web Token
-- SmallRye Health ([guide](https://quarkus.io/guides/smallrye-health)): Monitor service health
-- SmallRye Metrics ([guide](https://quarkus.io/guides/smallrye-metrics)): Expose metrics for your services
-- SmallRye JWT Build ([guide](https://quarkus.io/guides/security-jwt-build)): Create JSON Web Token with SmallRye JWT Build API
-
-## Provided Code
-
-### YAML Config
-
-Configure your application with YAML
-
-[Related guide section...](https://quarkus.io/guides/config-reference#configuration-examples)
-
-The Quarkus application configuration is located in `src/main/resources/application.yml`.
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-### RESTEasy JAX-RS
-
-Easily start your RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started#the-jax-rs-resources)
-
-### SmallRye Health
-
-Monitor your application's health using SmallRye Health
-
-[Related guide section...](https://quarkus.io/guides/smallrye-health)
