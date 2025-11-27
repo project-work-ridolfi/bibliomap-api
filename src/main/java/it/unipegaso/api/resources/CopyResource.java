@@ -86,7 +86,7 @@ public class CopyResource {
 						.build();
 			}
 			
-			boolean canceled = copiesRepository.delete(copyLibraryId);
+			boolean canceled = copiesRepository.delete(copyId);
 			
 			// se trovato e cancellato
 			if(canceled) {
