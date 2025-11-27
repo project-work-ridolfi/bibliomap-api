@@ -54,23 +54,6 @@ public class BookResource {
         return Response.ok(books).build();
     }
 
-    @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @RolesAllowed("user")
-    @Path("/add-copy")
-    public Response createBook(
-            @FormParam("title") String title,
-            @FormParam("authors") String authors,
-            @FormParam("isbn") String isbn,
-            @FormParam("tags") String tags,
-            @FormParam("cover") FileUpload cover) {
-        // TODO: validare input
-        // TODO: se cover presente → upload GridFS + genera thumbnail
-        // TODO: salvare item su MongoDB
-        return Response.status(Response.Status.CREATED)
-                .entity("{\"id\": \"book-123\", \"message\": \"Book created (TODO)\"}")
-                .build();
-    }
 
     /**
      * GET /api/books/{id}
