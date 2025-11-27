@@ -14,7 +14,7 @@ public record BookDetailDTO(
 		String coverUrl,
 		Integer publicationYear,
 		String language,
-		String cover_type,
+		String coverType,
 		String publisher,
 
 		// dati libreria e proprietario
@@ -26,7 +26,8 @@ public record BookDetailDTO(
 		// dati specifici copia
 		String condition,
 		String status,
-		String ownerNotec,
-		List<String> tags) {}
+		String ownerNotes,
+		List<String> tags
+		) {}
 
 

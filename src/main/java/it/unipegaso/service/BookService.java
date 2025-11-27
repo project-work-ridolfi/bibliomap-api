@@ -222,20 +222,21 @@ public class BookService {
 	}
 
 	private BookDetailDTO mapToDetailDTO(Document doc) {
-		// Estrazione sottodocumenti
+		
 		Document book = doc.get("bookInfo", Document.class);
 		Document lib = doc.get("libraryInfo", Document.class);
 		Document owner = doc.get("ownerInfo", Document.class);
 
-		// Gestione Cover (se è base64 puro aggiungiamo header, se ha già header lo teniamo)
+		// cover logic
 		String rawCover = book.getString("cover");
 		String finalCover = null;
 		if (rawCover != null && !rawCover.isEmpty()) {
 			finalCover = rawCover.startsWith("data:") ? rawCover : "data:image/jpeg;base64," + rawCover;
 		}
 
-		// Gestione Username
-		String username = (owner != null) ? owner.getString("username") : "Utente Sconosciuto";
+		// username logic
+		String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
+        String ownerId = (owner != null) ? owner.getString("_id") : null;
 
 		return new BookDetailDTO(
 				doc.getString("_id"),
@@ -243,14 +244,14 @@ public class BookService {
 				book.getString("title"),
 				book.getString("author"),
 				finalCover,
-				book.getInteger("pubblication_year", 0), // default 0 se null
+				book.getInteger("publication_year", 0), 
 				book.getString("language"),
-				book.getString("cover_type"),
+				book.getString("cover_type"), 
 				book.getString("publisher"),
 
 				lib.getString("name"),
 				lib.getString("_id"),
-				lib.getString("ownerId"),
+				lib.getString("ownerId"), 
 				username,
 
 				doc.getString("condition"),

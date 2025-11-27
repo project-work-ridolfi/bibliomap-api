@@ -10,6 +10,7 @@ import org.jboss.logging.Logger;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 
 import it.unipegaso.database.model.Copy;
@@ -39,11 +40,25 @@ public class CopiesRepository implements IRepository<Copy> {
 
     @Override
     public Optional<Copy> get(String id) {
-        if (id == null || id.trim().isEmpty()) return Optional.empty();
+        if (id == null || id.trim().isEmpty()) {
+        	return Optional.empty();
+        }
         return Optional.ofNullable(copies.find(Filters.eq("_id", id)).first());
     }
 
     public List<Copy> findByLibrary(String libraryId) {
         return copies.find(Filters.eq("libraryId", libraryId)).into(new ArrayList<>());
+    }
+    
+    public boolean delete(String id) {
+    	
+        if (id == null || id.trim().isEmpty()) {
+        	return false;
+        }
+        
+    	DeleteResult result = copies.deleteOne(Filters.eq("_id", id));
+    	
+    	return result.wasAcknowledged();
+    	
     }
 }
