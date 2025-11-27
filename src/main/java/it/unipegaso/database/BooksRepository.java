@@ -40,4 +40,16 @@ public class BooksRepository implements IRepository<Book> {
         if (isbn == null || isbn.trim().isEmpty()) return Optional.empty();
         return Optional.ofNullable(books.find(Filters.eq("_id", isbn)).first());
     }
+
+	@Override
+	public boolean update(Book obj) throws MongoWriteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean delete(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

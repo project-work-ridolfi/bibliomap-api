@@ -3,6 +3,7 @@ package it.unipegaso.database.model;
 import java.util.List;
 
 import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -14,10 +15,18 @@ public class Copy {
 	public String id; 
 	
 	public String libraryId;
-	public String book_isbn;
+	
+	@BsonProperty("book_isbn")
+    public String bookIsbn;
 	public String status;
 	public String condition;
-	public String owner_notes;
+	
+	@BsonProperty("owner_notes")
+    public String ownerNotes;
+	
+	@BsonProperty("custom_cover")
+    public String customCover;
+	
 	public List<String> tags;
 
 }

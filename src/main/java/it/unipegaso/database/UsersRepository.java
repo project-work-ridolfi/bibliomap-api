@@ -181,6 +181,17 @@ public class UsersRepository implements IRepository<User>{
 		
 		return Optional.ofNullable(users.find(Filters.eq(ID, id)).first());
 	}
+
+	@Override
+	public boolean update(User obj) throws MongoWriteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean delete(String id) {
+		return delete("_id", id);
+	}
     
     
 	

@@ -72,4 +72,18 @@ public class LibrariesRepository implements IRepository<Library> {
 		
 		return libraries.find(Filters.eq(OWNER_ID, userId));
 	}
+
+
+	@Override
+	public boolean update(Library obj) throws MongoWriteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean delete(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

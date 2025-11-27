@@ -12,5 +12,9 @@ public interface IRepository<T> {
 	String create(T obj) throws MongoWriteException;
 	
 	Optional<T> get(String id);
+	
+	boolean update (T obj) throws MongoWriteException;
+	
+	boolean delete (String id);
 
 }

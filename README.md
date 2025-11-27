@@ -109,4 +109,3 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 - [ ] fuzzy level (da ricontrollare se è vero)
 - [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
 - [ ] documentazione
-

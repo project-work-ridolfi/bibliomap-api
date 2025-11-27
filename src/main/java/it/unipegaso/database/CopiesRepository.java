@@ -12,6 +12,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.result.UpdateResult;
 
 import it.unipegaso.database.model.Copy;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -61,4 +62,15 @@ public class CopiesRepository implements IRepository<Copy> {
     	return result.wasAcknowledged();
     	
     }
+
+	@Override
+	public boolean update(Copy copy) throws MongoWriteException {
+
+		 if (copy == null || copy.id.isEmpty()) {
+	        	return false;
+	        }
+		UpdateResult result = copies.replaceOne(Filters.eq("_id", copy.id), copy);
+		
+		return result.getMatchedCount() == 1;
+	}
 }

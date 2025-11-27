@@ -41,5 +41,17 @@ public class LocationsRepository implements IRepository<Location> {
         return Optional.ofNullable(locations.find(Filters.eq(ID, id)).first());
     }
 
+	@Override
+	public boolean update(Location obj) throws MongoWriteException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean delete(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
     
 }
