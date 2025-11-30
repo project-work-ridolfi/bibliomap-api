@@ -101,6 +101,11 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
  - [ ] condizione opzionale ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
  - [ ] caricamento copertina (drag or choose, cerca su google, camera??, scegli icona)
  - [ ] lista di tag (si può scegliere da una lista fissa, alcuni suggeriti dal libro stesso, oppure inserire un tag nuovo)
+ - [ ] GET /api/users/me/libraries
+  - [ ] recupera lista librerie dell'utente loggato (id, nome) per il menu a tendina
+ - [ ] GET /api/books/external/lookup-metadata
+ - [ ] GET /api/books/external/search-isbn
+ - [ ] POST /api/books/add-composite
 - [ ] pagina libro per proprietario con modifiche abilitate (gestione copia/libro, modificabili solo proprietà della copia, la copertina forse diventa proprietà della copia)
 - [ ] gestione libri, sposta da libreria a libreria, duplica
 - [ ] pagina libro per utente che la vede, bottone per richiedere il prestito -> manda email
