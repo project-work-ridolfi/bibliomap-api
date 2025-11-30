@@ -33,8 +33,6 @@ public class LibraryService {
 
 	/**
 	 * Crea una nuova libreria e la collega all'utente e alla sua posizione.
-	 * @param sessionId id sessione
-	 * @param libraryDTO dati libreria
 	 * @return id libreria creata
 	 */
 	public String createNewLibrary(User user, LibraryDTO libraryDTO) {

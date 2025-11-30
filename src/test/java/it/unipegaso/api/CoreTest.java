@@ -16,7 +16,6 @@ public class CoreTest {
         
         System.out.println("is valid: " + isPasswordValid );
 
-		
 	}
 
 }

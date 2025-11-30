@@ -63,7 +63,7 @@ public class UsersRepositoryTest {
         // Tenta di creare lo stesso utente una seconda volta
         User duplicateUser = createBaseUser(); 
         
-        // Ci aspettiamo un'eccezione IllegalArgumentException
+        // eccezione IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () -> {
             usersRepository.create(duplicateUser);
         }, "Creazione duplicata deve lanciare IllegalArgumentException.");
@@ -95,6 +95,6 @@ public class UsersRepositoryTest {
         nonExistingUser.id = "4b277b75-1e3d-4c3e-a892-a1b9d4e5f6g7"; // UUID casuale
         
         // updateUtente deve ritornare false (0 modificati)
-        assertFalse(usersRepository.updateUser(nonExistingUser), "Aggiornamento utente non esistente deve ritornare false.");
+        assertFalse(usersRepository.update(nonExistingUser), "Aggiornamento utente non esistente deve ritornare false.");
     }
 }

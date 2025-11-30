@@ -27,20 +27,14 @@ public class LibrariesRepository implements IRepository<Library> {
 	@Inject
 	MongoCollection<Library> libraries;
 	
-	/*
-	 * inserisce una nuova location nel db
-	 * @param newLocation l'oggetto location
-	 * @return l'id con la quale e' stata inserita la location nel db
-	 * @throws MongoWriteException in caso qualcosa non sia andato bene
-	 */
 	public String create(Library newLibrary) throws MongoWriteException {
 	    
-	    // Assegna l'ID come Stringa UUID generata da Java
+	    // assegna l'ID come Stringa UUID generata da Java
 		newLibrary.id = UUID.randomUUID().toString();
 
 	    InsertOneResult result = libraries.insertOne(newLibrary);
 
-	    // Verifica e logga (l'ID è già nell'oggetto newLocation)
+	    // Verifica e logga 
 	    if (!result.wasAcknowledged()) {
 	        LOG.error("Inserimento location non confermato dal database.");
 	        return null;

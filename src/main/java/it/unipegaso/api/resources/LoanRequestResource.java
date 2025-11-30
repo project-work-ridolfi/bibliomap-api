@@ -12,25 +12,13 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-/**
- * Endpoint per workflow richieste prestito.
- */
+
 @Path("/api/requests")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class LoanRequestResource {
 
-    /**
-     * POST /api/requests
-     * Crea nuova richiesta prestito/consultazione.
-     * Body: {
-     *   "targetItemId": "book-123",
-     *   "type": "loan",
-     *   "message": "Vorrei prendere in prestito...",
-     *   "proposedDates": ["2025-11-05"],
-     *   "duration": 14
-     * }
-     */
+   
     @POST
     @RolesAllowed("user")
     public Response createRequest(Object requestDto) {
@@ -42,13 +30,7 @@ public class LoanRequestResource {
                 .entity("{\"id\": \"req-123\", \"status\": \"pending\"}").build();
     }
 
-    /**
-     * GET /api/requests/my
-     * Lista richieste utente (inviate + ricevute).
-     * Query params:
-     * - type: "sent" | "received" (default: all)
-     * - status: "pending" | "accepted" | ...
-     */
+   
     @GET
     @Path("/my")
     @RolesAllowed("user")
@@ -59,10 +41,7 @@ public class LoanRequestResource {
         return Response.ok("{\"sent\": [], \"received\": [], \"message\": \"TODO\"}").build();
     }
 
-    /**
-     * GET /api/requests/{id}
-     * Dettaglio richiesta (solo requester o owner).
-     */
+    
     @GET
     @Path("/{id}")
     @RolesAllowed("user")
@@ -71,15 +50,6 @@ public class LoanRequestResource {
         return Response.ok("{\"id\": \"" + requestId + "\", \"status\": \"TODO\"}").build();
     }
 
-    /**
-     * PATCH /api/requests/{id}
-     * Aggiorna stato richiesta.
-     * Body: { "status": "accepted" | "cancelled" | "completed" }
-     * 
-     * Autorizzazioni:
-     * - Owner può: pending→accepted, pending→cancelled, active→completed
-     * - Requester può: pending→cancelled, active→cancelled
-     */
     @PATCH
     @Path("/{id}")
     @RolesAllowed("user")

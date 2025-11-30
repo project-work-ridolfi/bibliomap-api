@@ -211,7 +211,7 @@ public class CopyResource {
         @FormParam("status") public String status;
         @FormParam("condition") public String condition;
         @FormParam("ownerNotes") public String ownerNotes;
-        @FormParam("tags") public String tags; // comma separated
+        @FormParam("tags") public String tags; // separate da virgola
         @FormParam("useDefaultCover") public boolean useDefaultCover; 
         @FormParam("coverFile") public FileUpload coverFile; 
     }

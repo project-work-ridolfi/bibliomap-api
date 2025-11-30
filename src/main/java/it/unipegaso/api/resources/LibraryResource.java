@@ -67,7 +67,7 @@ public class LibraryResource {
 			return e.getResponse();
 		} catch (IllegalStateException e) {
 			LOG.errorf("errore logica: %s", e.getMessage());
-			return Response.status(Response.Status.UNAUTHORIZED) // 401 se l'utente non è valido
+			return Response.status(Response.Status.UNAUTHORIZED) // 401 se l'utente non e' valido
 					.entity(new ErrorResponse("AUTH_ERROR", "utente non autenticato o non trovato"))
 					.build();
 		} catch (Exception e) {
@@ -76,40 +76,6 @@ public class LibraryResource {
 					.entity(new ErrorResponse("SERVER_ERROR", "errore interno creazione libreria"))
 					.build();
 		}
-	}
-
-
-
-	/**
-	 * GET /api/libraries/search
-	 * Ricerca con multipli filtri opzionali.
-	 * 
-	 * Query params:
-	 * - near: lat,lon (es: "41.9028,12.4964")
-	 * - radius: metri (default: 5000)
-	 * - bbox: lon1,lat1,lon2,lat2
-	 * - tags: "storia,arte"
-	 * - q: ricerca testuale titolo/autore
-	 */
-	@GET
-	@Path("/search")
-	public Response searchLibraries(
-			@QueryParam("near") String near,
-			@QueryParam("radius") @DefaultValue("5000") int radius,
-			@QueryParam("bbox") String bbox,
-			@QueryParam("tags") String tags,
-			@QueryParam("q") String textQuery,
-			@QueryParam("limit") @DefaultValue("50") int limit,
-			@QueryParam("offset") @DefaultValue("0") int offset) {
-
-		// TODO: costruire query MongoDB con:
-		// - $nearSphere se near presente
-		// - $geoWithin se bbox presente
-		// - $text se q presente
-		// - match su tags se presente
-		// TODO: filtrare utenti con locationMode=none
-
-		return Response.ok("{\"results\": [], \"total\": 0, \"message\": \"TODO - geospatial query\"}").build();
 	}
 
 

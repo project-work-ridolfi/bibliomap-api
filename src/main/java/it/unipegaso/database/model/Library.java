@@ -10,17 +10,17 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Library {
-	
+
 	@BsonId
 	public String id; 
-    
+
 	public String name;
-    public LocalDateTime createdAt; 
-    public LocalDateTime modifiedAt;
-    public String ownerId; 
-    public String locationId; 
-    public String visibility; //all, logged-in, no one
-    public int blurRadius;
-    public String notes; //anche vuoto
-    public List<String> tags; //anche vuoto
+	public LocalDateTime createdAt; 
+	public LocalDateTime modifiedAt;
+	public String ownerId; 
+	public String locationId; 
+	public String visibility; //all, logged-in, no one
+	public int blurRadius;
+	public String notes; 
+	public List<String> tags;
 }

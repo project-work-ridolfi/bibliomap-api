@@ -35,8 +35,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
         final String path = requestContext.getUriInfo().getPath();
         final int status = responseContext.getStatus();
         
-        // ⭐ AGGIUNGI GLI HEADER CORS QUI
-        responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:5173");
+        responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:5173"); //TODO
         responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
         responseContext.getHeaders().add("Access-Control-Allow-Headers", 
             "Content-Type, Authorization, X-Session-Id, Accept");

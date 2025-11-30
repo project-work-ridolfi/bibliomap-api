@@ -69,9 +69,7 @@ public class AuthResourceTest {
 		put("acceptPrivacy", true);
 	}};
 
-	/**
-	 * pulizia preventiva e post test per garantire la ripetibilità.
-	 */
+	
 	private void cleanTestUsers() {
 		usersRepository.delete(UsersRepository.EMAIL, TEST_EMAIL);
 		usersRepository.delete(UsersRepository.EMAIL, "final_test@bibliomap.it");
@@ -90,9 +88,7 @@ public class AuthResourceTest {
 	}
 
 
-	/**
-	 * helper per creare un utente nel db che possa fare login.
-	 */
+	
 	private void setupTestUser() {
 		// pulizia preventiva immediata (se un test precedente ha fallito)
 		usersRepository.delete(UsersRepository.EMAIL, TEST_EMAIL); 

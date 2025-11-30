@@ -19,9 +19,7 @@ public class LocationService {
 	@Inject
 	LocationsRepository locationRepository;
 
-	/**
-	 * Helper per la conversione da coordinate a oggetto GeoJSON Point.
-	 */
+	// Helper per la conversione da coordinate a oggetto GeoJSON Point.
 	private Point createGeoJsonPoint(SetLocationDTO dto) {
 		// Logica di conversione e gestione errori
 		double lat = dto.latitude();
@@ -39,14 +37,14 @@ public class LocationService {
 		newLocation.location = geoPoint;
 
 		String id = null;
-		
+
 		try {
 			id = locationRepository.create(newLocation);
-			
+
 		}catch(Exception e) {
-	        LOG.error("Impossibile inserire location nel database");
+			LOG.error("Impossibile inserire location nel database");
 		}
-		
+
 		return id;
 	}
 }

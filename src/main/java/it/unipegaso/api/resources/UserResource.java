@@ -60,11 +60,6 @@ public class UserResource {
 	LibraryService libraryService;
 
 
-	/**
-	 * GET /api/users/check-exists/{username}
-	 * Fa un check per vedere se l'username è già registrato (esiste) 
-	 * interrogando il database MongoDB.
-	 */
 	@GET
 	@Path("/check-exists/{username}")
 	@PermitAll 
@@ -77,10 +72,7 @@ public class UserResource {
 		return Response.ok(new CheckExistsResponse(exists)).build();
 	}
 
-	/**
-	 * GET /api/users/{id}
-	 * Recupera profilo pubblico (filtra campi privacy).
-	 */
+	
 	@GET
 	@Path("/{id}")
 	public Response getUserProfile(@PathParam("id") String userId) {
@@ -102,7 +94,6 @@ public class UserResource {
 		try {
 			user = userService.getUserFromSession(sessionId);
 
-
 			// SALVATAGGIO NUOVA LOCATION
 			locationId = locationService.saveNewLocation(request); 
 
@@ -121,7 +112,7 @@ public class UserResource {
 		user.visibility = request.visibility();
 		user.blurRadius = request.blurRadius();
 
-		boolean updateSuccess = userRepository.updateUser(user);
+		boolean updateSuccess = userRepository.update(user);
 
 		if(updateSuccess) {
 			LOG.infof("Posizione salvata e Utente %s aggiornato con Location ID: %s", user.username, locationId);
@@ -163,7 +154,6 @@ public class UserResource {
 			// Cattura 500 lanciati dal servizio per errore DB
 			return e.getResponse(); 
 		}
-		// Nota: Non è più necessario il controllo "errorResponse != null"
 	}
 
 
@@ -193,7 +183,7 @@ public class UserResource {
 	        	
 	        }
 
-	        // Se la lista è vuota (0 librerie), lo stato è comunque 200 OK
+	        // Se la lista e' vuota (0 librerie), lo stato è comunque 200 OK
 	        return Response.ok(Map.of("libraries", librariesDTO, "count", librariesDTO.size())).build();
 	    
 	    }catch(NotAuthorizedException e) {
@@ -208,27 +198,19 @@ public class UserResource {
 	    }
 	}
 
-	/**
-	 * PUT /api/users/{id}/privacy
-	 * Body: { "locationMode": "pin", "shareEmail": false }
-	 * Auth: solo owner può modificare
-	 */
+	
 	@PUT
 	@Path("/{id}/privacy")
 	@RolesAllowed("user")
 	public Response updatePrivacySettings(
 			@PathParam("id") String userId,
 			Object privacyDto) {
-		// TODO: validare locationMode (exact|pin|city|none)
+		// TODO: validare locationMode 
 		// TODO: salvare preferenze + audit log
 		return Response.ok("{\"message\": \"Privacy updated (TODO)\"}").build();
 	}
 
-	/**
-	 * GET /api/user/export
-	 * Esporta tutti i dati personali (GDPR compliance).
-	 * Auth: solo owner
-	 */
+
 	@GET
 	@Path("/export")
 	@RolesAllowed("user")
@@ -238,11 +220,7 @@ public class UserResource {
 		return Response.ok("{\"export\": \"TODO - complete user data\"}").build();
 	}
 
-	/**
-	 * DELETE /api/user
-	 * Cancellazione account (right to be forgotten).
-	 * Auth: solo owner
-	 */
+
 	@DELETE
 	@RolesAllowed("user")
 	public Response deleteAccount() {

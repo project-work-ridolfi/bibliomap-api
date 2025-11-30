@@ -7,7 +7,6 @@ import com.mongodb.MongoWriteException;
 public interface IRepository<T> {
 	
     public static final String ID = "_id";
-
 	
 	String create(T obj) throws MongoWriteException;
 	

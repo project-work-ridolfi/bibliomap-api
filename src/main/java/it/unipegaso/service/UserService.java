@@ -13,7 +13,6 @@ import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 
-
 @ApplicationScoped
 public class UserService {
 
@@ -25,13 +24,7 @@ public class UserService {
 	@Inject
 	UsersRepository userRepository;
 
-    /**
-     * Recupera l'oggetto User dal database utilizzando la Session ID e i dati in Redis.
-     * @param sessionId L'ID della sessione utente (dal cookie SESSION_ID).
-     * @return L'oggetto User se trovato.
-     * @throws NotAuthorizedException se la sessione o i dati di autenticazione sono mancanti.
-     * @throws NotFoundException se l'utente è in sessione ma non nel DB.
-     */
+    
 	public User getUserFromSession(String sessionId) {
 
         // verifica la presenza della sessione
