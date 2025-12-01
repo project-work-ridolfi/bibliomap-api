@@ -26,6 +26,11 @@ public class BookResource {
 	@Inject
 	BookService bookService;
 
+	@Inject
+	GoogleBooksService googleBooksService;
+
+	@inject
+    BooksRepository bookRepository;
 
 	@GET
 	@Path("/nearby")
@@ -67,5 +72,50 @@ public class BookResource {
 		return Response.ok(detail).build();
 	}
 	
+
+	@GET
+	@Path("/external/lookup-metadata")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response lookupBookMetadata(@QueryParam("isbn") String isbn) {
+		//TODO CHECK TUTTO
+		//controllo se presente nel db
+		Optional<Book> optBook = bookRepository.get(isbn);
+
+		BookDetailDTO detail = null;
+
+        if(optBook.isPresent()) {
+            Book book = optBook.get();
+
+            detail = new BookDetailDTO(
+                isbn, // viene usato come id
+                isbn,
+                book.title,
+                book.author,
+                book.cover,
+                book.publication_year,
+                book.language,
+                book.cover_type, 
+                book.publisher,
+                null, // libraryName
+                null, // libraryId
+                null, // ownerId
+                null, // ownerName
+                null, // condition
+                null, // status
+                null, // ownerNotes
+                null  // tags
+        }
+		else{
+			//altrimenti chiamata al servizio google
+			 detail = googleBooksService.lookupBookMetadata(isbn);
+		}
+
+		if (detail == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		return Response.ok(detail).build();
+
+	}
 
 }

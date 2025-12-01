@@ -12,6 +12,7 @@ import com.mongodb.client.result.InsertOneResult;
 import it.unipegaso.database.model.Book;
 import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class BooksRepository implements IRepository<Book> {
 
 	private static final Logger LOG = Logger.getLogger(BooksRepository.class);

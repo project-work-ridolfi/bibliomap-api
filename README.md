@@ -92,6 +92,7 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 - [x] riorganizza registration dto, usa solo uno con valori nullable
 - [x] usa error message sempre nei casi di errore (no mappa)
 - [x] crea oggetti model per Books, Copies, Locations e Libraries
+- [ ] per le cover usiamo anche google books, da togliere com'è ora nel fe
 - [ ] definisci flusso di ricerca
 - [ ] definisci flusso di prestito
 - [ ] pagina aggiunta libro (da finire e testare), deve avere:
@@ -101,8 +102,8 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
  - [ ] condizione opzionale ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
  - [ ] caricamento copertina (drag or choose, cerca su google, camera??, scegli icona)
  - [ ] lista di tag (si può scegliere da una lista fissa, alcuni suggeriti dal libro stesso, oppure inserire un tag nuovo)
- - [ ] GET /api/users/me/libraries
-  - [ ] recupera lista librerie dell'utente loggato (id, nome) per il menu a tendina
+ - [x] GET /api/users/me/libraries
+  - [x] recupera lista librerie dell'utente loggato (id, nome) per il menu a tendina
  - [ ] GET /api/books/external/lookup-metadata
  - [ ] GET /api/books/external/search-isbn
  - [ ] POST /api/books/add-composite
