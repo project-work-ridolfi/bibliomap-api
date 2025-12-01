@@ -1,17 +1,16 @@
 package it.unipegaso.api.resources;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
+import it.unipegaso.database.BooksRepository;
+import it.unipegaso.database.model.Book;
 import it.unipegaso.service.BookService;
-import jakarta.annotation.security.RolesAllowed;
+import it.unipegaso.service.GoogleBooksService;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -29,7 +28,7 @@ public class BookResource {
 	@Inject
 	GoogleBooksService googleBooksService;
 
-	@inject
+	@Inject
     BooksRepository bookRepository;
 
 	@GET
@@ -85,6 +84,7 @@ public class BookResource {
 
         if(optBook.isPresent()) {
             Book book = optBook.get();
+            
 
             detail = new BookDetailDTO(
                 isbn, // viene usato come id
@@ -104,6 +104,7 @@ public class BookResource {
                 null, // status
                 null, // ownerNotes
                 null  // tags
+                );
         }
 		else{
 			//altrimenti chiamata al servizio google

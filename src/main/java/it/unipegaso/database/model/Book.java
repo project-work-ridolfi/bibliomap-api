@@ -14,7 +14,7 @@ public class Book {
 	public String author;
 	public String title;
 	public String language;
-	public int pubblication_year;
+	public int publication_year;
 	public String publisher;
 	public String cover_type;
 	public String cover; //TODO

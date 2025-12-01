@@ -1,4 +1,4 @@
-package it.unipegaso.api.service;
+package it.unipegaso.service;
 
 import it.unipegaso.api.dto.BookDetailDTO;
 import jakarta.enterprise.context.ApplicationScoped;
