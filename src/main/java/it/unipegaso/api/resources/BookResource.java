@@ -92,9 +92,15 @@ public class BookResource {
 		
 		
 		
-		Optional<Book> optBook = bookService.findExistingBook(author, title, year, publisher, language);
+		List<Book> bookList = bookService.findExistingBooks(author, title, year, publisher, language);
 		
-		return null;
+		if(bookList == null || bookList.isEmpty()) {
+			//chiamiamo google service
+			//bookList = googleBooksService. METODO DA FARE TODO
+		}
+		
+		
+		return Response.ok(bookList).build();
 
 	}
 	

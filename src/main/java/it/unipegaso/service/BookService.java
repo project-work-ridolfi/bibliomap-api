@@ -19,6 +19,7 @@ import com.mongodb.client.model.Sorts;
 
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
+import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.LocationsRepository;
 import it.unipegaso.database.model.Book;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -32,6 +33,9 @@ public class BookService {
 
 	@Inject
 	LocationsRepository locationsRepository;
+	
+	@Inject
+	BooksRepository booksRepository;
 
 	@Inject
 	MongoClient mongoClient; 
@@ -263,11 +267,31 @@ public class BookService {
 	}
 
 
-	public Optional<Book> findExistingBook(String author, String title, int year, String publisher, String language) {
+	public List<Book> findExistingBooks(String author, String title, int year, String publisher, String language) {
+	    
+	    // lista dinamica per i filtri
+	    List<Bson> conditions = new ArrayList<>();
 
-		
-		
-		
-		return null;
+	    // author e title sono obbligatori
+	    conditions.add(Filters.eq("author", author));
+	    conditions.add(Filters.eq("title", title));
+
+	    // aggiunge filtri opzionali solo se presenti
+	    if (year > 0) {
+	        conditions.add(Filters.eq("publication_year", year)); 
+	    }
+
+	    if (publisher != null && !publisher.trim().isEmpty()) {
+	        conditions.add(Filters.eq("publisher", publisher));
+	    }
+
+	    if (language != null && !language.trim().isEmpty()) {
+	        conditions.add(Filters.eq("language", language));
+	    }
+
+	    // combina tutto in un and logico
+	    Bson finalFilter = Filters.and(conditions);
+
+	    return booksRepository.find(finalFilter).into(new ArrayList<>());
 	}
 }
