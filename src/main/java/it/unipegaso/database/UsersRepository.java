@@ -8,6 +8,7 @@ import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
@@ -35,7 +36,8 @@ public class UsersRepository implements IRepository<User>{
 			return Optional.empty();
 		}
 
-		User userModel = users.find(Filters.eq(USERNAME, username)).first();
+		Bson filter = Filters.eq(USERNAME, username);
+		User userModel = find(filter).first();
 
 		LOG.infof("Query DB per username '%s'. Trovato: %b", username, userModel != null);
 
@@ -47,7 +49,7 @@ public class UsersRepository implements IRepository<User>{
 			return Optional.empty();
 		}
 
-		User userModel = users.find(Filters.eq(EMAIL, email)).first();
+		User userModel = find(Filters.eq(EMAIL, email)).first();
 
 		LOG.infof("Query DB per email '%s'. Trovato: %b", email, userModel != null);
 
@@ -158,6 +160,11 @@ public class UsersRepository implements IRepository<User>{
 	@Override
 	public boolean delete(String id) {
 		return delete("_id", id);
+	}
+
+	@Override
+	public FindIterable<User> find(Bson filter) {
+		return users.find(filter);
 	}
 
 

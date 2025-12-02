@@ -3,6 +3,7 @@ package it.unipegaso.database;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
@@ -27,6 +28,7 @@ public class LibrariesRepository implements IRepository<Library> {
 	@Inject
 	MongoCollection<Library> libraries;
 	
+	@Override
 	public String create(Library newLibrary) throws MongoWriteException {
 	    
 	    // assegna l'ID come Stringa UUID generata da Java
@@ -79,5 +81,11 @@ public class LibrariesRepository implements IRepository<Library> {
 	public boolean delete(String id) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+
+	@Override
+	public FindIterable<Library> find(Bson filter) {
+		return libraries.find(filter);
 	}
 }

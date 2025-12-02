@@ -2,9 +2,11 @@ package it.unipegaso.database;
 
 import java.util.Optional;
 
+import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
@@ -39,8 +41,15 @@ public class BooksRepository implements IRepository<Book> {
 
     @Override
     public Optional<Book> get(String isbn) {
-        if (isbn == null || isbn.trim().isEmpty()) return Optional.empty();
+        if (isbn == null || isbn.trim().isEmpty()) {
+        	return Optional.empty();
+        }
         return Optional.ofNullable(books.find(Filters.eq("_id", isbn)).first());
+    }
+    
+    @Override
+    public FindIterable<Book>find (Bson filter){
+    	return books.find(filter);
     }
 
 	@Override

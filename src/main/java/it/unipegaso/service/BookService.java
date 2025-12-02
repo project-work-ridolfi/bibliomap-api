@@ -3,6 +3,7 @@ package it.unipegaso.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ import com.mongodb.client.model.Sorts;
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
 import it.unipegaso.database.LocationsRepository;
+import it.unipegaso.database.model.Book;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -236,7 +238,6 @@ public class BookService {
 
 		// username logic
 		String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
-		String ownerId = (owner != null) ? owner.getString("_id") : null;
 
 		return new BookDetailDTO(
 				doc.getString("_id"),
@@ -259,5 +260,14 @@ public class BookService {
 				doc.getString("owner_notes"),
 				doc.getList("tags", String.class)
 				);
+	}
+
+
+	public Optional<Book> findExistingBook(String author, String title, int year, String publisher, String language) {
+
+		
+		
+		
+		return null;
 	}
 }

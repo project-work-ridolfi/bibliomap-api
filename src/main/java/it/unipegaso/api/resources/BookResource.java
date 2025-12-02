@@ -1,10 +1,12 @@
 package it.unipegaso.api.resources;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
+import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.model.Book;
 import it.unipegaso.service.BookService;
@@ -44,7 +46,9 @@ public class BookResource {
 			) {
 
 		if (lat == null || lng == null) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("{\"message\": \"Coordinate mancanti\"}").build();
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ErrorResponse("BAD_REQUEST", "Coordinate mancanti"))
+					.build();
 		}
 		if (radius == null) radius = 10.0; // Aumentiamo un po' il default a 10km
 		if (visibility == null) visibility = "public";
@@ -71,12 +75,34 @@ public class BookResource {
 		return Response.ok(detail).build();
 	}
 	
+	@GET
+	@Path("/external/search-isbn")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response lookupISBN(@QueryParam("author") String author,
+			@QueryParam("title") String title,
+			@QueryParam("year") int year,
+			@QueryParam("publisher")String publisher,
+			@QueryParam("language") String language) {
+		
+		if(author == null || title == null) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ErrorResponse("BAD_REQUEST", "Parametri obbligatori assenti"))
+					.build();	
+		}
+		
+		
+		
+		Optional<Book> optBook = bookService.findExistingBook(author, title, year, publisher, language);
+		
+		return null;
+
+	}
+	
 
 	@GET
 	@Path("/external/lookup-metadata")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response lookupBookMetadata(@QueryParam("isbn") String isbn) {
-		//TODO CHECK TUTTO
 		//controllo se presente nel db
 		Optional<Book> optBook = bookRepository.get(isbn);
 
@@ -118,5 +144,5 @@ public class BookResource {
 		return Response.ok(detail).build();
 
 	}
-
+	
 }

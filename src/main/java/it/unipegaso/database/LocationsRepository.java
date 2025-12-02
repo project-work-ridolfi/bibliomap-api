@@ -3,9 +3,11 @@ package it.unipegaso.database;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
@@ -51,6 +53,11 @@ public class LocationsRepository implements IRepository<Location> {
 	public boolean delete(String id) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public FindIterable<Location> find(Bson filter) {
+		return locations.find(filter);
 	}
 
     

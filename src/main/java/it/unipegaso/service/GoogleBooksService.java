@@ -1,6 +1,7 @@
 package it.unipegaso.service;
 
 import it.unipegaso.api.dto.BookDetailDTO;
+import it.unipegaso.api.util.StringUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -50,10 +51,38 @@ public class GoogleBooksService {
                 LOG.error("error fetching from google books: " + response.statusCode());
                 return null;
             }
-
+            
             // parsa risposta json
             JsonNode root = objectMapper.readTree(response.body());
             int totalItems = root.path("totalItems").asInt(0);
+
+            LOG.debug("GOOGLE RESPONSE " + root);
+            
+            /*
+             * GOOGLE RESPONSE {
+             * "kind":"books#volumes",
+             * "totalItems":1,
+             * "items":[
+             * {"kind":"books#volume",
+             * "id":"dvNHngEACAAJ",
+             * "etag":"+feXnTquw6c",
+             * "selfLink":"https://www.googleapis.com/books/v1/volumes/dvNHngEACAAJ",
+             * "volumeInfo":{
+             * "title":"Orange is the new black. Da Manhattan al carcere: il mio anno dietro le sbarre",
+             * "authors":["Piper Kerman"],
+             * "publishedDate":"2014",
+             * "industryIdentifiers":[{"type":"ISBN_10","identifier":"8817072699"},{"type":"ISBN_13","identifier":"9788817072694"}],
+             * "readingModes":{"text":false,"image":false},
+             * "pageCount":427,
+             * "printType":"BOOK",
+             * "categories":["Biography & Autobiography"],
+             * "maturityRating":"NOT_MATURE","allowAnonLogging":false,"contentVersion":"preview-1.0.0","imageLinks":{"smallThumbnail":"http://books.google.com/books/content?id=dvNHngEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api","thumbnail":"http://books.google.com/books/content?id=dvNHngEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"},
+             * "language":"it",
+             * "previewLink":"http://books.google.it/books?id=dvNHngEACAAJ&dq=isbn:9788817072694&hl=&cd=1&source=gbs_api","infoLink":"http://books.google.it/books?id=dvNHngEACAAJ&dq=isbn:9788817072694&hl=&source=gbs_api",
+             * "canonicalVolumeLink":"https://books.google.com/books/about/Orange_is_the_new_black_Da_Manhattan_al.html?hl=&id=dvNHngEACAAJ"},
+             * "saleInfo":{"country":"IT","saleability":"NOT_FOR_SALE","isEbook":false},
+             * "accessInfo":{"country":"IT","viewability":"NO_PAGES","embeddable":false,"publicDomain":false,"textToSpeechPermission":"ALLOWED","epub":{"isAvailable":false},"pdf":{"isAvailable":false},"webReaderLink":"http://play.google.com/books/reader?id=dvNHngEACAAJ&hl=&source=gbs_api","accessViewStatus":"NONE","quoteSharingAllowed":false}}]}
+             */
 
             if (totalItems == 0) {
                 // nessun libro trovato per questo isbn
@@ -97,6 +126,7 @@ public class GoogleBooksService {
                     cover = cover.replace("http://", "https://");
                 }
             }
+            
 
             // ritorna dto popolato con soli metadati
             // i campi relativi alla copia vengono lasciati null
@@ -107,7 +137,7 @@ public class GoogleBooksService {
                     author,
                     cover,
                     publicationYear,
-                    language,
+                    StringUtils.getFullLanguage(language),
                     "paperback", // default o null
                     publisher,
                     null, // libraryName

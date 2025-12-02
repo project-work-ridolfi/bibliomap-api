@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.MongoWriteException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
@@ -48,7 +50,10 @@ public class CopiesRepository implements IRepository<Copy> {
     }
 
     public List<Copy> findByLibrary(String libraryId) {
-        return copies.find(Filters.eq("libraryId", libraryId)).into(new ArrayList<>());
+    	
+    	Bson filter = Filters.eq("libraryId", libraryId);
+    	
+        return find(filter).into(new ArrayList<>());
     }
     
     public boolean delete(String id) {
@@ -72,5 +77,10 @@ public class CopiesRepository implements IRepository<Copy> {
 		UpdateResult result = copies.replaceOne(Filters.eq("_id", copy.id), copy);
 		
 		return result.getMatchedCount() == 1;
+	}
+
+	@Override
+	public FindIterable<Copy> find(Bson filter) {
+		return copies.find(filter);
 	}
 }
