@@ -1,6 +1,5 @@
 package it.unipegaso.api.resources;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,13 +89,11 @@ public class BookResource {
 					.build();	
 		}
 		
-		
-		
 		List<Book> bookList = bookService.findExistingBooks(author, title, year, publisher, language);
 		
 		if(bookList == null || bookList.isEmpty()) {
 			//chiamiamo google service
-			//bookList = googleBooksService. METODO DA FARE TODO
+			bookList = googleBooksService.lookUpIsbn(title, author, publisher, year);
 		}
 		
 		
