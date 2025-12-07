@@ -70,7 +70,7 @@ public class CopyResource {
 			}
 			
 			Copy copy = opCopy.get();
-			String copyLibraryId = copy.libraryId;
+			String copyLibraryId = copy.getLibraryId();
 			
 			//prendo tutte le sue librerie
 			List<Library> libraries = libraryService.getUserLibraries(user.id);
@@ -80,7 +80,7 @@ public class CopyResource {
 			
 			for(Library library:libraries) {
 				
-				String libraryId = library.id;
+				String libraryId = library.getId();
 				
 				if(copyLibraryId.equals(libraryId)) {
 					found = true;
@@ -168,29 +168,29 @@ public class CopyResource {
 
             // verify ownership
             boolean isOwner = libraryService.getUserLibraries(user.id).stream()
-                    .anyMatch(lib -> lib.id.equals(copy.libraryId));
+                    .anyMatch(lib -> lib.getId().equals(copy.getLibraryId()));
 
             if (!isOwner) return Response.status(Response.Status.FORBIDDEN).build();
 
             // update fields
-            copy.status = status;
-            copy.condition = condition;
-            copy.ownerNotes = ownerNotes;
+            copy.setStatus(status);
+            copy.setCondition(condition);
+            copy.setOwnerNotes(ownerNotes);
             
             // update tags
             if (tags != null && !tags.isEmpty()) {
-                copy.tags = Arrays.asList(tags.split(","));
+                copy.setTags(Arrays.asList(tags.split(",")));
             } else {
-                copy.tags = new ArrayList<>();
+                copy.setTags(new ArrayList<>());
             }
 
             // handle cover logic
             if (useDefaultCover) {
-                copy.customCover = null; 
+                copy.setCustomCover(null); 
             } else if (coverFile != null && coverFile.fileName() != null) {
                 byte[] fileBytes = java.nio.file.Files.readAllBytes(coverFile.uploadedFile());
                 String base64Img = ImageUtils.resizeAndConvertToBase64(fileBytes, 400);
-                copy.customCover = "data:image/jpeg;base64," + base64Img;
+                copy.setCustomCover("data:image/jpeg;base64," + base64Img);
             }
 
             boolean updated = copiesRepository.update(copy); 

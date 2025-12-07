@@ -32,7 +32,7 @@ public class LibrariesRepository implements IRepository<Library> {
 	public String create(Library newLibrary) throws MongoWriteException {
 	    
 	    // assegna l'ID come Stringa UUID generata da Java
-		newLibrary.id = UUID.randomUUID().toString();
+		newLibrary.setId(UUID.randomUUID().toString());
 
 	    InsertOneResult result = libraries.insertOne(newLibrary);
 
@@ -43,7 +43,7 @@ public class LibrariesRepository implements IRepository<Library> {
 	    }
 
 	    // L'ID è stato assegnato prima dell'inserimento ed è garantito non nullo.
-	    return newLibrary.id; 
+	    return newLibrary.getId(); 
 	}
 	
 

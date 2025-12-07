@@ -262,13 +262,13 @@ public class GoogleBooksService {
 		}
 
 		Book book = new Book();
-		book.isbn = isbn;
-		book.author = author;
-		book.cover = cover;
-		book.language = StringUtils.getFullLanguage(language);
-		book.publication_year = publicationYear;
-		book.publisher = publisher;
-		book.title = title;
+		book.setIsbn(isbn);
+		book.setAuthor(author);
+		book.setCover(cover);
+		book.setLanguage(StringUtils.getFullLanguage(language));
+		book.setPublication_year(publicationYear);
+		book.setPublisher(publisher);
+		book.setTitle(title);
 
 		return book;
 

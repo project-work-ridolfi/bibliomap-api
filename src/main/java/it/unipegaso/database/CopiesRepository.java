@@ -30,7 +30,7 @@ public class CopiesRepository implements IRepository<Copy> {
 
     @Override
     public String create(Copy copy) throws MongoWriteException {
-        copy.id = UUID.randomUUID().toString();
+        copy.setId( UUID.randomUUID().toString()) ;
         
         InsertOneResult result = copies.insertOne(copy);
         
@@ -38,7 +38,7 @@ public class CopiesRepository implements IRepository<Copy> {
             LOG.error("Inserimento copia non confermato");
             return null;
         }
-        return copy.id;
+        return copy.getId();
     }
 
     @Override
@@ -71,10 +71,10 @@ public class CopiesRepository implements IRepository<Copy> {
 	@Override
 	public boolean update(Copy copy) throws MongoWriteException {
 
-		 if (copy == null || copy.id.isEmpty()) {
+		 if (copy == null || copy.getId().isEmpty()) {
 	        	return false;
 	        }
-		UpdateResult result = copies.replaceOne(Filters.eq("_id", copy.id), copy);
+		UpdateResult result = copies.replaceOne(Filters.eq("_id", copy.getId()), copy);
 		
 		return result.getMatchedCount() == 1;
 	}

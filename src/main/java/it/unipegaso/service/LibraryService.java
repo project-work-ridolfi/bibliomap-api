@@ -41,9 +41,9 @@ public class LibraryService {
 		LOG.debug("username: " + user.username);
 
 		Library newLibrary = new Library();
-		newLibrary.name = libraryDTO.name();
-		newLibrary.ownerId = user.id;
-		newLibrary.visibility = libraryDTO.visibility();
+		newLibrary.setName(libraryDTO.name());
+		newLibrary.setOwnerId(user.id);
+		newLibrary.setVisibility(libraryDTO.visibility());
 
 		LOG.info("library creata");
 
@@ -51,13 +51,13 @@ public class LibraryService {
 		if ("user_default".equals(libraryDTO.locationType()) && user.locationId != null) {
 
 			LOG.debug("user default");
-			newLibrary.locationId = user.locationId;
+			newLibrary.setLocationId(user.locationId);
 		} 
 		// TODO: Gestire "new_location" navigando a un altro endpoint di creazione posizione.
 
 		LocalDateTime now = LocalDateTime.now();
-		newLibrary.createdAt = now;
-		newLibrary.modifiedAt = now;
+		newLibrary.setCreatedAt(now);
+		newLibrary.setModifiedAt(now);
 
 		try {
 

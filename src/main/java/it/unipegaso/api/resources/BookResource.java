@@ -3,15 +3,20 @@ package it.unipegaso.api.resources;
 import java.util.List;
 import java.util.Optional;
 
+import org.jboss.resteasy.reactive.MultipartForm;
+
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
+import it.unipegaso.api.dto.BookMultipartBody;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.model.Book;
 import it.unipegaso.service.BookService;
 import it.unipegaso.service.GoogleBooksService;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -30,7 +35,7 @@ public class BookResource {
 	GoogleBooksService googleBooksService;
 
 	@Inject
-    BooksRepository bookRepository;
+	BooksRepository bookRepository;
 
 	@GET
 	@Path("/nearby")
@@ -58,8 +63,29 @@ public class BookResource {
 		return Response.ok(books).build();
 	}
 
+	@POST
+	@Path("/save")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response save(BookMultipartBody request) { 
+		try {
+			if (request.book == null) {
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(new ErrorResponse("BAD_REQUEST", "Parametri obbligatori assenti")).build();
+			}
 
-	
+			boolean savedCopy = bookService.saveBookWithBase64Cover(request.book, request.coverFile);
+			return Response.ok(savedCopy).build();
+
+		} catch (IllegalArgumentException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse("BAD_REQUEST", "Parametri malformati")).build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.serverError().entity(new ErrorResponse("SERVER_ERROR", "internal server error")).build();
+		}
+	}
+
+
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -73,7 +99,7 @@ public class BookResource {
 
 		return Response.ok(detail).build();
 	}
-	
+
 	@GET
 	@Path("/external/search-isbn")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -82,25 +108,25 @@ public class BookResource {
 			@QueryParam("year") int year,
 			@QueryParam("publisher")String publisher,
 			@QueryParam("language") String language) {
-		
+
 		if(author == null || title == null) {
 			return Response.status(Response.Status.BAD_REQUEST)
 					.entity(new ErrorResponse("BAD_REQUEST", "Parametri obbligatori assenti"))
 					.build();	
 		}
-		
+
 		List<Book> bookList = bookService.findExistingBooks(author, title, year, publisher, language);
-		
+
 		if(bookList == null || bookList.isEmpty()) {
 			//chiamiamo google service
 			bookList = googleBooksService.lookUpIsbn(title, author, publisher, year);
 		}
-		
-		
+
+
 		return Response.ok(bookList).build();
 
 	}
-	
+
 
 	@GET
 	@Path("/external/lookup-metadata")
@@ -111,33 +137,33 @@ public class BookResource {
 
 		BookDetailDTO detail = null;
 
-        if(optBook.isPresent()) {
-            Book book = optBook.get();
-            
+		if(optBook.isPresent()) {
+			Book book = optBook.get();
 
-            detail = new BookDetailDTO(
-                isbn, // viene usato come id
-                isbn,
-                book.title,
-                book.author,
-                book.cover,
-                book.publication_year,
-                book.language,
-                book.cover_type, 
-                book.publisher,
-                null, // libraryName
-                null, // libraryId
-                null, // ownerId
-                null, // ownerName
-                null, // condition
-                null, // status
-                null, // ownerNotes
-                null  // tags
-                );
-        }
+
+			detail = new BookDetailDTO(
+					isbn, // viene usato come id
+					isbn,
+					book.getTitle(),
+					book.getAuthor(),
+					book.getCover(),
+					book.getPublication_year(),
+					book.getLanguage(),
+					book.getCover_type(), 
+					book.getPublisher(),
+					null, // libraryName
+					null, // libraryId
+					null, // ownerId
+					null, // ownerName
+					null, // condition
+					null, // status
+					null, // ownerNotes
+					null  // tags
+					);
+		}
 		else{
 			//altrimenti chiamata al servizio google
-			 detail = googleBooksService.lookupBookMetadata(isbn);
+			detail = googleBooksService.lookupBookMetadata(isbn);
 		}
 
 		if (detail == null) {
@@ -147,5 +173,5 @@ public class BookResource {
 		return Response.ok(detail).build();
 
 	}
-	
+
 }

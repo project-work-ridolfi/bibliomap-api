@@ -25,7 +25,7 @@ public class BooksRepository implements IRepository<Book> {
 
     @Override
     public String create(Book book) throws MongoWriteException {
-        if (book.isbn == null || book.isbn.isEmpty()) {
+        if (book.getIsbn() == null || book.getIsbn().isEmpty()) {
             LOG.error("Tentativo di inserire libro senza ISBN");
             return null;
         }
@@ -36,7 +36,7 @@ public class BooksRepository implements IRepository<Book> {
             LOG.error("Inserimento libro non confermato");
             return null;
         }
-        return book.isbn;
+        return book.getIsbn();
     }
 
     @Override

@@ -1,15 +1,23 @@
 package it.unipegaso.service;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -20,278 +28,373 @@ import com.mongodb.client.model.Sorts;
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
 import it.unipegaso.database.BooksRepository;
+import it.unipegaso.database.CopiesRepository; 
+import it.unipegaso.database.LibrariesRepository; 
 import it.unipegaso.database.LocationsRepository;
 import it.unipegaso.database.model.Book;
+import it.unipegaso.database.model.Copy;
+import it.unipegaso.database.model.Library;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class BookService {
 
+    private static final Logger LOG = Logger.getLogger(BookService.class);
+    private static final int MAX_IMG_SIZE = 400; // Pixel lato massimo
 
-	private static final Logger LOG = Logger.getLogger(BookService.class);
+    @Inject
+    LocationsRepository locationsRepository;
 
-	@Inject
-	LocationsRepository locationsRepository;
-	
-	@Inject
-	BooksRepository booksRepository;
+    @Inject
+    BooksRepository booksRepository;
 
-	@Inject
-	MongoClient mongoClient; 
+    @Inject
+    CopiesRepository copiesRepository; 
 
-	public List<BookMapDTO> searchBooks(double lat, double lng, double radiusKm, String visibilityFilter, String excludeUserId, String searchText, String sortBy) {
+    @Inject
+    LibrariesRepository librariesRepository; 
 
-		MongoCollection<Document> locationsCol = mongoClient.getDatabase("bibliomap").getCollection("locations");
-		List<Bson> pipeline = new ArrayList<>();
+    @Inject
+    MongoClient mongoClient;
 
-		// query geospaziale
-		Document geoNear = new Document("$geoNear", new Document()
-				.append("near", new Document("type", "Point").append("coordinates", Arrays.asList(lng, lat)))
-				.append("distanceField", "distance")
-				.append("maxDistance", radiusKm * 1000)
-				.append("spherical", true)
-				);
-		pipeline.add(geoNear);
+    public List<BookMapDTO> searchBooks(double lat, double lng, double radiusKm, String visibilityFilter, String excludeUserId, String searchText, String sortBy) {
+        MongoCollection<Document> locationsCol = mongoClient.getDatabase("bibliomap").getCollection("locations");
+        List<Bson> pipeline = new ArrayList<>();
 
-		// join librerie
-		pipeline.add(new Document("$lookup", new Document()
-				.append("from", "libraries")
-				.append("localField", "_id")
-				.append("foreignField", "locationId")
-				.append("as", "library")
-				));
-		pipeline.add(new Document("$unwind", "$library"));
+        // 1. GeoNear
+        Document geoNear = new Document("$geoNear", new Document()
+                .append("near", new Document("type", "Point").append("coordinates", Arrays.asList(lng, lat)))
+                .append("distanceField", "distance")
+                .append("maxDistance", radiusKm * 1000)
+                .append("spherical", true));
+        pipeline.add(geoNear);
 
-		// filtri preliminari su libreria
-		List<Bson> libraryFilters = new ArrayList<>();
+        // 2. Lookup Library
+        pipeline.add(new Document("$lookup", new Document()
+                .append("from", "libraries")
+                .append("localField", "_id")
+                .append("foreignField", "locationId")
+                .append("as", "library")));
+        pipeline.add(new Document("$unwind", "$library"));
 
-		List<String> allowedVisibilities = new ArrayList<>(Arrays.asList("all"));
-		if ("logged-in".equals(visibilityFilter)) allowedVisibilities.add("logged-in");
-		libraryFilters.add(Filters.in("library.visibility", allowedVisibilities));
+        // 3. Filtri preliminari su Library
+        List<Bson> libraryFilters = new ArrayList<>();
+        List<String> allowedVisibilities = new ArrayList<>(Arrays.asList("all"));
+        if ("logged-in".equals(visibilityFilter)) allowedVisibilities.add("logged-in");
+        libraryFilters.add(Filters.in("library.visibility", allowedVisibilities));
 
-		if (excludeUserId != null && !excludeUserId.trim().isEmpty()) {
-			libraryFilters.add(Filters.ne("library.ownerId", excludeUserId));
-		}
+        if (excludeUserId != null && !excludeUserId.trim().isEmpty()) {
+            libraryFilters.add(Filters.ne("library.ownerId", excludeUserId));
+        }
+        pipeline.add(Aggregates.match(Filters.and(libraryFilters)));
 
-		pipeline.add(Aggregates.match(Filters.and(libraryFilters)));
+        // 4. Lookup Owner (User)
+        pipeline.add(new Document("$lookup", new Document()
+                .append("from", "users")
+                .append("localField", "library.ownerId")
+                .append("foreignField", "_id")
+                .append("as", "ownerInfo")));
+        pipeline.add(new Document("$unwind", new Document("path", "$ownerInfo").append("preserveNullAndEmptyArrays", true)));
 
-		// join utenti per dati owner
-		pipeline.add(new Document("$lookup", new Document()
-				.append("from", "users")
-				.append("localField", "library.ownerId")
-				.append("foreignField", "_id")
-				.append("as", "ownerInfo")
-				));
-		// mantieni la libreria anche se l'utente non esiste più
-		pipeline.add(new Document("$unwind", new Document("path", "$ownerInfo").append("preserveNullAndEmptyArrays", true)));
+        // 5. Lookup Copies
+        pipeline.add(new Document("$lookup", new Document()
+                .append("from", "copies")
+                .append("localField", "library._id")
+                .append("foreignField", "libraryId")
+                .append("as", "copy")));
+        pipeline.add(new Document("$unwind", "$copy"));
 
-		// join copie
-		pipeline.add(new Document("$lookup", new Document()
-				.append("from", "copies")
-				.append("localField", "library._id")
-				.append("foreignField", "libraryId")
-				.append("as", "copy")
-				));
-		pipeline.add(new Document("$unwind", "$copy"));
+        // 6. Lookup Books (usando copy.book_isbn -> books._id)
+        pipeline.add(new Document("$lookup", new Document()
+                .append("from", "books")
+                .append("localField", "copy.book_isbn")
+                .append("foreignField", "_id")
+                .append("as", "bookInfo")));
+        pipeline.add(new Document("$unwind", "$bookInfo"));
 
-		// join libri
-		pipeline.add(new Document("$lookup", new Document()
-				.append("from", "books")
-				.append("localField", "copy.book_isbn")
-				.append("foreignField", "_id")
-				.append("as", "bookInfo")
-				));
-		pipeline.add(new Document("$unwind", "$bookInfo"));
+        // 7. Ricerca Testuale
+        if (searchText != null && !searchText.trim().isEmpty()) {
+            Pattern regex = Pattern.compile(Pattern.quote(searchText), Pattern.CASE_INSENSITIVE);
+            pipeline.add(Aggregates.match(Filters.or(
+                    Filters.regex("bookInfo.title", regex),
+                    Filters.regex("bookInfo.author", regex))));
+        }
 
-		// filtro ricerca testuale
-		if (searchText != null && !searchText.trim().isEmpty()) {
-			Pattern regex = Pattern.compile(Pattern.quote(searchText), Pattern.CASE_INSENSITIVE);
-			pipeline.add(Aggregates.match(Filters.or(
-					Filters.regex("bookInfo.title", regex),
-					Filters.regex("bookInfo.author", regex)
-					)));
-		}
+        // 8. Sorting
+        if ("title".equals(sortBy)) {
+            pipeline.add(Aggregates.sort(Sorts.ascending("bookInfo.title")));
+        } else if ("author".equals(sortBy)) {
+            pipeline.add(Aggregates.sort(Sorts.ascending("bookInfo.author")));
+        } else {
+            pipeline.add(Aggregates.sort(Sorts.ascending("distance")));
+        }
 
-		// ordinamento risultati
-		if ("title".equals(sortBy)) {
-			pipeline.add(Aggregates.sort(Sorts.ascending("bookInfo.title")));
-		} else if ("author".equals(sortBy)) {
-			pipeline.add(Aggregates.sort(Sorts.ascending("bookInfo.author")));
-		} else {
-			pipeline.add(Aggregates.sort(Sorts.ascending("distance")));
-		}
+        List<BookMapDTO> results = new ArrayList<>();
+        Random rand = new Random();
 
-		List<BookMapDTO> results = new ArrayList<>();
-		Random rand = new Random();
+        for (Document doc : locationsCol.aggregate(pipeline)) {
+            try {
+                Document lib = doc.get("library", Document.class);
+                Document copy = doc.get("copy", Document.class);
+                Document book = doc.get("bookInfo", Document.class);
+                Document geo = doc.get("geolocation", Document.class);
+                Document ownerInfo = doc.get("ownerInfo", Document.class);
 
-		for (Document doc : locationsCol.aggregate(pipeline)) {
-			try {
-				Document lib = doc.get("library", Document.class);
-				Document copy = doc.get("copy", Document.class);
-				Document book = doc.get("bookInfo", Document.class);
-				Document geo = doc.get("geolocation", Document.class);
-				Document ownerInfo = doc.get("ownerInfo", Document.class);
+                // Privacy blur
+                int libBlur = lib.getInteger("blurRadius", 0);
+                int userBlur = (ownerInfo != null) ? ownerInfo.getInteger("blurRadius", 0) : 0;
+                int effectiveBlur = Math.max(libBlur, userBlur);
 
-				// calcolo blur privacy massimo tra utente e libreria
-				int libBlur = lib.getInteger("blurRadius", 0);
-				int userBlur = (ownerInfo != null) ? ownerInfo.getInteger("blurRadius", 0) : 0;
-				int effectiveBlur = Math.max(libBlur, userBlur);
+                List<Double> coords = geo.getList("coordinates", Double.class);
+                double finalLat = coords.get(1);
+                double finalLng = coords.get(0);
+                boolean isFuzzed = false;
 
-				// applicazione fuzzing coordinate se necessario
-				List<Double> coords = geo.getList("coordinates", Double.class);
-				double finalLat = coords.get(1);
-				double finalLng = coords.get(0);
-				boolean isFuzzed = false;
+                if (effectiveBlur > 0) {
+                    double offset = (double) effectiveBlur / 111000.0;
+                    finalLat += (rand.nextDouble() * 2 - 1) * offset;
+                    finalLng += (rand.nextDouble() * 2 - 1) * offset;
+                    isFuzzed = true;
+                }
 
-				if (effectiveBlur > 0) {
-					double offset = (double) effectiveBlur / 111000.0; 
-					finalLat += (rand.nextDouble() * 2 - 1) * offset;
-					finalLng += (rand.nextDouble() * 2 - 1) * offset;
-					isFuzzed = true;
-				}
+                String ownerUsername = (ownerInfo != null) ? ownerInfo.getString("username") : "utente bibliomap";
+                List<String> tags = copy.getList("tags", String.class);
+                if (tags == null) tags = new ArrayList<>();
 
-				// recupero sicuro username
-				String ownerUsername = "utente bibliomap";
-				if (ownerInfo != null && ownerInfo.getString("username") != null) {
-					ownerUsername = ownerInfo.getString("username");
-				}
+                results.add(new BookMapDTO(
+                        copy.getString("_id"),
+                        book.getString("title"),
+                        book.getString("author"),
+                        lib.getString("name"),
+                        finalLat,
+                        finalLng,
+                        doc.getDouble("distance") / 1000.0,
+                        isFuzzed,
+                        book.getString("cover"),
+                        lib.getString("ownerId"),
+                        ownerUsername,
+                        tags));
 
-				// estrazione tags
-				List<String> tags = copy.getList("tags", String.class);
-				if (tags == null) tags = new ArrayList<>();
+            } catch (Exception e) {
+                LOG.error("errore mapping libro: " + e.getMessage());
+            }
+        }
+        return results;
+    }
 
-				results.add(new BookMapDTO(
-						copy.getString("_id"),
-						book.getString("title"),
-						book.getString("author"),
-						lib.getString("name"),
-						finalLat,
-						finalLng,
-						doc.getDouble("distance") / 1000.0,
-						isFuzzed,
-						book.getString("cover"), 
-						lib.getString("ownerId"),
-						ownerUsername,
-						tags 
-						));
+    public BookDetailDTO getBookDetails(String copyId) {
+        MongoCollection<Document> copiesCol = mongoClient.getDatabase("bibliomap").getCollection("copies");
+        List<Bson> pipeline = new ArrayList<>();
 
-			} catch (Exception e) {
-				LOG.error("errore mapping libro: " + e.getMessage());
-			}
-		}
+        pipeline.add(Aggregates.match(Filters.eq("_id", copyId)));
+        
+        // Lookup su Books usando book_isbn
+        pipeline.add(new Document("$lookup", new Document()
+                .append("from", "books")
+                .append("localField", "book_isbn")
+                .append("foreignField", "_id")
+                .append("as", "bookInfo")));
+        pipeline.add(new Document("$unwind", "$bookInfo"));
 
-		return results;
-	}
+        pipeline.add(new Document("$lookup", new Document()
+                .append("from", "libraries")
+                .append("localField", "libraryId")
+                .append("foreignField", "_id")
+                .append("as", "libraryInfo")));
+        pipeline.add(new Document("$unwind", "$libraryInfo"));
 
+        pipeline.add(new Document("$lookup", new Document()
+                .append("from", "users")
+                .append("localField", "libraryInfo.ownerId")
+                .append("foreignField", "_id")
+                .append("as", "ownerInfo")));
+        pipeline.add(new Document("$unwind", new Document("path", "$ownerInfo").append("preserveNullAndEmptyArrays", true)));
 
-	public BookDetailDTO getBookDetails(String copyId) {
+        Document result = copiesCol.aggregate(pipeline).first();
+        if (result == null) return null;
 
-		MongoCollection<Document> copiesCol = mongoClient.getDatabase("bibliomap").getCollection("copies");
-		List<Bson> pipeline = new ArrayList<>();
+        return mapToDetailDTO(result);
+    }
 
-		// 1. Trova la copia specifica
-		pipeline.add(Aggregates.match(Filters.eq("_id", copyId)));
+    private BookDetailDTO mapToDetailDTO(Document doc) {
+        Document book = doc.get("bookInfo", Document.class);
+        Document lib = doc.get("libraryInfo", Document.class);
+        Document owner = doc.get("ownerInfo", Document.class);
 
-		// 2. Join con Tabella Libri (per titolo, autore, cover...)
-		pipeline.add(new Document("$lookup", new Document()
-				.append("from", "books")
-				.append("localField", "book_isbn")
-				.append("foreignField", "_id")
-				.append("as", "bookInfo")));
-		pipeline.add(new Document("$unwind", "$bookInfo"));
+        // Controllo se è base64 o url
+        String rawCover = book.getString("cover");
+        String finalCover = null;
+        if (rawCover != null && !rawCover.isEmpty()) {
+            finalCover = rawCover.startsWith("http") ? rawCover : (rawCover.startsWith("data:") ? rawCover : "data:image/jpeg;base64," + rawCover);
+        }
 
-		// 3. Join con Tabella Librerie (per nome libreria e ownerId)
-		pipeline.add(new Document("$lookup", new Document()
-				.append("from", "libraries")
-				.append("localField", "libraryId")
-				.append("foreignField", "_id")
-				.append("as", "libraryInfo")));
-		pipeline.add(new Document("$unwind", "$libraryInfo"));
+        String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
 
-		// 4. Join con Utenti (per prendere lo username del proprietario)
-		pipeline.add(new Document("$lookup", new Document()
-				.append("from", "users")
-				.append("localField", "libraryInfo.ownerId")
-				.append("foreignField", "_id")
-				.append("as", "ownerInfo")));
+        return new BookDetailDTO(
+                doc.getString("_id"),
+                book.getString("_id"), // ISBN
+                book.getString("title"),
+                book.getString("author"),
+                finalCover,
+                book.getInteger("publication_year", 0),
+                book.getString("language"),
+                book.getString("cover_type"),
+                book.getString("publisher"),
+                lib.getString("name"),
+                lib.getString("_id"),
+                lib.getString("ownerId"),
+                username,
+                doc.getString("condition"),
+                doc.getString("status"),
+                doc.getString("owner_notes"),
+                doc.getList("tags", String.class));
+    }
 
-		// Unwind "safe": se l'utente non esiste più, non rompe tutto
-		pipeline.add(new Document("$unwind", new Document("path", "$ownerInfo").append("preserveNullAndEmptyArrays", true)));
+    public List<Book> findExistingBooks(String author, String title, int year, String publisher, String language) {
+        List<Bson> conditions = new ArrayList<>();
+        conditions.add(Filters.eq("author", author));
+        conditions.add(Filters.eq("title", title));
 
-		// Esecuzione Query
-		Document result = copiesCol.aggregate(pipeline).first();
+        if (year > 0) conditions.add(Filters.eq("publication_year", year));
+        if (publisher != null && !publisher.trim().isEmpty()) conditions.add(Filters.eq("publisher", publisher));
+        if (language != null && !language.trim().isEmpty()) conditions.add(Filters.eq("language", language));
 
-		if (result == null) return null;
-
-		return mapToDetailDTO(result);
-	}
-
-	private BookDetailDTO mapToDetailDTO(Document doc) {
-
-		Document book = doc.get("bookInfo", Document.class);
-		Document lib = doc.get("libraryInfo", Document.class);
-		Document owner = doc.get("ownerInfo", Document.class);
-
-		// cover logic
-		String rawCover = book.getString("cover");
-		String finalCover = null;
-		if (rawCover != null && !rawCover.isEmpty()) {
-			finalCover = rawCover.startsWith("data:") ? rawCover : "data:image/jpeg;base64," + rawCover;
-		}
-
-		// username logic
-		String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
-
-		return new BookDetailDTO(
-				doc.getString("_id"),
-				book.getString("_id"),
-				book.getString("title"),
-				book.getString("author"),
-				finalCover,
-				book.getInteger("publication_year", 0), 
-				book.getString("language"),
-				book.getString("cover_type"), 
-				book.getString("publisher"),
-
-				lib.getString("name"),
-				lib.getString("_id"),
-				lib.getString("ownerId"), 
-				username,
-
-				doc.getString("condition"),
-				doc.getString("status"),
-				doc.getString("owner_notes"),
-				doc.getList("tags", String.class)
-				);
-	}
+        return booksRepository.find(Filters.and(conditions)).into(new ArrayList<>());
+    }
 
 
-	public List<Book> findExistingBooks(String author, String title, int year, String publisher, String language) {
-	    
-	    // lista dinamica per i filtri
-	    List<Bson> conditions = new ArrayList<>();
+    public boolean saveBookWithBase64Cover(BookDetailDTO dto, FileUpload coverFile) {
+        // Validazione LibraryID
+        if (dto.libraryId() == null) {
+        	return false;
+        }
 
-	    // author e title sono obbligatori
-	    conditions.add(Filters.eq("author", author));
-	    conditions.add(Filters.eq("title", title));
+        try {
+            Book book = findOrCreateBook(dto, coverFile);
 
-	    // aggiunge filtri opzionali solo se presenti
-	    if (year > 0) {
-	        conditions.add(Filters.eq("publication_year", year)); 
-	    }
+            Optional<Library> libraryOpt = librariesRepository.get(dto.libraryId());
+            if (libraryOpt.isEmpty()) {
+                LOG.warn("Tentativo di salvataggio su libreria inesistente: " + dto.libraryId());
+                return false;
+            }
 
-	    if (publisher != null && !publisher.trim().isEmpty()) {
-	        conditions.add(Filters.eq("publisher", publisher));
-	    }
+            Copy copy = new Copy();
+            
+            copy.setId(java.util.UUID.randomUUID().toString());
+            
+            copy.setBookIsbn(book.getIsbn()); // Link foreign key logica verso Book
+            copy.setLibraryId(dto.libraryId()); // Link foreign key logica verso Library
+            
+            copy.setCondition(dto.condition());
+            copy.setStatus(dto.status());
+            copy.setOwnerNotes(dto.ownerNotes());
+            if (dto.tags() != null) {
+                copy.setTags(dto.tags());
+            }
 
-	    if (language != null && !language.trim().isEmpty()) {
-	        conditions.add(Filters.eq("language", language));
-	    }
+            copiesRepository.create(copy);
+            return true;
 
-	    // combina tutto in un and logico
-	    Bson finalFilter = Filters.and(conditions);
+        } catch (Exception e) {
+            LOG.error("Errore salvataggio libro/copia", e);
+            return false;
+        }
+    }
 
-	    return booksRepository.find(finalFilter).into(new ArrayList<>());
-	}
+    private Book findOrCreateBook(BookDetailDTO dto, FileUpload coverFile) {
+        Book book = null;
+
+        // cerca per ISBN (Primary Key)
+        if (dto.isbn() != null && !dto.isbn().isBlank()) {
+            Optional<Book> existing = booksRepository.get(dto.isbn());
+            if (existing.isPresent()) {
+                book = existing.get();
+            }
+        }
+
+
+        //  se null, crea nuovo
+        if (book == null) {
+            book = new Book();
+            
+            book.setIsbn(dto.isbn()); 
+            book.setTitle(dto.title());
+            book.setAuthor(dto.author());
+            book.setPublisher(dto.publisher());
+            book.setPublication_year(dto.publicationYear() != null ? dto.publicationYear() : 0);
+            book.setLanguage(dto.language());
+
+            // --- LOGICA IMMAGINE BASE64 ---
+            String base64Image = processImageToBase64(coverFile);
+
+            if (base64Image != null) {
+                // Salviamo direttamente la stringa base64 nel campo 'cover'
+                book.setCover(base64Image);
+            } else if (dto.coverUrl() != null) {
+                // Fallback URL esterno
+                book.setCover(dto.coverUrl());
+            }
+
+            booksRepository.create(book);
+        }
+        
+        return book;
+    }
+
+    private String processImageToBase64(FileUpload file) {
+        if (file == null || file.fileName() == null) return null;
+        
+        java.nio.file.Path tempPath = file.uploadedFile();
+
+        try {
+            BufferedImage originalImage = ImageIO.read(tempPath.toFile());
+            
+            if (originalImage == null) {
+            	return null; 
+            }
+
+            int originalWidth = originalImage.getWidth();
+            int originalHeight = originalImage.getHeight();
+            int newWidth = originalWidth;
+            int newHeight = originalHeight;
+
+            // Logica di ridimensionamento (Resize)
+            if (originalWidth > MAX_IMG_SIZE || originalHeight > MAX_IMG_SIZE) {
+                if (originalWidth > originalHeight) {
+                    newWidth = MAX_IMG_SIZE;
+                    newHeight = (newWidth * originalHeight) / originalWidth;
+                } else {
+                    newHeight = MAX_IMG_SIZE;
+                    newWidth = (newHeight * originalWidth) / originalHeight;
+                }
+            }
+
+            // Creazione immagine scalata
+            Image resultingImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+            BufferedImage outputImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = outputImage.createGraphics();
+            g2d.drawImage(resultingImage, 0, 0, null);
+            g2d.dispose();
+
+            // Conversione in Base64
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            // Scrive come JPG per risparmiare spazio nel documento Mongo
+            ImageIO.write(outputImage, "jpg", os); 
+            String b64 = Base64.getEncoder().encodeToString(os.toByteArray());
+
+            return "data:image/jpeg;base64," + b64;
+
+        } catch (Exception e) {
+            LOG.error("Errore elaborazione immagine: " + e.getMessage());
+            return null;
+        } finally {
+            // Elimina il file temporaneo creato dal framework
+            try {
+                java.nio.file.Files.deleteIfExists(tempPath);
+            } catch (Exception ex) {
+                LOG.warn("Impossibile eliminare il file temporaneo: " + tempPath + " - " + ex.getMessage());
+            }
+        }
+    }
 }

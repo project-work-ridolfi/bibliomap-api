@@ -177,8 +177,8 @@ public class UserResource {
 	        for(Library lib : userLibraries) {
 	        	
 	        	Map<String, String> namesIdsMap = new HashMap<>();
-	        	namesIdsMap.put("id", lib.id);
-	        	namesIdsMap.put("name", lib.name);
+	        	namesIdsMap.put("id", lib.getId());
+	        	namesIdsMap.put("name", lib.getName());
 	        	librariesDTO.add(namesIdsMap);
 	        	
 	        }
