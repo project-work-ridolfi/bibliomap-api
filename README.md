@@ -114,20 +114,8 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 - [ ] libreria da aggiungere la gestione di una location sua
 - [ ] libreria va messa la possibilità di una visibilità diversa da quella dell'utente
 - [ ] fuzzy level (da ricontrollare se è vero)
-- [ ] Creare Enum `LoanStatus`: `PENDING`, `ACCEPTED`, `ON_LOAN`, `RETURNED`, `REJECTED`, `CANCELLED`
-- [ ] Creare Entity `Loan` nella collection `loans`:
-    - `id` (UUID)
-    - `requesterId` (UUID)
-    - `ownerId` (UUID)
-    - `copyId` (UUID)
-    - `status` (LoanStatus)
-    - `createdAt`, `updatedAt` (Timestamp)
-    - `loanStartDate` (Timestamp - valorizzato al passaggio di mano)
-    - `expectedReturnDate` (Timestamp - calcolato start + 30gg)
-    - `actualReturnDate` (Timestamp - valorizzato alla restituzione)
-    - `conditionStart` (String - snapshot condizione copia)
-    - `conditionEnd` (String - input proprietario alla fine)
-    - `ownerNotes` (String)
+- [x] Creare Enum `LoanStatus`: `PENDING`, `ACCEPTED`, `ON_LOAN`, `RETURNED`, `REJECTED`, `CANCELLED`
+- [x] Creare Entity `Loan` nella collection `loans`:
 - [ ] Creare `LoanRepository`:
     - Query per trovare richieste in arrivo per `ownerId` con stato `PENDING`
     - Query per trovare prestiti attivi (`ON_LOAN`) per `ownerId` e `requesterId`

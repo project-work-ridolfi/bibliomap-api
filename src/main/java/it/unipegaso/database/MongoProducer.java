@@ -10,6 +10,7 @@ import com.mongodb.client.MongoDatabase;
 import it.unipegaso.database.model.Book;
 import it.unipegaso.database.model.Copy;
 import it.unipegaso.database.model.Library;
+import it.unipegaso.database.model.Loan;
 import it.unipegaso.database.model.Location;
 import it.unipegaso.database.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -85,6 +86,18 @@ public class MongoProducer {
         MongoCollection<Book> collection = database.getCollection("books", Book.class);
         
         LOG.infof("Producer creato per la collection users: %s.%s", database.getName(), collection.getNamespace().getCollectionName());
+        
+        return collection;
+    }
+    
+    @Produces
+    public MongoCollection<Loan> loans() { 
+        
+        MongoDatabase database = mongoClient.getDatabase(databaseName); 
+        
+        MongoCollection<Loan> collection = database.getCollection("loans", Loan.class);
+        
+        LOG.infof("Producer creato per la collection loans: %s.%s", database.getName(), collection.getNamespace().getCollectionName());
         
         return collection;
     }
