@@ -114,5 +114,48 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 - [ ] libreria da aggiungere la gestione di una location sua
 - [ ] libreria va messa la possibilità di una visibilità diversa da quella dell'utente
 - [ ] fuzzy level (da ricontrollare se è vero)
+- [ ] Creare Enum `LoanStatus`: `PENDING`, `ACCEPTED`, `ON_LOAN`, `RETURNED`, `REJECTED`, `CANCELLED`
+- [ ] Creare Entity `Loan` nella collection `loans`:
+    - `id` (UUID)
+    - `requesterId` (UUID)
+    - `ownerId` (UUID)
+    - `copyId` (UUID)
+    - `status` (LoanStatus)
+    - `createdAt`, `updatedAt` (Timestamp)
+    - `loanStartDate` (Timestamp - valorizzato al passaggio di mano)
+    - `expectedReturnDate` (Timestamp - calcolato start + 30gg)
+    - `actualReturnDate` (Timestamp - valorizzato alla restituzione)
+    - `conditionStart` (String - snapshot condizione copia)
+    - `conditionEnd` (String - input proprietario alla fine)
+    - `ownerNotes` (String)
+- [ ] Creare `LoanRepository`:
+    - Query per trovare richieste in arrivo per `ownerId` con stato `PENDING`
+    - Query per trovare prestiti attivi (`ON_LOAN`) per `ownerId` e `requesterId`
+    - Query per trovare storico prestiti (`RETURNED`)
+    - Query per cron job: `status == ON_LOAN` AND `expectedReturnDate < now`
+- [ ] Implementare `createLoanRequest(requesterId, copyId)`:
+    - Verifica che la copia esista e `status == 'available'`
+    - Salva `Loan` con stato `PENDING`
+    - Invia Email notifica al proprietario (usando mail service esistente)
+- [ ] Implementare `manageRequest(loanId, ownerId, action)`:
+    - Action `ACCEPT`: aggiorna stato a `ACCEPTED`, notifica richiedente
+    - Action `REJECT`: aggiorna stato a `REJECTED`, notifica richiedente
+- [ ] Implementare `startLoan(loanId, ownerId)` (Consegna fisica):
+    - Verifica che stato sia `ACCEPTED`
+    - Aggiorna `Loan`: stato `ON_LOAN`, `loanStartDate` = now, `expectedReturnDate` = now + 30gg
+    - **SIDE EFFECT**: Aggiorna `Copy`: `status` = `on_loan`
+- [ ] Implementare `closeLoan(loanId, ownerId, conditionEnd)` (Restituzione):
+    - Verifica che stato sia `ON_LOAN`
+    - Aggiorna `Loan`: stato `RETURNED`, `actualReturnDate` = now, `conditionEnd`
+    - **SIDE EFFECT**: Aggiorna `Copy`: `status` = `available`, `condition` = `conditionEnd`
+- [ ] `POST /api/loans/request`: Body `{ copyId }`
+- [ ] `PATCH /api/loans/{id}/status`: Body `{ status: 'ACCEPTED'|'REJECTED' }`
+- [ ] `POST /api/loans/{id}/start`: Endpoint per segnare l'inizio del prestito
+- [ ] `POST /api/loans/{id}/return`: Body `{ condition: '...' }`
+- [ ] `GET /api/loans/requests/incoming`: Richieste da approvare
+- [ ] `GET /api/loans/active`: Prestiti in corso (sia dati che ricevuti)
+- [ ] Creare Scheduler `@Scheduled(cron = "0 0 9 * * ?")` (ogni giorno alle 9):
+    - Cerca prestiti scaduti (`ON_LOAN` && `expectedReturnDate` passata)
+    - Per ogni prestito, invia Email di sollecito al `requesterId`
 - [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
 - [ ] documentazione
