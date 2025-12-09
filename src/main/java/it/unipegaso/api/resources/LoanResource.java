@@ -1,12 +1,16 @@
 package it.unipegaso.api.resources;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
 import it.unipegaso.api.dto.ErrorResponse;
+import it.unipegaso.api.dto.ManageLoanDTO;
 import it.unipegaso.api.util.SessionIDProvider;
+import it.unipegaso.api.util.StringUtils;
 import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.CopiesRepository;
 import it.unipegaso.database.LibrariesRepository;
@@ -105,26 +109,6 @@ public class LoanResource {
 			
 			String ownerId = lib.getOwnerId();
 
-			//crea richiesta
-			Loan loanRequest = new Loan();
-
-			loanRequest.setCopyId(copyId);
-			loanRequest.setRequesterId(requesterId);
-			loanRequest.setOwnerId(ownerId);
-			loanRequest.setStatus(LoanStatus.PENDING.toString());
-
-			Date now = new Date();
-			loanRequest.setCreatedAt(now);
-
-			//se e' andato tutto bene lo salvo
-			String loanId = loansRepository.create(loanRequest);
-			
-			if(loanId == null) {
-				LOG.error("impossibile salvare richiesta di prestito");
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(new ErrorResponse("SERVER_ERROR", "errore db"))
-						.build();
-			}
 			
 
 			Optional<User> opOwner = userRepository.get(ownerId);
@@ -143,8 +127,30 @@ public class LoanResource {
 			}
 			
 			Book book = opBook.get();
+			String title = book.getTitle();
 			
-			boolean success = emailService.sendLoanRequestEmail(owner.getEmail(), owner.getUsername(), user.getUsername(), book.getTitle(), book.getAuthor(), loanId);
+			//crea richiesta
+			Loan loanRequest = new Loan();
+			
+			loanRequest.setCopyId(copyId);
+			loanRequest.setRequesterId(requesterId);
+			loanRequest.setOwnerId(ownerId);
+			loanRequest.setStatus(LoanStatus.PENDING.toString());
+			loanRequest.setTitle(title);
+			
+			Date now = new Date();
+			loanRequest.setCreatedAt(now);
+			
+			//se e' andato tutto bene lo salvo
+			String loanId = loansRepository.create(loanRequest);
+			
+			if(loanId == null) {
+				LOG.error("impossibile salvare richiesta di prestito");
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(new ErrorResponse("SERVER_ERROR", "errore db"))
+						.build();
+			}
+			boolean success = emailService.sendLoanRequestEmail(owner.getEmail(), owner.getUsername(), user.getUsername(), title, book.getAuthor(), loanId);
 
 			if(!success) {
 				LOG.error("impossibile inviare email per richiesta prestito, cancello dal db la richiesta");
@@ -154,9 +160,10 @@ public class LoanResource {
 						.build();
 			}
 			
+			Map<String, String> response = new HashMap<>();
+			response.put("loanId", loanId);
 			
-			
-			return Response.status(Response.Status.ACCEPTED).build();
+			return Response.status(Response.Status.OK).entity(response).build();
 
 		}catch(NotAuthorizedException e) {
 			return e.getResponse();
@@ -172,7 +179,97 @@ public class LoanResource {
 					.build();
 		}
 
-
 	}
+	
+	
+	@POST
+	@Path("/manage")
+	public Response manageRequest(@Context HttpHeaders headers, ManageLoanDTO dto) {
 
+		LOG.debug("MANAGE LOAN REQUEST");
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+			
+			String action = dto.action();
+			
+			if(StringUtils.isEmpty(action) || (!"ACCEPT".equalsIgnoreCase(action) && !"REJECT".equalsIgnoreCase(action))) {
+				LOG.error("richiesta errata action [" + action + "]");
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(new ErrorResponse("BAD_REQUEST", "action not allowed")).build();
+			}
+			
+			String loanId = dto.loanId();
+			if(StringUtils.isEmpty(loanId)) {
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
+			}
+			
+			Optional<Loan> opLoan = loansRepository.get(loanId);
+			if(opLoan.isEmpty()) {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
+			
+			Loan loan = opLoan.get();
+
+			// controllo di sicurezza 
+			if (!loan.getOwnerId().equals(currentUser.getId())) {
+				LOG.warn("Utente " + currentUser.getId() + " ha tentato di gestire prestito non suo: " + loanId);
+				return Response.status(Response.Status.FORBIDDEN)
+						.entity(new ErrorResponse("FORBIDDEN", "Non sei il proprietario di questo prestito")).build();
+			}
+
+			// controllo coerenza stato 
+			if (!LoanStatus.PENDING.toString().equals(loan.getStatus())) {
+				return Response.status(Response.Status.CONFLICT)
+						.entity(new ErrorResponse("CONFLICT", "La richiesta è già stata processata")).build();
+			}
+			
+			// Cambio stato
+			String newStatus = "ACCEPT".equalsIgnoreCase(action) ? LoanStatus.ACCEPTED.toString() : LoanStatus.REJECTED.toString();
+			loan.setStatus(newStatus);
+			
+			if(!StringUtils.isEmpty(dto.notes())) {
+				loan.setOwnerNotes(dto.notes());
+			}
+			
+			boolean success = loansRepository.update(loan);
+			if(!success) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+			
+			// Recupero dati per email
+			String requesterID = loan.getRequesterId();
+			Optional<User> opRequester = userRepository.get(requesterID);
+			
+			if(opRequester.isEmpty()) {
+				// Edge case: il richiedente non esiste piu', loggo errore
+				LOG.warn("Requester not found for loan " + loanId);
+				return Response.ok().build(); 
+			}
+			
+			User requester = opRequester.get();
+			String title = loan.getTitle();
+			
+			success = emailService.sendRequestResponseEmail(requester.getEmail(), requester.getUsername(), title, action);
+
+			if(!success) {
+				LOG.error("impossibile inviare email, rollback sul db");
+				loan.setStatus(LoanStatus.PENDING.toString());
+				loansRepository.update(loan); // rollback stato
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(new ErrorResponse("SERVER_ERROR", "errore invio notifica")).build();
+			}
+			
+			return Response.ok().build();
+
+		} catch(NotAuthorizedException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			LOG.error("errore sconosciuto manage request", e);
+			return Response.serverError().build();
+		}
+	}
 }

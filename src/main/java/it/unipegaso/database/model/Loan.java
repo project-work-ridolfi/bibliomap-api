@@ -10,6 +10,8 @@ public class Loan {
 	@BsonId
 	private String id;
 	
+	private String title;
+	
 	@BsonProperty("requester_id")
 	private String requesterId;
 	
@@ -35,12 +37,6 @@ public class Loan {
 	
 	@BsonProperty("actual_return_date")
 	private Date actualReturnDate;
-	
-	@BsonProperty("condition_start")
-	private String conditionStart;
-	
-	@BsonProperty("condition_end")
-	private String conditionEnd;
 	
 	@BsonProperty("owner_notes")
 	private String ownerNotes;
@@ -105,24 +101,17 @@ public class Loan {
 	public void setActualReturnDate(Date actualReturnDate) {
 		this.actualReturnDate = actualReturnDate;
 	}
-	public String getConditionStart() {
-		return conditionStart;
-	}
-	public void setConditionStart(String conditionStart) {
-		this.conditionStart = conditionStart;
-	}
-	public String getConditionEnd() {
-		return conditionEnd;
-	}
-	public void setConditionEnd(String conditionEnd) {
-		this.conditionEnd = conditionEnd;
-	}
 	public String getOwnerNotes() {
 		return ownerNotes;
 	}
 	public void setOwnerNotes(String ownerNotes) {
 		this.ownerNotes = ownerNotes;
 	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
 	
-
 }

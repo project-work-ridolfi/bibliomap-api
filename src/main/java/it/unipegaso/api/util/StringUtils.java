@@ -9,6 +9,12 @@ public class StringUtils {
 	}
 	
 	
+	public static boolean isEmpty(String string) {
+		
+		return string == null || string.isBlank();
+		
+	}
+	
 	public static String getFullLanguage(String abbr) {
 		
 		if (abbr != null && !abbr.isBlank()) {

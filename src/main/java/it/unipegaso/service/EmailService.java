@@ -1,5 +1,8 @@
 package it.unipegaso.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -15,7 +18,6 @@ public class EmailService {
 
 	private static final Logger LOG = Logger.getLogger(EmailService.class);
 
-
 	@Inject
 	@Location("EmailService/otpEmail.html")
 	Template otpEmailTemplate;
@@ -23,6 +25,10 @@ public class EmailService {
 	@Inject
 	@Location("EmailService/loanRequest.html")
 	Template loanRequestTemplate;
+
+	@Inject
+	@Location("EmailService/requestResponse.html")
+	Template requestResponseTemplate;
 
 	@Inject
 	@ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
@@ -33,128 +39,93 @@ public class EmailService {
 	String fromEmail;
 
 	@Inject
-	@ConfigProperty(name = "quarkus.email.base-url", defaultValue = "http://localhost:5173/") //TODO
+	@ConfigProperty(name = "quarkus.email.base-url", defaultValue = "http://localhost:5173/")
 	String baseUrl;
 
 	@Inject
 	Mailer mailer;
 
+	// Invia notifica di esito (accettazione/rifiuto) al richiedente.
+	public boolean sendRequestResponseEmail(String recipientEmail, String recipientName, String bookTitle, String action) {
 
-	public boolean sendLoanRequestEmail(String recipientEmail, String recipientName, String requesterUsername, String bookTitle, String author, String loanId) {
+		boolean isAccepted = "accepted".equalsIgnoreCase(action) || "accept".equalsIgnoreCase(action) || "true".equalsIgnoreCase(action);
 
-		String loanUrl = baseUrl + "/TODOLOANREQUEST/" + loanId ; //TODO
+		Map<String, Object> data = new HashMap<>();
+		data.put("recipientName", recipientName);
+		data.put("bookTitle", bookTitle);
+		data.put("isAccepted", isAccepted);
+		// Link alla dashboard per vedere i dettagli
+		data.put("dashboardUrl", baseUrl + "dashboard");
 
-		LoanEmailData data = new LoanEmailData (recipientName, requesterUsername, bookTitle, author, loanUrl);
+		String htmlBody = requestResponseTemplate
+				.data(data) 
+				.render();
 
+		String statusText = isAccepted ? "ACCETTATA" : "RIFIUTATA";
+		String subject = "[Bibliomap] La tua richiesta di prestito è stata " + statusText;
+
+		return sendEmail(recipientEmail, subject, htmlBody, "Esito richiesta");
+	}
+
+	// Invia notifica di nuova richiesta di prestito al proprietario del libro.
+	public boolean sendLoanRequestEmail(String recipientEmail, String recipientName, String requesterName, String bookTitle, String author, String loanId) {
+
+		// url per portare l'utente direttamente alla gestione della richiesta
+		String loanUrl = baseUrl + "dashboard?tab=requests&highlight=" + loanId;
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("recipientName", recipientName);
+		data.put("requesterName", requesterName); 
+		data.put("bookTitle", bookTitle);
+		data.put("author", author);
+		data.put("loanUrl", loanUrl);
 
 		String htmlBody = loanRequestTemplate
-				.data(data) 
+				.data(data)
 				.render();
 
 		String subject = "[Bibliomap] Hai una nuova richiesta di prestito!";
 
-		if(debugEmail) {
-			LOG.info("DEBUG EMAIL - subject: " + subject);
-			LOG.info(htmlBody);
-			return true;
-		}
-
-		try {
-			mailer.send(Mail.withHtml(
-					recipientEmail, // to
-					subject,       
-					htmlBody        
-					)
-					.setFrom(fromEmail) 
-					);
-
-			LOG.infof("Email di richiesta prestito inviata con successo a %s", recipientEmail);
-			return true;
-
-		} catch (Exception e) {
-			LOG.errorf(e, "ERRORE SMTP durante l'invio di richiesta prestito a %s. Controllare la configurazione.", recipientEmail);
-			return false;
-		}
+		return sendEmail(recipientEmail, subject, htmlBody, "Nuova richiesta prestito");
 	}
 
-
-	/**
-	 * Invia un'email all'utente con il codice OTP.
-	 * @param recipientEmail L'email del destinatario.
-	 * @param otpCode Il codice OTP generato.
-	 * @param recipientName L'username del destinatario.
-	 * @param verificationUrl TODO l'url in caso abbiano chiuso la pagina per la verifica dell'otp
-	 * @return true se l'email è stata processata (mock o inviata), false in caso di errore SMTP.
-	 */
+	// Invia un'email all'utente con il codice OTP per la verifica.
 	public boolean sendOtpEmail(String recipientEmail, String otpCode, String recipientName) {
 
-		// crea l'oggetto dati per il template
-		String verificationUrl = baseUrl + "/TODOOTP"; //TODO
+		String verificationUrl = baseUrl + "verify-otp?email=" + recipientEmail; // TODO
 
-		OtpEmailData data = new OtpEmailData(recipientName, otpCode, verificationUrl);
+		Map<String, Object> data = new HashMap<>();
+		data.put("recipientName", recipientName);
+		data.put("otpCode", otpCode);
+		data.put("verificationUrl", verificationUrl);
 
-		// genera il contenuto HTML usando Qute
-		// .data() passa l'oggetto OtpEmailData al template
 		String htmlBody = otpEmailTemplate
-				.data(data) 
+				.data(data)
 				.render();
 
 		String subject = "[Bibliomap] Il tuo codice di verifica OTP: " + otpCode;
 
-		try {
-			mailer.send(Mail.withHtml(
-					recipientEmail, // to
-					subject,       
-					htmlBody        
-					)
-					.setFrom(fromEmail) 
-					);
+		return sendEmail(recipientEmail, subject, htmlBody, "Codice OTP");
+	}
 
-			LOG.infof("Email di verifica OTP HTML inviata con successo a %s", recipientEmail);
+	private boolean sendEmail(String to, String subject, String body, String logType) {
+		if (debugEmail) {
+			LOG.info("--------------------------------------------------");
+			LOG.infof("DEBUG EMAIL [%s] to: %s", logType, to);
+			LOG.infof("Subject: %s", subject);
+			LOG.info("Body:");
+			LOG.info(body);
+			LOG.info("--------------------------------------------------");
 			return true;
+		}
 
+		try {
+			mailer.send(Mail.withHtml(to, subject, body).setFrom(fromEmail));
+			LOG.infof("Email [%s] inviata con successo a %s", logType, to);
+			return true;
 		} catch (Exception e) {
-			LOG.errorf(e, "ERRORE SMTP durante l'invio OTP HTML a %s. Controllare la configurazione.", recipientEmail);
+			LOG.errorf(e, "ERRORE SMTP invio [%s] a %s. Controllare configurazione.", logType, to);
 			return false;
 		}
-	}
-
-	public class OtpEmailData {
-		private final String recipientName;
-		private final String otpCode;
-		private final String verificationUrl;
-
-		public OtpEmailData(String recipientName, String otpCode, String verificationUrl) {
-			this.recipientName = recipientName;
-			this.otpCode = otpCode;
-			this.verificationUrl = verificationUrl;
-		}
-
-		public String getRecipientName() { return recipientName; }
-		public String getOtpCode() { return otpCode; }
-		public String getVerificationUrl() { return verificationUrl; }
-	}
-
-	public class LoanEmailData {
-		private final String recipientName;
-		private final String requesterName;
-		private final String bookTitle;
-		private final String author;
-		private final String loanUrl;
-
-		public LoanEmailData(String recipientName, String requesterName, String bookTitle, String author, String loanUrl) {
-			this.recipientName = recipientName;
-			this.requesterName = requesterName;
-			this.bookTitle = bookTitle;
-			this.author = author;
-			this.loanUrl = loanUrl;
-		}
-
-		public String getRecipientName() { return recipientName; }
-		public String getRequesterName() { return requesterName; }
-		public String getBookTitle() { return bookTitle; }
-		public String getAuthor() { return author; }
-		public String getLoanUrl() { return loanUrl; }
-
 	}
 }
