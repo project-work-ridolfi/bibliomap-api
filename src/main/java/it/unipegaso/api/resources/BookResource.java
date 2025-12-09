@@ -3,8 +3,6 @@ package it.unipegaso.api.resources;
 import java.util.List;
 import java.util.Optional;
 
-import org.jboss.resteasy.reactive.MultipartForm;
-
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
 import it.unipegaso.api.dto.BookMultipartBody;

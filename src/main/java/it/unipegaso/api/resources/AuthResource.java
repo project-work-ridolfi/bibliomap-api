@@ -192,10 +192,10 @@ public class AuthResource {
 		User newUser = new User();
 
 		// Campi obbligatori e di sicurezza
-		newUser.username = request.username();
-		newUser.email = request.email();
-		newUser.hashedPassword = hashedPassword;
-		newUser.acceptedTerms = request.acceptTerms();
+		newUser.setUsername(request.username());
+		newUser.setEmail(request.email());
+		newUser.setHashedPassword(hashedPassword);
+		newUser.setAcceptedTerms(request.acceptTerms());
 		Response response;
 
 		try {
@@ -210,7 +210,7 @@ public class AuthResource {
 				String authenticatedSessionId = UUID.randomUUID().toString(); 
 
 				// salva lo stato autenticato in Redis (userId e username)
-				registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, newUser.id, newUser.username, sessionDurationMinutes * 60); 
+				registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, newUser.getId(), newUser.getUsername(), sessionDurationMinutes * 60); 
 
 				// determina se il flag 'Secure' deve essere TRUE
 				boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
@@ -224,7 +224,7 @@ public class AuthResource {
 
 				Map<String, String> responseBody = Map.of(
 						"message", "User created and authenticated.",
-						"userId", newUser.id 
+						"userId", newUser.getId() 
 						);
 
 				// ritorna la risposta con il nuovo Cookie SESSION_ID 
@@ -287,7 +287,7 @@ public class AuthResource {
 		User user = userOptional.get();
 
 		// verifica la password
-		boolean isPasswordValid = BcryptUtil.matches(credentials.password(), user.hashedPassword);
+		boolean isPasswordValid = BcryptUtil.matches(credentials.password(), user.getHashedPassword());
 
 		if (!isPasswordValid) {
 			return Response.status(Response.Status.UNAUTHORIZED) 
@@ -301,7 +301,7 @@ public class AuthResource {
 
 		int durationSeconds =  sessionDurationMinutes * 60;
 		// salva lo stato autenticato in Redis
-		registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, user.id, user.username, durationSeconds); 
+		registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, user.getId(), user.getUsername(), durationSeconds); 
 
 		// determina se il flag 'Secure' deve essere TRUE
 		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
@@ -316,7 +316,7 @@ public class AuthResource {
 		// risposta di successo
 		Map<String, String> responseBody = Map.of(
 				"message", "Accesso effettuato con successo.",
-				"userId", user.id 
+				"userId", user.getId() 
 				);
 
 		return Response.ok(responseBody) // 200 OK

@@ -69,7 +69,7 @@ public class AuthResourceTest {
 		put("acceptPrivacy", true);
 	}};
 
-	
+
 	private void cleanTestUsers() {
 		usersRepository.delete(UsersRepository.EMAIL, TEST_EMAIL);
 		usersRepository.delete(UsersRepository.EMAIL, "final_test@bibliomap.it");
@@ -88,7 +88,7 @@ public class AuthResourceTest {
 	}
 
 
-	
+
 	private void setupTestUser() {
 		// pulizia preventiva immediata (se un test precedente ha fallito)
 		usersRepository.delete(UsersRepository.EMAIL, TEST_EMAIL); 
@@ -96,11 +96,11 @@ public class AuthResourceTest {
 		String hash = bcryptHash(TEST_PASSWORD);
 
 		User user = new User();
-		user.email = TEST_EMAIL;
-		user.username = TEST_USERNAME;
-		user.hashedPassword = hash; 
-		user.acceptedTerms = true;
-		user.id = "test-user-id"; // imposta un id fisso per i test
+		user.setEmail(TEST_EMAIL);
+		user.setUsername(TEST_USERNAME);
+		user.setHashedPassword(hash); 
+		user.setAcceptedTerms(true);
+		user.setId("test-user-id"); // imposta un id fisso per i test
 		usersRepository.create(user);
 	}
 
@@ -162,12 +162,13 @@ public class AuthResourceTest {
 	@Test
 	public void testRegisterInit_ExistingEmail_Conflict() {
 		// prepara il db: inserisce l'utente prima del test
-		User existingUser = new User();
-		existingUser.email = TEST_EMAIL;
-		existingUser.username = TEST_USERNAME;
-		existingUser.hashedPassword = "somehash";
-		existingUser.acceptedTerms = true;
-		usersRepository.create(existingUser);
+		User user = new User();
+		user.setEmail(TEST_EMAIL);
+		user.setUsername(TEST_USERNAME);
+		user.setHashedPassword("somehash"); 
+		user.setAcceptedTerms(true);
+
+		usersRepository.create(user);
 
 		RestAssured.given()
 		.contentType(MediaType.APPLICATION_JSON)

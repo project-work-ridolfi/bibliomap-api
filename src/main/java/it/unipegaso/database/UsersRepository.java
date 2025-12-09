@@ -61,14 +61,14 @@ public class UsersRepository implements IRepository<User>{
 
 			String id = UUID.randomUUID().toString();
 
-			if (newUser.id == null) {
-				newUser.id = id;
+			if (newUser.getId() == null) {
+				newUser.setId(id);
 			}else {
-				id = newUser.id;
+				id = newUser.getId();
 			}
 			LocalDateTime now = LocalDateTime.now();
-			newUser.createdAt = now;
-			newUser.modifiedAt = now;
+			newUser.setCreatedAt(now);
+			newUser.setModifiedAt(now);
 
 			InsertOneResult result = users.insertOne(newUser);
 
@@ -130,36 +130,38 @@ public class UsersRepository implements IRepository<User>{
 	@Override
 	public boolean update(User user) throws MongoWriteException {
 
-		if (user.id == null) {
+		if (user.getId() == null) {
 			LOG.error("Aggiornamento utente fallito: ID utente mancante.");
 			return false;
 		}
 
 		// Aggiorna il timestamp di modifica prima della sostituzione
-		user.modifiedAt = LocalDateTime.now();
+		user.setModifiedAt(LocalDateTime.now());
 
+		String id = user.getId();
+		
 		try {
-			Bson query = Filters.eq("_id", user.id); 
+			Bson query = Filters.eq(ID, id); 
 			UpdateResult result = users.replaceOne(query, user);
 
 			if (result.wasAcknowledged() && result.getModifiedCount() > 0) {
 				return true;
 			} else if (result.getModifiedCount() == 0) {
-				LOG.warnf("Aggiornamento utente non eseguito: Utente con ID %s non trovato.", user.id);
+				LOG.warnf("Aggiornamento utente non eseguito: Utente con ID %s non trovato.", id);
 				return false;
 			} else {
-				LOG.errorf("Aggiornamento utente fallito per ID %s.", user.id);
+				LOG.errorf("Aggiornamento utente fallito per ID %s.", id);
 				return false;
 			}
 		} catch (MongoWriteException e) {
-			LOG.errorf(e, "Errore DB durante l'aggiornamento dell'utente %s.", user.id);
+			LOG.errorf(e, "Errore DB durante l'aggiornamento dell'utente %s.", id);
 			throw new RuntimeException("Errore DB durante l'aggiornamento utente.", e);
 		}
 	}
 
 	@Override
 	public boolean delete(String id) {
-		return delete("_id", id);
+		return delete(ID, id);
 	}
 
 	@Override

@@ -108,18 +108,18 @@ public class UserResource {
 		}
 
 		// AGGIORNAMENTO UTENTE CON IL LOCATION ID E I SETTING
-		user.locationId = locationId;
-		user.visibility = request.visibility();
-		user.blurRadius = request.blurRadius();
+		user.setLocationId(locationId);
+		user.setVisibility(request.visibility());
+		user.setBlurRadius(request.blurRadius());
 
 		boolean updateSuccess = userRepository.update(user);
 
 		if(updateSuccess) {
-			LOG.infof("Posizione salvata e Utente %s aggiornato con Location ID: %s", user.username, locationId);
+			LOG.infof("Posizione salvata e Utente %s aggiornato con Location ID: %s", user.getUsername(), locationId);
 			// Successo 204 No Content
 			return Response.ok().build(); 
 		} else {
-			LOG.errorf("Fallimento nell'aggiornare User %s con Location ID %s", user.username, locationId);
+			LOG.errorf("Fallimento nell'aggiornare User %s con Location ID %s", user.getUsername(), locationId);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new ErrorResponse("DB_FAILURE", "Aggiornamento utente con locationId fallito."))
 					.build();
@@ -139,12 +139,12 @@ public class UserResource {
 
 			// se il controllo arriva qui senza eccezioni, l'utente e' autenticato 
 			Map<String, String> responseBody = Map.of(
-					"id", user.id, 
-					"username", user.username,
-					"email", user.email 
+					"id", user.getId(), 
+					"username", user.getUsername(),
+					"email", user.getEmail() 
 					);
 
-			LOG.infof("profilo caricato con successo per: %s", user.username);
+			LOG.infof("profilo caricato con successo per: %s", user.getUsername());
 			return Response.ok(responseBody).build();
 
 		} catch (NotAuthorizedException e) {
@@ -168,7 +168,7 @@ public class UserResource {
 	    try {
 	        User user = userService.getUserFromSession(sessionId); 
 
-	        String userId = user.id;
+	        String userId = user.getId();
 
 	        List<Library> userLibraries = libraryService.getUserLibraries(userId); 
 	        

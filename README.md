@@ -116,15 +116,11 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 - [ ] fuzzy level (da ricontrollare se è vero)
 - [x] Creare Enum `LoanStatus`: `PENDING`, `ACCEPTED`, `ON_LOAN`, `RETURNED`, `REJECTED`, `CANCELLED`
 - [x] Creare Entity `Loan` nella collection `loans`:
-- [ ] Creare `LoanRepository`:
-    - Query per trovare richieste in arrivo per `ownerId` con stato `PENDING`
-    - Query per trovare prestiti attivi (`ON_LOAN`) per `ownerId` e `requesterId`
-    - Query per trovare storico prestiti (`RETURNED`)
-    - Query per cron job: `status == ON_LOAN` AND `expectedReturnDate < now`
-- [ ] Implementare `createLoanRequest(requesterId, copyId)`:
+- [x] Creare `LoanRepository`:
+- [x] Implementare `createLoanRequest(requesterId, copyId)`:
     - Verifica che la copia esista e `status == 'available'`
     - Salva `Loan` con stato `PENDING`
-    - Invia Email notifica al proprietario (usando mail service esistente)
+    - Invia Email notifica al proprietario
 - [ ] Implementare `manageRequest(loanId, ownerId, action)`:
     - Action `ACCEPT`: aggiorna stato a `ACCEPTED`, notifica richiedente
     - Action `REJECT`: aggiorna stato a `REJECTED`, notifica richiedente

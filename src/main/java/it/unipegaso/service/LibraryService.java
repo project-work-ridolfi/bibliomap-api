@@ -38,20 +38,20 @@ public class LibraryService {
 	public String createNewLibrary(User user, LibraryDTO libraryDTO) {
 
 		LOG.debug("create new library init");
-		LOG.debug("username: " + user.username);
+		LOG.debug("username: " + user.getUsername());
 
 		Library newLibrary = new Library();
 		newLibrary.setName(libraryDTO.name());
-		newLibrary.setOwnerId(user.id);
+		newLibrary.setOwnerId(user.getId());
 		newLibrary.setVisibility(libraryDTO.visibility());
 
 		LOG.info("library creata");
 
 		// collegamento della posizione del profilo
-		if ("user_default".equals(libraryDTO.locationType()) && user.locationId != null) {
+		if ("user_default".equals(libraryDTO.locationType()) && user.getLocationId() != null) {
 
 			LOG.debug("user default");
-			newLibrary.setLocationId(user.locationId);
+			newLibrary.setLocationId(user.getLocationId());
 		} 
 		// TODO: Gestire "new_location" navigando a un altro endpoint di creazione posizione.
 

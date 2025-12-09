@@ -12,16 +12,85 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class User {
 	
 	@BsonId
-	public String id; 
+	private String id; 
     
-	public String username;
-    public String email;
-    public String hashedPassword;
-    public boolean acceptedTerms; 
-    public LocalDateTime createdAt; 
-    public LocalDateTime modifiedAt;
-    public String locationId; 
-    public String visibility; //all, logged-in, no one
-    public int blurRadius;
-    public List<String> collections;
+	private String username;
+	private String email;
+	private String hashedPassword;
+	private boolean acceptedTerms; 
+	private LocalDateTime createdAt; 
+	private LocalDateTime modifiedAt;
+	private String locationId; 
+	private String visibility; //all, logged-in, no one
+	private int blurRadius;
+	private List<String> collections;
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getHashedPassword() {
+		return hashedPassword;
+	}
+	public void setHashedPassword(String hashedPassword) {
+		this.hashedPassword = hashedPassword;
+	}
+	public boolean isAcceptedTerms() {
+		return acceptedTerms;
+	}
+	public void setAcceptedTerms(boolean acceptedTerms) {
+		this.acceptedTerms = acceptedTerms;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+	public LocalDateTime getModifiedAt() {
+		return modifiedAt;
+	}
+	public void setModifiedAt(LocalDateTime modifiedAt) {
+		this.modifiedAt = modifiedAt;
+	}
+	public String getLocationId() {
+		return locationId;
+	}
+	public void setLocationId(String locationId) {
+		this.locationId = locationId;
+	}
+	public String getVisibility() {
+		return visibility;
+	}
+	public void setVisibility(String visibility) {
+		this.visibility = visibility;
+	}
+	public int getBlurRadius() {
+		return blurRadius;
+	}
+	public void setBlurRadius(int blurRadius) {
+		this.blurRadius = blurRadius;
+	}
+	public List<String> getCollections() {
+		return collections;
+	}
+	public void setCollections(List<String> collections) {
+		this.collections = collections;
+	}
+	
+	
 }

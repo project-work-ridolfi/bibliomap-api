@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,11 +29,12 @@ public class UsersRepositoryTest {
 
     // Helper per creare un utente base
     private User createBaseUser() {
-        User user = new User();
-        user.username = TEST_USERNAME;
-        user.email = TEST_EMAIL;
-        user.hashedPassword = "hashedpassword";
-        user.acceptedTerms = true;
+    	
+    	User user = new User();
+		user.setEmail(TEST_EMAIL);
+		user.setUsername(TEST_USERNAME);
+		user.setHashedPassword("somehash"); 
+		user.setAcceptedTerms(true);
         return user;
     }
 
@@ -52,7 +55,7 @@ public class UsersRepositoryTest {
     @Test
     public void testCreateUser_Success() {
         assertTrue(usersRepository.create(testUser) != null, "La creazione utente deve avere successo.");
-        assertNotNull(testUser.createdAt, "La data di creazione deve essere impostata.");
+        assertNotNull(testUser.getCreatedAt(), "La data di creazione deve essere impostata.");
     }
 
     @Test
@@ -92,7 +95,7 @@ public class UsersRepositoryTest {
     public void testUpdateUser_NotFound() {
         // Crea un utente fittizio MA con un ID casuale che non esiste
         User nonExistingUser = createBaseUser();
-        nonExistingUser.id = "4b277b75-1e3d-4c3e-a892-a1b9d4e5f6g7"; // UUID casuale
+        nonExistingUser.setId(UUID.randomUUID().toString());
         
         // updateUtente deve ritornare false (0 modificati)
         assertFalse(usersRepository.update(nonExistingUser), "Aggiornamento utente non esistente deve ritornare false.");

@@ -73,7 +73,7 @@ public class CopyResource {
 			String copyLibraryId = copy.getLibraryId();
 			
 			//prendo tutte le sue librerie
-			List<Library> libraries = libraryService.getUserLibraries(user.id);
+			List<Library> libraries = libraryService.getUserLibraries(user.getId());
 			
 			//controllo che fra la lista delle librerie dell'utente ci sia quella della copia da cancellare
 			boolean found = false;
@@ -167,7 +167,7 @@ public class CopyResource {
             Copy copy = opCopy.get();
 
             // verify ownership
-            boolean isOwner = libraryService.getUserLibraries(user.id).stream()
+            boolean isOwner = libraryService.getUserLibraries(user.getId()).stream()
                     .anyMatch(lib -> lib.getId().equals(copy.getLibraryId()));
 
             if (!isOwner) return Response.status(Response.Status.FORBIDDEN).build();

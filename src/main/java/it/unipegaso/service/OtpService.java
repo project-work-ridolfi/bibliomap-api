@@ -47,7 +47,7 @@ public class OtpService {
     @ConfigProperty(name = "quarkus.auth.otp.max-retries", defaultValue = "3")
     long maxRetriesConfig; 
 
-    @ConfigProperty(name = "quarkus.auth.otp.debug-mode", defaultValue = "false")
+    @ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
     boolean otpDebugMode;
 
 

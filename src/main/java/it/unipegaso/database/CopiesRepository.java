@@ -23,59 +23,59 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class CopiesRepository implements IRepository<Copy> {
 
-    private static final Logger LOG = Logger.getLogger(CopiesRepository.class);
+	private static final Logger LOG = Logger.getLogger(CopiesRepository.class);
 
-    @Inject
-    MongoCollection<Copy> copies;
+	@Inject
+	MongoCollection<Copy> copies;
 
-    @Override
-    public String create(Copy copy) throws MongoWriteException {
-        copy.setId( UUID.randomUUID().toString()) ;
-        
-        InsertOneResult result = copies.insertOne(copy);
-        
-        if (!result.wasAcknowledged()) {
-            LOG.error("Inserimento copia non confermato");
-            return null;
-        }
-        return copy.getId();
-    }
+	@Override
+	public String create(Copy copy) throws MongoWriteException {
+		copy.setId( UUID.randomUUID().toString()) ;
 
-    @Override
-    public Optional<Copy> get(String id) {
-        if (id == null || id.trim().isEmpty()) {
-        	return Optional.empty();
-        }
-        return Optional.ofNullable(copies.find(Filters.eq("_id", id)).first());
-    }
+		InsertOneResult result = copies.insertOne(copy);
 
-    public List<Copy> findByLibrary(String libraryId) {
-    	
-    	Bson filter = Filters.eq("libraryId", libraryId);
-    	
-        return find(filter).into(new ArrayList<>());
-    }
-    
-    public boolean delete(String id) {
-    	
-        if (id == null || id.trim().isEmpty()) {
-        	return false;
-        }
-        
-    	DeleteResult result = copies.deleteOne(Filters.eq("_id", id));
-    	
-    	return result.wasAcknowledged();
-    	
-    }
+		if (!result.wasAcknowledged()) {
+			LOG.error("Inserimento copia non confermato");
+			return null;
+		}
+		return copy.getId();
+	}
+
+	@Override
+	public Optional<Copy> get(String id) {
+		if (id == null || id.trim().isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.ofNullable(copies.find(Filters.eq(ID, id)).first());
+	}
+
+	public List<Copy> findByLibrary(String libraryId) {
+
+		Bson filter = Filters.eq("libraryId", libraryId);
+
+		return find(filter).into(new ArrayList<>());
+	}
+
+	public boolean delete(String id) {
+
+		if (id == null || id.trim().isEmpty()) {
+			return false;
+		}
+
+		DeleteResult result = copies.deleteOne(Filters.eq(ID, id));
+
+		return result.wasAcknowledged();
+
+	}
 
 	@Override
 	public boolean update(Copy copy) throws MongoWriteException {
 
-		 if (copy == null || copy.getId().isEmpty()) {
-	        	return false;
-	        }
-		UpdateResult result = copies.replaceOne(Filters.eq("_id", copy.getId()), copy);
-		
+		if (copy == null || copy.getId().isEmpty()) {
+			return false;
+		}
+		UpdateResult result = copies.replaceOne(Filters.eq(ID, copy.getId()), copy);
+
 		return result.getMatchedCount() == 1;
 	}
 
