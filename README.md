@@ -121,7 +121,7 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
     - Verifica che la copia esista e `status == 'available'`
     - Salva `Loan` con stato `PENDING`
     - Invia Email notifica al proprietario
-- [ ] Implementare `manageRequest(loanId, ownerId, action)`:
+- [x] Implementare `manageRequest(loanId, ownerId, action)`:
     - Action `ACCEPT`: aggiorna stato a `ACCEPTED`, notifica richiedente
     - Action `REJECT`: aggiorna stato a `REJECTED`, notifica richiedente
 - [ ] Implementare `startLoan(loanId, ownerId)` (Consegna fisica):
