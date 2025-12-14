@@ -124,7 +124,7 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 - [x] Implementare `manageRequest(loanId, ownerId, action)`:
     - Action `ACCEPT`: aggiorna stato a `ACCEPTED`, notifica richiedente
     - Action `REJECT`: aggiorna stato a `REJECTED`, notifica richiedente
-- [ ] Implementare `startLoan(loanId, ownerId)` (Consegna fisica):
+- [x] Implementare `startLoan(loanId, ownerId)` (Consegna fisica):
     - Verifica che stato sia `ACCEPTED`
     - Aggiorna `Loan`: stato `ON_LOAN`, `loanStartDate` = now, `expectedReturnDate` = now + 30gg
     - **SIDE EFFECT**: Aggiorna `Copy`: `status` = `on_loan`

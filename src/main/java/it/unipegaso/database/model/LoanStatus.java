@@ -6,5 +6,6 @@ public enum LoanStatus {
 	ON_LOAN, 
 	RETURNED,
 	REJECTED,
+	ERROR,
 	CANCELLED;
 }

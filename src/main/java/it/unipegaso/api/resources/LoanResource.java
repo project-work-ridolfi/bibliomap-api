@@ -1,5 +1,6 @@
 package it.unipegaso.api.resources;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,13 +44,13 @@ public class LoanResource {
 
 	@Inject 
 	UserService userService;
-	
+
 	@Inject 
 	UsersRepository userRepository;
 
 	@Inject
 	CopiesRepository copiesRepository;
-	
+
 	@Inject
 	BooksRepository bookRepository;
 
@@ -58,7 +59,7 @@ public class LoanResource {
 
 	@Inject
 	EmailService emailService;
-	
+
 	@Inject
 	LoansRepository loansRepository;
 
@@ -90,7 +91,7 @@ public class LoanResource {
 
 			String status = copy.getStatus();
 			String bookId = copy.getBookIsbn();
-			
+
 			// se non è disponibile TODO usa enum
 			if(!"available".equals(status)) {
 				LOG.info("copy not available");
@@ -106,44 +107,44 @@ public class LoanResource {
 			}
 
 			Library lib = opLib.get();
-			
+
 			String ownerId = lib.getOwnerId();
 
-			
+
 
 			Optional<User> opOwner = userRepository.get(ownerId);
-			
+
 			if(opOwner.isEmpty()) {
 				LOG.info("owner not found");
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
-			
+
 			User owner = opOwner.get();
-			
+
 			Optional<Book> opBook = bookRepository.get(bookId);
 			if(opBook.isEmpty()) {
 				LOG.info("book not found");
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
-			
+
 			Book book = opBook.get();
 			String title = book.getTitle();
-			
+
 			//crea richiesta
 			Loan loanRequest = new Loan();
-			
+
 			loanRequest.setCopyId(copyId);
 			loanRequest.setRequesterId(requesterId);
 			loanRequest.setOwnerId(ownerId);
 			loanRequest.setStatus(LoanStatus.PENDING.toString());
 			loanRequest.setTitle(title);
-			
+
 			Date now = new Date();
 			loanRequest.setCreatedAt(now);
-			
+
 			//se e' andato tutto bene lo salvo
 			String loanId = loansRepository.create(loanRequest);
-			
+
 			if(loanId == null) {
 				LOG.error("impossibile salvare richiesta di prestito");
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -159,10 +160,10 @@ public class LoanResource {
 						.entity(new ErrorResponse("SERVER_ERROR", "errore invio email"))
 						.build();
 			}
-			
+
 			Map<String, String> response = new HashMap<>();
 			response.put("loanId", loanId);
-			
+
 			return Response.status(Response.Status.OK).entity(response).build();
 
 		}catch(NotAuthorizedException e) {
@@ -180,8 +181,101 @@ public class LoanResource {
 		}
 
 	}
-	
-	
+
+
+	@POST
+	@Path("/{id}/start")
+	public Response startLoan(@Context HttpHeaders headers, @PathParam("id") String loanId) {
+
+		LOG.debug("START LOAN");
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+
+			// check loan id
+			if (StringUtils.isEmpty(loanId)) {
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
+			}
+
+			Optional<Loan> opLoan = loansRepository.get(loanId);
+			if (opLoan.isEmpty()) {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
+
+			Loan loan = opLoan.get();
+
+			// verifica che sia il proprietario del libro
+			if (!loan.getOwnerId().equals(currentUser.getId())) {
+				LOG.warn("Utente " + currentUser.getId() + " ha tentato di gestire prestito non suo: " + loanId);
+				return Response.status(Response.Status.FORBIDDEN)
+						.entity(new ErrorResponse("FORBIDDEN", "Non sei il proprietario di questo prestito")).build();
+			}
+
+			// verifica status
+			if (!LoanStatus.ACCEPTED.toString().equals(loan.getStatus())) {
+				return Response.status(Response.Status.CONFLICT)
+						.entity(new ErrorResponse("CONFLICT", "La richiesta è già stata processata")).build();
+			}
+
+			String copyId = loan.getCopyId();
+			Optional<Copy> opCopy = copiesRepository.get(copyId);
+
+			// controlla copia
+			if (opCopy.isEmpty()) {
+				
+				loan.setStatus(LoanStatus.ERROR.toString());
+				loansRepository.update(loan);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(new ErrorResponse("NOT_FOUND", "La copia del libro non e' stata trovata")).build();
+			}
+
+			// update loan status e aggiunte date
+			Calendar cal = Calendar.getInstance();
+			loan.setLoanStartDate(cal.getTime());
+
+			cal.add(Calendar.DAY_OF_MONTH, 30); //il prestito dura 30 giorni
+			loan.setExpectedReturnDate(cal.getTime());
+
+			loan.setStatus(LoanStatus.ON_LOAN.toString());
+
+			boolean success = loansRepository.update(loan);
+
+			if (!success) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+
+			Copy copy = opCopy.get();
+			copy.setStatus("on_loan");
+
+			success = copiesRepository.update(copy);
+
+			// handle copy update failure
+			if (!success) {
+				LOG.warn("IMPOSSIBILE AGGIORNARE COPIA");
+				// manual rollback
+				loan.setStatus(LoanStatus.ACCEPTED.toString());
+				loan.setLoanStartDate(null);
+				loan.setExpectedReturnDate(null);
+				loansRepository.update(loan);
+
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(new ErrorResponse("UPDATE_FAILED", "Impossibile aggiornare stato copia, operazione annullata")).build();
+			}
+
+			return Response.ok().build();
+
+		} catch (NotAuthorizedException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			LOG.error("errore sconosciuto manage request", e);
+			return Response.serverError().build();
+		}
+	}
+
+
 	@POST
 	@Path("/manage")
 	public Response manageRequest(@Context HttpHeaders headers, ManageLoanDTO dto) {
@@ -192,26 +286,26 @@ public class LoanResource {
 
 		try {
 			User currentUser = userService.getUserFromSession(sessionId);
-			
+
 			String action = dto.action();
-			
+
 			if(StringUtils.isEmpty(action) || (!"ACCEPT".equalsIgnoreCase(action) && !"REJECT".equalsIgnoreCase(action))) {
 				LOG.error("richiesta errata action [" + action + "]");
 				return Response.status(Response.Status.BAD_REQUEST)
 						.entity(new ErrorResponse("BAD_REQUEST", "action not allowed")).build();
 			}
-			
+
 			String loanId = dto.loanId();
 			if(StringUtils.isEmpty(loanId)) {
 				return Response.status(Response.Status.BAD_REQUEST)
 						.entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
 			}
-			
+
 			Optional<Loan> opLoan = loansRepository.get(loanId);
 			if(opLoan.isEmpty()) {
 				return Response.status(Response.Status.NOT_FOUND).build();
 			}
-			
+
 			Loan loan = opLoan.get();
 
 			// controllo di sicurezza 
@@ -226,33 +320,33 @@ public class LoanResource {
 				return Response.status(Response.Status.CONFLICT)
 						.entity(new ErrorResponse("CONFLICT", "La richiesta è già stata processata")).build();
 			}
-			
+
 			// Cambio stato
 			String newStatus = "ACCEPT".equalsIgnoreCase(action) ? LoanStatus.ACCEPTED.toString() : LoanStatus.REJECTED.toString();
 			loan.setStatus(newStatus);
-			
+
 			if(!StringUtils.isEmpty(dto.notes())) {
 				loan.setOwnerNotes(dto.notes());
 			}
-			
+
 			boolean success = loansRepository.update(loan);
 			if(!success) {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
-			
+
 			// Recupero dati per email
 			String requesterID = loan.getRequesterId();
 			Optional<User> opRequester = userRepository.get(requesterID);
-			
+
 			if(opRequester.isEmpty()) {
 				// Edge case: il richiedente non esiste piu', loggo errore
 				LOG.warn("Requester not found for loan " + loanId);
 				return Response.ok().build(); 
 			}
-			
+
 			User requester = opRequester.get();
 			String title = loan.getTitle();
-			
+
 			success = emailService.sendRequestResponseEmail(requester.getEmail(), requester.getUsername(), title, action);
 
 			if(!success) {
@@ -262,7 +356,7 @@ public class LoanResource {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity(new ErrorResponse("SERVER_ERROR", "errore invio notifica")).build();
 			}
-			
+
 			return Response.ok().build();
 
 		} catch(NotAuthorizedException e) {
@@ -272,4 +366,7 @@ public class LoanResource {
 			return Response.serverError().build();
 		}
 	}
+
+
+
 }
