@@ -3,6 +3,7 @@ package it.unipegaso.api.resources;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ import it.unipegaso.database.model.User;
 import it.unipegaso.service.EmailService;
 import it.unipegaso.service.UserService;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
@@ -466,5 +468,77 @@ public class LoanResource {
 		}
 	}
 
+	
+	@GET
+	@Path("/requests/incoming")
+	public Response getIncomingRequests(@Context HttpHeaders headers) {
+
+		LOG.debug("GET INCOMING REQUESTS");
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+
+			// recupera richieste dove l'utente e' proprietario e lo stato e' PENDING
+			List<Loan> requests = loansRepository.findIncomingByOwner(currentUser.getId());
+
+			return Response.ok(requests).build();
+
+		} catch (NotAuthorizedException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			LOG.error("errore recupero richieste in entrata", e);
+			return Response.serverError().build();
+		}
+	}
+
+	@GET
+	@Path("/active")
+	public Response getActiveLoans(@Context HttpHeaders headers) {
+
+		LOG.debug("GET ACTIVE LOANS");
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+
+			// recupera prestiti in corso (stato ON_LOAN) sia come proprietario che come richiedente
+			List<Loan> activeLoans = loansRepository.findActiveByUser(currentUser.getId());
+
+			return Response.ok(activeLoans).build();
+
+		} catch (NotAuthorizedException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			LOG.error("errore recupero prestiti attivi", e);
+			return Response.serverError().build();
+		}
+	}
+	
+	@GET
+	@Path("/all")
+	public Response getAllLoans(@Context HttpHeaders headers) {
+
+		LOG.debug("GET ALL LOANS");
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+
+			// recupera tutti prestiti sia come proprietario che come richiedente
+			List<Loan> activeLoans = loansRepository.findAllUserLoans(currentUser.getId());
+
+			return Response.ok(activeLoans).build();
+
+		} catch (NotAuthorizedException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			LOG.error("errore recupero prestiti", e);
+			return Response.serverError().build();
+		}
+	}
 
 }

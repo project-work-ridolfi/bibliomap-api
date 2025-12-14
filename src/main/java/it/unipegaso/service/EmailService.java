@@ -1,5 +1,7 @@
 package it.unipegaso.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,18 +31,19 @@ public class EmailService {
 	@Inject
 	@Location("EmailService/requestResponse.html")
 	Template requestResponseTemplate;
-	
+
 	@Inject
 	@Location("EmailService/returnConfirmation.html")
 	Template returnConfirmationTemplate;
 
 	@Inject
+	@Location("EmailService/overdueReminder.html")
+	Template overdueReminderTemplate;
+
+	@Inject
 	@ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
 	boolean debugEmail;
 
-	@Inject
-	@ConfigProperty(name = "quarkus.auth.otp.from", defaultValue = "noreply@bibliomap.it")
-	String fromEmail;
 
 	@Inject
 	@ConfigProperty(name = "quarkus.email.base-url", defaultValue = "http://localhost:5173/")
@@ -110,6 +113,26 @@ public class EmailService {
 		return sendEmail(recipientEmail, subject, htmlBody, "Conferma restituzione");
 	}
 
+	// invia sollecito per prestito scaduto
+	public boolean sendOverdueReminderEmail(String recipientEmail, String recipientName, String bookTitle, Date dueDate) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("recipientName", recipientName);
+		data.put("bookTitle", bookTitle);
+		data.put("dueDate", sdf.format(dueDate));
+		data.put("dashboardUrl", baseUrl + "dashboard");
+
+		String htmlBody = overdueReminderTemplate
+				.data(data)
+				.render();
+
+		String subject = "[Bibliomap] Sollecito: il periodo di prestito è scaduto";
+
+		return sendEmail(recipientEmail, subject, htmlBody, "Sollecito scadenza");
+	}
+
 	// Invia un'email all'utente con il codice OTP per la verifica.
 	public boolean sendOtpEmail(String recipientEmail, String otpCode, String recipientName) {
 
@@ -129,6 +152,8 @@ public class EmailService {
 		return sendEmail(recipientEmail, subject, htmlBody, "Codice OTP");
 	}
 
+
+
 	private boolean sendEmail(String to, String subject, String body, String logType) {
 		if (debugEmail) {
 			LOG.info("--------------------------------------------------");
@@ -141,7 +166,9 @@ public class EmailService {
 		}
 
 		try {
-			mailer.send(Mail.withHtml(to, subject, body).setFrom(fromEmail));
+			mailer.send(Mail.withHtml(to, subject, body)
+					.setFrom("Bibliomap <adriana.ridolfi@studenti.unipegaso.it>")
+					.setReplyTo("noreply@invalid.local"));
 			LOG.infof("Email [%s] inviata con successo a %s", logType, to);
 			return true;
 		} catch (Exception e) {
@@ -149,4 +176,6 @@ public class EmailService {
 			return false;
 		}
 	}
+
+
 }

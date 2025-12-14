@@ -128,17 +128,17 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
     - Verifica che stato sia `ACCEPTED`
     - Aggiorna `Loan`: stato `ON_LOAN`, `loanStartDate` = now, `expectedReturnDate` = now + 30gg
     - **SIDE EFFECT**: Aggiorna `Copy`: `status` = `on_loan`
-- [ ] Implementare `closeLoan(loanId, ownerId, conditionEnd)` (Restituzione):
+- [x] Implementare `closeLoan(loanId, ownerId, conditionEnd)` (Restituzione):
     - Verifica che stato sia `ON_LOAN`
     - Aggiorna `Loan`: stato `RETURNED`, `actualReturnDate` = now, `conditionEnd`
     - **SIDE EFFECT**: Aggiorna `Copy`: `status` = `available`, `condition` = `conditionEnd`
-- [ ] `POST /api/loans/request`: Body `{ copyId }`
-- [ ] `PATCH /api/loans/{id}/status`: Body `{ status: 'ACCEPTED'|'REJECTED' }`
-- [ ] `POST /api/loans/{id}/start`: Endpoint per segnare l'inizio del prestito
-- [ ] `POST /api/loans/{id}/return`: Body `{ condition: '...' }`
-- [ ] `GET /api/loans/requests/incoming`: Richieste da approvare
-- [ ] `GET /api/loans/active`: Prestiti in corso (sia dati che ricevuti)
-- [ ] Creare Scheduler `@Scheduled(cron = "0 0 9 * * ?")` (ogni giorno alle 9):
+- [x] `POST /api/loans/request`: Body `{ copyId }`
+- [x] `PATCH /api/loans/{id}/status`: Body `{ status: 'ACCEPTED'|'REJECTED' }`
+- [x] `POST /api/loans/{id}/start`: Endpoint per segnare l'inizio del prestito
+- [x] `POST /api/loans/{id}/return`: Body `{ condition: '...' }`
+- [x] `GET /api/loans/requests/incoming`: Richieste da approvare
+- [x] `GET /api/loans/active`: Prestiti in corso (sia dati che ricevuti)
+- [x] Creare Scheduler `@Scheduled(cron = "0 0 9 * * ?")` (ogni giorno alle 9):
     - Cerca prestiti scaduti (`ON_LOAN` && `expectedReturnDate` passata)
     - Per ogni prestito, invia Email di sollecito al `requesterId`
 - [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc

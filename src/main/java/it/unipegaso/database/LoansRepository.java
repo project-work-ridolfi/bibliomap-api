@@ -1,6 +1,8 @@
 package it.unipegaso.database;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 
 import it.unipegaso.database.model.Loan;
+import it.unipegaso.database.model.LoanStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -23,6 +26,10 @@ import jakarta.inject.Inject;
 public class LoansRepository implements IRepository<Loan> {
 
 	private static final Logger LOG = Logger.getLogger(LoansRepository.class);
+	
+	private static final String REQUESTER_ID = "requester_id";
+	private static final String OWNER_ID = "owner_id";
+
 
 	@Inject
 	MongoCollection<Loan> loans;
@@ -52,14 +59,14 @@ public class LoansRepository implements IRepository<Loan> {
 
 	@Override
 	public boolean update(Loan loan) throws MongoWriteException {
-		
+
 		if (loan == null || loan.getId().isEmpty()) {
 			return false;
 		}
-		
+
 		Date now = new Date();
 		loan.setUpdatedAt(now);
-		
+
 		UpdateResult result = loans.replaceOne(Filters.eq(ID, loan.getId()), loan);
 
 		return result.getMatchedCount() == 1;
@@ -79,6 +86,45 @@ public class LoansRepository implements IRepository<Loan> {
 	@Override
 	public FindIterable<Loan> find(Bson filter) {
 		return loans.find(filter);
+	}
+
+	public List<Loan> findActiveByUser(String id) {
+		// filtro per prestiti in corso dove l'utente e' coinvolto (sia come richiedente che come proprietario)
+		Bson filter = Filters.and(
+				Filters.or(Filters.eq(REQUESTER_ID, id), Filters.eq(OWNER_ID, id)),
+				Filters.eq("status", LoanStatus.ON_LOAN.toString())
+				);
+
+		return loans.find(filter).into(new ArrayList<>());
+	}
+
+	public List<Loan> findAllUserLoans(String id) {
+		// filtro per prestiti dove l'utente e' coinvolto (sia come richiedente che come proprietario)
+		Bson filter = Filters.or(Filters.eq(REQUESTER_ID, id), Filters.eq(OWNER_ID, id));
+
+		return loans.find(filter).into(new ArrayList<>());
+	}
+
+	public List<Loan> findIncomingByOwner(String id) {
+		// filtro per richieste pendenti ricevute dal proprietario
+		Bson filter = Filters.and(
+				Filters.eq(OWNER_ID, id), 
+				Filters.eq("status", LoanStatus.PENDING.toString())
+				);
+
+		return loans.find(filter).into(new ArrayList<>());
+	}
+	
+	public List<Loan> findOverdue(Date date) {
+	    // stato ON_LOAN e data di ritorno prevista minore di adesso
+	    Bson filter = Filters.and(
+	        Filters.eq("status", LoanStatus.ON_LOAN.toString()),
+	        Filters.lt("expected_return_date", date)
+	    );
+	    
+	    List<Loan> result = new ArrayList<>();
+	    find(filter).forEach(result::add);
+	    return result;
 	}
 
 }
