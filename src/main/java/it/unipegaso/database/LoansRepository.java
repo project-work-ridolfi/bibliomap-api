@@ -16,8 +16,10 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 
 import it.unipegaso.database.model.Loan;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class LoansRepository implements IRepository<Loan> {
 
 	private static final Logger LOG = Logger.getLogger(LoansRepository.class);
