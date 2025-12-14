@@ -19,7 +19,7 @@ public class Library {
 	private LocalDateTime modifiedAt;
 	private String ownerId; 
 	private String locationId; 
-	private String visibility; //all, logged-in, no one
+	private String visibility; //all, logged-in, private
 	private int blurRadius;
 	private String notes; 
 	private List<String> tags;

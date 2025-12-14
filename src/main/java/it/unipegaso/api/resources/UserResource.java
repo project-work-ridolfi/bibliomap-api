@@ -129,7 +129,6 @@ public class UserResource {
 
 	@GET
 	@Path("/me")
-	@RolesAllowed("user")
 	public Response getUserMe(@Context HttpHeaders headers) {
 
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);

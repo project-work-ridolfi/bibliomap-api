@@ -1,13 +1,18 @@
 package it.unipegaso.api.resources;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jboss.logging.Logger;
 
+import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.LibraryDTO;
 import it.unipegaso.api.util.SessionIDProvider;
+import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
+import it.unipegaso.service.BookService;
 import it.unipegaso.service.LibraryService;
 import it.unipegaso.service.UserService;
 import jakarta.inject.Inject;
@@ -38,6 +43,9 @@ public class LibraryResource {
 	@Inject 
 	UserService userService;
 
+	@Inject
+	BookService bookService;
+	
 	@POST
 	public Response createLibrary(LibraryDTO request, @Context HttpHeaders headers) {
 
@@ -78,15 +86,36 @@ public class LibraryResource {
 
 
 
-	/**
-	 * GET /api/libraries/{id}
-	 * Dettaglio collezione con lista libri.
-	 */
 	@GET
 	@Path("/{id}")
-	public Response getLibrary(@PathParam("id") String libraryId) {
-		// TODO: fetch collezione + populate items
-		return Response.ok("{\"id\": \"" + libraryId + "\", \"title\": \"TODO\"}").build();
+	public Response getLibrary(@PathParam("id") String libraryId, @Context HttpHeaders headers) {
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		String currentUserId = null;
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+			currentUserId = currentUser.getId();
+		} catch (Exception e) {
+			// utente non loggato, procediamo come guest (currentUserId resta null)
+		}
+
+		Library library = libraryService.getLibraryDetail(libraryId, currentUserId);
+
+		if (library == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		List<BookDetailDTO> books = bookService.getBooksByLibrary(libraryId);
+		
+		// costruisco la risposta includendo i libri
+		Map<String, Object> response = new HashMap<>();
+		response.put("id", library.getId());
+		response.put("name", library.getName());
+		response.put("visibility", library.getVisibility());
+		response.put("books", books);
+
+		return Response.ok(response).build();
 	}
 
 	/**

@@ -3,6 +3,7 @@ package it.unipegaso.service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
@@ -80,5 +81,25 @@ public class LibraryService {
 	    
 	    // conversione da FindIterable a List se e' vuoto, restituisce una lista vuota
 	    return found.into(new java.util.ArrayList<>());
+	}
+
+	public Library getLibraryDetail(String libraryId, String currentUserId) {
+		
+	    LOG.debug("recupero dettaglio libreria: " + libraryId);
+
+	    Optional<Library> opLib = librariesRepository.get(libraryId);
+	    if (opLib.isEmpty()) {
+	        return null;
+	    }
+
+	    Library lib = opLib.get();
+	    boolean isOwner = lib.getOwnerId().equals(currentUserId);
+
+	    // gestione visibilita
+	    if (!isOwner && "private".equals(lib.getVisibility())) {
+	        return null; // libreria privata
+	    }
+	
+	    return lib;
 	}
 }
