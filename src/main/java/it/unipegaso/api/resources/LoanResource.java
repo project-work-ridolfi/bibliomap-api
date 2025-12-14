@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.jboss.logging.Logger;
 
 import it.unipegaso.api.dto.ErrorResponse;
-import it.unipegaso.api.dto.ManageLoanDTO;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.api.util.StringUtils;
 import it.unipegaso.database.BooksRepository;
@@ -27,6 +26,7 @@ import it.unipegaso.service.EmailService;
 import it.unipegaso.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -225,7 +225,7 @@ public class LoanResource {
 
 			// controlla copia
 			if (opCopy.isEmpty()) {
-				
+
 				loan.setStatus(LoanStatus.ERROR.toString());
 				loansRepository.update(loan);
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -276,9 +276,9 @@ public class LoanResource {
 	}
 
 
-	@POST
-	@Path("/manage")
-	public Response manageRequest(@Context HttpHeaders headers, ManageLoanDTO dto) {
+	@PATCH
+	@Path("/{id}/status")
+	public Response manageRequest(@Context HttpHeaders headers, @PathParam("id") String loanId, Map<String, String> request) {
 
 		LOG.debug("MANAGE LOAN REQUEST");
 
@@ -287,7 +287,12 @@ public class LoanResource {
 		try {
 			User currentUser = userService.getUserFromSession(sessionId);
 
-			String action = dto.action();
+			if (request == null || !request.containsKey("action")) {
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(new ErrorResponse("BAD_REQUEST", "action mandatory")).build();
+			}
+
+			String action = (String) request.getOrDefault("action", "");
 
 			if(StringUtils.isEmpty(action) || (!"ACCEPT".equalsIgnoreCase(action) && !"REJECT".equalsIgnoreCase(action))) {
 				LOG.error("richiesta errata action [" + action + "]");
@@ -295,7 +300,6 @@ public class LoanResource {
 						.entity(new ErrorResponse("BAD_REQUEST", "action not allowed")).build();
 			}
 
-			String loanId = dto.loanId();
 			if(StringUtils.isEmpty(loanId)) {
 				return Response.status(Response.Status.BAD_REQUEST)
 						.entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
@@ -325,8 +329,10 @@ public class LoanResource {
 			String newStatus = "ACCEPT".equalsIgnoreCase(action) ? LoanStatus.ACCEPTED.toString() : LoanStatus.REJECTED.toString();
 			loan.setStatus(newStatus);
 
-			if(!StringUtils.isEmpty(dto.notes())) {
-				loan.setOwnerNotes(dto.notes());
+			String notes = request.getOrDefault("notes", "");
+
+			if(!StringUtils.isEmpty(notes)) {
+				loan.setOwnerNotes(notes);
 			}
 
 			boolean success = loansRepository.update(loan);
@@ -366,7 +372,99 @@ public class LoanResource {
 			return Response.serverError().build();
 		}
 	}
+	
+	@POST
+	@Path("/{id}/return")
+	public Response closeLoan(@Context HttpHeaders headers, @PathParam("id") String loanId, Map<String, String> request) {
 
+		LOG.debug("CLOSE LOAN");
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+
+			if (StringUtils.isEmpty(loanId)) {
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
+
+			Optional<Loan> opLoan = loansRepository.get(loanId);
+			if (opLoan.isEmpty()) {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
+
+			Loan loan = opLoan.get();
+
+			// controllo proprietario copia
+			if (!loan.getOwnerId().equals(currentUser.getId())) {
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
+
+			// controllo stato coerente
+			if (!LoanStatus.ON_LOAN.toString().equals(loan.getStatus())) {
+				return Response.status(Response.Status.CONFLICT)
+						.entity(new ErrorResponse("CONFLICT", "il prestito non e' in corso")).build();
+			}
+
+			String conditionEnd = request.getOrDefault("condition", "ottimo");
+			String oldStatus = loan.getStatus();
+
+			// aggiornamento dati prestito
+			loan.setStatus("RETURNED");
+			loan.setActualReturnDate(new Date());
+
+			if (!loansRepository.update(loan)) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+
+			// aggiornamento stato copia
+			Optional<Copy> opCopy = copiesRepository.get(loan.getCopyId());
+			if (opCopy.isPresent()) {
+				Copy copy = opCopy.get();
+				copy.setStatus("available");
+				copy.setCondition(conditionEnd);
+				copiesRepository.update(copy);
+			}
+
+			// notifica email restituzione
+			boolean mailSuccess = false;
+			try {
+				Optional<User> opRequester = userRepository.get(loan.getRequesterId());
+				if (opRequester.isPresent()) {
+					User requester = opRequester.get();
+					// invio mail di fine prestito
+					mailSuccess = emailService.sendReturnConfirmationEmail(requester.getEmail(), requester.getUsername(), loan.getTitle());
+				}
+			} catch (Exception e) {
+				LOG.error("errore invio mail restituzione", e);
+			}
+
+			if (!mailSuccess) {
+				// rollback stato prestito
+				loan.setStatus(oldStatus);
+				loan.setActualReturnDate(null);
+				loansRepository.update(loan);
+				
+				// rollback stato copia
+				if (opCopy.isPresent()) {
+					Copy copy = opCopy.get();
+					copy.setStatus("on_loan");
+					copiesRepository.update(copy);
+				}
+
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(new ErrorResponse("SERVER_ERROR", "errore notifica, operazione annullata")).build();
+			}
+
+			return Response.ok().build();
+
+		} catch (NotAuthorizedException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			LOG.error("errore chiusura prestito", e);
+			return Response.serverError().build();
+		}
+	}
 
 
 }

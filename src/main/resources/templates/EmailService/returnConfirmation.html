@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Prestito Concluso</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; color: #333; }
+        .container { padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; }
+        .header { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .footer { font-size: 0.8em; color: #7f8c8d; margin-top: 20px; }
+        .button { background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="header">Ciao {recipientName},</h2>
+        <p>Ti informiamo che il prestito del libro <strong>{bookTitle}</strong> è stato ufficialmente concluso dal proprietario.</p>
+        <p>Speriamo che la lettura sia stata piacevole e che l'esperienza di condivisione con Bibliomap ti abbia soddisfatto.</p>
+        
+        <p>Puoi controllare lo storico dei tuoi prestiti o cercarne di nuovi nella tua dashboard:</p>
+        
+        <a href="{dashboardUrl}" class="button">Vai alla Dashboard</a>
+
+        <div class="footer">
+            <p>Grazie per far parte della nostra comunità di lettori.</p>
+            <p>Team Bibliomap </p>
+        </div>
+    </div>
+</body>
+</html>

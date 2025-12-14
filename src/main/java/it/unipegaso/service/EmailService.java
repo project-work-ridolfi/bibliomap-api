@@ -29,6 +29,10 @@ public class EmailService {
 	@Inject
 	@Location("EmailService/requestResponse.html")
 	Template requestResponseTemplate;
+	
+	@Inject
+	@Location("EmailService/returnConfirmation.html")
+	Template returnConfirmationTemplate;
 
 	@Inject
 	@ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
@@ -87,6 +91,23 @@ public class EmailService {
 		String subject = "[Bibliomap] Hai una nuova richiesta di prestito!";
 
 		return sendEmail(recipientEmail, subject, htmlBody, "Nuova richiesta prestito");
+	}
+
+	// invia conferma di fine prestito al richiedente
+	public boolean sendReturnConfirmationEmail(String recipientEmail, String recipientName, String bookTitle) {
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("recipientName", recipientName);
+		data.put("bookTitle", bookTitle);
+		data.put("dashboardUrl", baseUrl + "dashboard");
+
+		String htmlBody = returnConfirmationTemplate
+				.data(data)
+				.render();
+
+		String subject = "[Bibliomap] Il prestito di \"" + bookTitle + "\" è concluso";
+
+		return sendEmail(recipientEmail, subject, htmlBody, "Conferma restituzione");
 	}
 
 	// Invia un'email all'utente con il codice OTP per la verifica.
