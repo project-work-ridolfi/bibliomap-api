@@ -55,6 +55,7 @@ public class BookService {
 	@Inject
 	LibrariesRepository librariesRepository; 
 
+	
 	@Inject
 	MongoClient mongoClient;
 
@@ -405,6 +406,7 @@ public class BookService {
 		List<Copy> copies = copiesRepository.findByLibrary(libraryId);
 		List<BookDetailDTO> results = new ArrayList<>();
 
+		
 		for (Copy copy : copies) {
 			// per ogni copia cerco i metadati del libro tramite isbn
 			Optional<Book> bookOpt = booksRepository.get(copy.getBookIsbn());

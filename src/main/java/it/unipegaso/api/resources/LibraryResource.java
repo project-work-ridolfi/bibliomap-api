@@ -3,6 +3,7 @@ package it.unipegaso.api.resources;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
@@ -10,6 +11,7 @@ import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.LibraryDTO;
 import it.unipegaso.api.util.SessionIDProvider;
+import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
 import it.unipegaso.service.BookService;
@@ -45,6 +47,9 @@ public class LibraryResource {
 
 	@Inject
 	BookService bookService;
+	
+	@Inject
+	UsersRepository usersRepository;
 	
 	@POST
 	public Response createLibrary(LibraryDTO request, @Context HttpHeaders headers) {
@@ -108,13 +113,25 @@ public class LibraryResource {
 
 		List<BookDetailDTO> books = bookService.getBooksByLibrary(libraryId);
 		
+		
 		// costruisco la risposta includendo i libri
 		Map<String, Object> response = new HashMap<>();
+		
 		response.put("id", library.getId());
 		response.put("name", library.getName());
 		response.put("visibility", library.getVisibility());
 		response.put("books", books);
 
+		Optional<User> opOwner = usersRepository.get(library.getOwnerId());
+		
+		if(opOwner.isPresent()) {
+			User owner = opOwner.get();
+			if(!owner.getVisibility().equals("private")) {
+				response.put("ownerName", owner.getUsername());
+				response.put("ownerId", owner.getId());
+			}
+		}
+		
 		return Response.ok(response).build();
 	}
 
