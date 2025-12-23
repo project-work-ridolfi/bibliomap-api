@@ -69,7 +69,7 @@ public class EmailService {
 				.render();
 
 		String statusText = isAccepted ? "ACCETTATA" : "RIFIUTATA";
-		String subject = "[Bibliomap] La tua richiesta di prestito è stata " + statusText;
+		String subject = "La tua richiesta di prestito è stata " + statusText;
 
 		return sendEmail(recipientEmail, subject, htmlBody, "Esito richiesta");
 	}
@@ -91,7 +91,7 @@ public class EmailService {
 				.data(data)
 				.render();
 
-		String subject = "[Bibliomap] Hai una nuova richiesta di prestito!";
+		String subject = "Hai una nuova richiesta di prestito!";
 
 		return sendEmail(recipientEmail, subject, htmlBody, "Nuova richiesta prestito");
 	}
@@ -108,7 +108,7 @@ public class EmailService {
 				.data(data)
 				.render();
 
-		String subject = "[Bibliomap] Il prestito di \"" + bookTitle + "\" è concluso";
+		String subject = "Il prestito di \"" + bookTitle + "\" è concluso";
 
 		return sendEmail(recipientEmail, subject, htmlBody, "Conferma restituzione");
 	}
@@ -128,7 +128,7 @@ public class EmailService {
 				.data(data)
 				.render();
 
-		String subject = "[Bibliomap] Sollecito: il periodo di prestito è scaduto";
+		String subject = "Sollecito: il periodo di prestito è scaduto";
 
 		return sendEmail(recipientEmail, subject, htmlBody, "Sollecito scadenza");
 	}

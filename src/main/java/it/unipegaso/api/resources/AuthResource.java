@@ -38,7 +38,7 @@ public class AuthResource {
 
 	private static final Logger LOG = Logger.getLogger(AuthResource.class);
 
-	@ConfigProperty(name = "quarkus.auth.otp.debug-mode", defaultValue = "false")
+	@ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
 	boolean otpDebugMode;
 
 	@ConfigProperty(name = "quarkus.session.duration-minutes", defaultValue = "120")
