@@ -137,11 +137,12 @@ public class UserResource {
 			User user = userService.getUserFromSession(sessionId);
 
 			// se il controllo arriva qui senza eccezioni, l'utente e' autenticato 
-			Map<String, String> responseBody = Map.of(
-					"id", user.getId(), 
-					"username", user.getUsername(),
-					"email", user.getEmail() 
-					);
+			Map<String, Object> responseBody = new HashMap<>();
+	        responseBody.put("id", user.getId());
+	        responseBody.put("username", user.getUsername());
+	        responseBody.put("email", user.getEmail());
+	        responseBody.put("visibility", user.getVisibility()); 
+	        responseBody.put("blurRadius", user.getBlurRadius()); 
 
 			LOG.infof("profilo caricato con successo per: %s", user.getUsername());
 			return Response.ok(responseBody).build();
