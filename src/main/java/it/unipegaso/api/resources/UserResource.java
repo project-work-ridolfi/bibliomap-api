@@ -14,12 +14,12 @@ import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
+import it.unipegaso.service.EmailService;
 import it.unipegaso.service.LibraryService;
 import it.unipegaso.service.LocationService;
 import it.unipegaso.service.SessionDataService;
 import it.unipegaso.service.UserService;
 import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -58,6 +58,9 @@ public class UserResource {
 	
 	@Inject
 	LibraryService libraryService;
+	
+	@Inject
+	EmailService emailService;
 
 
 	@GET
@@ -70,6 +73,38 @@ public class UserResource {
 		LOG.infof("DB Check username '%s' (Esiste: %b)", username, exists);
 
 		return Response.ok(new CheckExistsResponse(exists)).build();
+	}
+	
+	@PUT
+	@Path("/{id}/privacy")
+	public Response updatePrivacySettings(@PathParam("id") String userId, Map<String, Object> data, @Context HttpHeaders headers) {
+	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+	    try {
+	        User user = userService.getUserFromSession(sessionId);
+	        
+	        // verifica che l'utente modifichi se stesso
+	        if (!user.getId().equals(userId)) {
+	            return Response.status(Response.Status.FORBIDDEN).build();
+	        }
+
+	        if (data.containsKey("username")) {
+	        	user.setUsername((String) data.get("username"));
+	        }
+	        
+	        if (data.containsKey("visibility")) {
+	        	user.setVisibility((String) data.get("visibility"));
+	        }
+	        
+	        if (data.containsKey("blurRadius")) {
+	            Number blur = (Number) data.get("blurRadius");
+	            user.setBlurRadius(blur.intValue());
+	        }
+
+	        userRepository.update(user);
+	        return Response.ok(user).build();
+	    } catch (Exception e) {
+	        return Response.status(Response.Status.UNAUTHORIZED).build();
+	    }
 	}
 
 	
@@ -199,34 +234,50 @@ public class UserResource {
 	}
 
 	
-	@PUT
-	@Path("/{id}/privacy")
-	@RolesAllowed("user")
-	public Response updatePrivacySettings(
-			@PathParam("id") String userId,
-			Object privacyDto) {
-		// TODO: validare locationMode 
-		// TODO: salvare preferenze + audit log
-		return Response.ok("{\"message\": \"Privacy updated (TODO)\"}").build();
-	}
-
-
 	@GET
-	@Path("/export")
-	@RolesAllowed("user")
-	public Response exportUserData() {
-		// TODO: generare JSON con tutti i dati utente
-		// (profilo, libri, collezioni, richieste, stats)
-		return Response.ok("{\"export\": \"TODO - complete user data\"}").build();
-	}
-
+    @Path("/export")
+    public Response exportUserData(@Context HttpHeaders headers) {
+        String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+        try {
+            User user = userService.getUserFromSession(sessionId);
+            
+            // in un sistema reale qui si avvierebbe un job asincrono
+            // per ora simuliamo l'invio della mail
+            LOG.infof("Richiesta export dati per utente: %s", user.getEmail());
+            
+            // TODO: implementare servizio email sendExportData(user)
+            
+            return Response.ok(Map.of("message", "La richiesta è stata presa in carico. Riceverai un'email con il dump dei tuoi dati.")).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+    }
 
 	@DELETE
-	@RolesAllowed("user")
-	public Response deleteAccount() {
-		// TODO: hard delete + cascade (items, collections, requests)
-		// TODO: anonimizzare stats aggregate
-		return Response.noContent().build();
+	@Path("/me")
+	public Response deleteAccount(@Context HttpHeaders headers) {
+	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+	    try {
+	        User user = userService.getUserFromSession(sessionId);
+	        
+	        UserService.DeletionResult result = userService.tryFullDeleteUser(user.getId());
+
+	        if (result.success) {
+	            emailService.sendAccountDeletedEmail(user.getEmail(), user.getUsername());
+	            sessionDataService.delete(sessionId);
+	            return Response.noContent().build();
+	        } else {
+	            // Notifichiamo l'utente via email sui prestiti bloccanti
+	            emailService.sendDeletionBlockedEmail(user.getEmail(), user.getUsername(), result.blockingLoans);
+	            
+	            // Ritorniamo un 409 Conflict per dire al frontend che non si può fare
+	            return Response.status(Response.Status.CONFLICT)
+	                    .entity(Map.of("message", "Prestiti attivi in corso", "loans", result.blockingLoans))
+	                    .build();
+	        }
+	    } catch (Exception e) {
+	        return Response.status(Response.Status.UNAUTHORIZED).build();
+	    }
 	}
 
 

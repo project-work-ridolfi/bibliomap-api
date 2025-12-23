@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
+import it.unipegaso.api.util.StringUtils;
 
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
@@ -19,33 +20,33 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class LibrariesRepository implements IRepository<Library> {
 
-	
+
 	private static final Logger LOG = Logger.getLogger(LibrariesRepository.class);
 
 	private static final String OWNER_ID = "ownerId";
 
-	
+
 	@Inject
 	MongoCollection<Library> libraries;
-	
+
 	@Override
 	public String create(Library newLibrary) throws MongoWriteException {
-	    
-	    // assegna l'ID come Stringa UUID generata da Java
+
+		// assegna l'ID come Stringa UUID generata da Java
 		newLibrary.setId(UUID.randomUUID().toString());
 
-	    InsertOneResult result = libraries.insertOne(newLibrary);
+		InsertOneResult result = libraries.insertOne(newLibrary);
 
-	    // Verifica e logga 
-	    if (!result.wasAcknowledged()) {
-	        LOG.error("Inserimento location non confermato dal database.");
-	        return null;
-	    }
+		// Verifica e logga 
+		if (!result.wasAcknowledged()) {
+			LOG.error("Inserimento location non confermato dal database.");
+			return null;
+		}
 
-	    // L'ID è stato assegnato prima dell'inserimento ed è garantito non nullo.
-	    return newLibrary.getId(); 
+		// L'ID è stato assegnato prima dell'inserimento ed è garantito non nullo.
+		return newLibrary.getId(); 
 	}
-	
+
 
 	@Override
 	public Optional<Library> get(String id) {
@@ -54,18 +55,19 @@ public class LibrariesRepository implements IRepository<Library> {
 			LOG.error("ID VUOTO");
 			return Optional.empty();
 		}
-		
+
 		return Optional.ofNullable(libraries.find(Filters.eq(ID, id)).first());
 	}
-	
-	
+
+
+
 	public FindIterable<Library> getAll(String userId){
-		
+
 		if(userId == null || userId.trim().isEmpty()) {
 			LOG.error("USERID VUOTO");
 			return null;
 		}
-		
+
 		return libraries.find(Filters.eq(OWNER_ID, userId));
 	}
 

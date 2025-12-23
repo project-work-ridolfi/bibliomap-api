@@ -3,6 +3,7 @@ package it.unipegaso.service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -12,6 +13,7 @@ import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
+import it.unipegaso.database.model.Loan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -31,6 +33,14 @@ public class EmailService {
 	@Inject
 	@Location("EmailService/requestResponse.html")
 	Template requestResponseTemplate;
+	
+	@Inject
+	@Location("EmailService/accountDeleted.html")
+	Template accountDeletedTemplate;
+	
+	@Inject
+	@Location("EmailService/accountDeletionBlocked.html")
+	Template accountDeletionBlockedTemplate;
 
 	@Inject
 	@Location("EmailService/returnConfirmation.html")
@@ -152,7 +162,33 @@ public class EmailService {
 		return sendEmail(recipientEmail, subject, htmlBody, "Codice OTP");
 	}
 
+	// invia notifica di conferma eliminazione account
+	public boolean sendAccountDeletedEmail(String recipientEmail, String recipientName) {
+	    Map<String, Object> data = new HashMap<>();
+	    data.put("recipientName", recipientName);
 
+	    String htmlBody = accountDeletedTemplate
+	            .data(data)
+	            .render();
+
+	    String subject = "Il tuo account Bibliomap è stato eliminato";
+
+	    return sendEmail(recipientEmail, subject, htmlBody, "Eliminazione account");
+	}
+	
+	public boolean sendDeletionBlockedEmail(String recipientEmail, String recipientName, List<Loan> blockingLoans) {
+	    Map<String, Object> data = new HashMap<>();
+	    data.put("recipientName", recipientName);
+	    data.put("loans", blockingLoans); // Passiamo la lista al template
+
+	    String htmlBody = accountDeletionBlockedTemplate
+	            .data(data)
+	            .render();
+
+	    String subject = "Azione richiesta: non puoi ancora eliminare il tuo account Bibliomap";
+
+	    return sendEmail(recipientEmail, subject, htmlBody, "Eliminazione bloccata");
+	}
 
 	private boolean sendEmail(String to, String subject, String body, String logType) {
 		if (debugEmail) {

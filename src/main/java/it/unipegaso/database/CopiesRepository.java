@@ -27,6 +27,8 @@ public class CopiesRepository implements IRepository<Copy> {
 
 	@Inject
 	MongoCollection<Copy> copies;
+	
+	private static final String LIBRARY_ID = "libraryId";
 
 	@Override
 	public String create(Copy copy) throws MongoWriteException {
@@ -51,7 +53,7 @@ public class CopiesRepository implements IRepository<Copy> {
 
 	public List<Copy> findByLibrary(String libraryId) {
 
-		Bson filter = Filters.eq("libraryId", libraryId);
+		Bson filter = Filters.eq(LIBRARY_ID, libraryId);
 
 		return find(filter).into(new ArrayList<>());
 	}
@@ -65,9 +67,19 @@ public class CopiesRepository implements IRepository<Copy> {
 		DeleteResult result = copies.deleteOne(Filters.eq(ID, id));
 
 		return result.wasAcknowledged();
-
 	}
 
+	public boolean deleteByLibraryId(String libraryId) {
+
+		if (libraryId == null || libraryId.trim().isEmpty()) {
+			return false;
+		}
+
+		DeleteResult result = copies.deleteOne(Filters.eq(LIBRARY_ID, libraryId));
+
+		return result.wasAcknowledged();
+	}
+	
 	@Override
 	public boolean update(Copy copy) throws MongoWriteException {
 

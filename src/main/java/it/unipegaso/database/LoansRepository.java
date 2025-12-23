@@ -82,6 +82,7 @@ public class LoansRepository implements IRepository<Loan> {
 
 		return result.wasAcknowledged();
 	}
+	
 
 	@Override
 	public FindIterable<Loan> find(Bson filter) {
@@ -125,6 +126,16 @@ public class LoansRepository implements IRepository<Loan> {
 	    List<Loan> result = new ArrayList<>();
 	    find(filter).forEach(result::add);
 	    return result;
+	}
+
+	public void deletePendingByUserId(String userId) {
+		Bson filter = Filters.and(
+				Filters.eq("status", LoanStatus.PENDING.toString()), 
+				Filters.or(Filters.eq(OWNER_ID, userId), Filters.eq(REQUESTER_ID, userId))
+				);
+
+		loans.deleteMany(filter);
+		
 	}
 
 }
