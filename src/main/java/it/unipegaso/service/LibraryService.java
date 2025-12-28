@@ -9,7 +9,6 @@ import org.jboss.logging.Logger;
 
 import com.mongodb.client.FindIterable;
 
-import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.LibraryDTO;
 import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.UsersRepository;
@@ -18,7 +17,6 @@ import it.unipegaso.database.model.User;
 import it.unipegaso.database.model.VisibilityOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
 public class LibraryService {

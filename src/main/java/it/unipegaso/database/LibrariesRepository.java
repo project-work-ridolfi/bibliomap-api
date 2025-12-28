@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
-import it.unipegaso.api.util.StringUtils;
 
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
