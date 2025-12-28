@@ -28,13 +28,13 @@ public class LocationsRepository implements IRepository<Location> {
 
     @Override
     public String create(Location newLocation) throws MongoWriteException {
-        newLocation.id = UUID.randomUUID().toString();
+        newLocation.setId(UUID.randomUUID().toString());
         InsertOneResult result = locations.insertOne(newLocation);
         if (!result.wasAcknowledged()) {
             LOG.error("Inserimento location non confermato.");
             return null;
         }
-        return newLocation.id;
+        return newLocation.getId();
     }
 
     @Override

@@ -9,13 +9,16 @@ import org.jboss.logging.Logger;
 
 import com.mongodb.client.FindIterable;
 
+import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.LibraryDTO;
 import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
+import it.unipegaso.database.model.VisibilityOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
 public class LibraryService {
@@ -44,7 +47,15 @@ public class LibraryService {
 		Library newLibrary = new Library();
 		newLibrary.setName(libraryDTO.name());
 		newLibrary.setOwnerId(user.getId());
-		newLibrary.setVisibility(libraryDTO.visibility());
+		
+		//controllo che visibility sia corretta
+		String visibilityInput = libraryDTO.visibility();
+
+		VisibilityOptions visibility = VisibilityOptions.fromString(visibilityInput)
+		            .orElseThrow();
+
+		String normalizedVisibility = visibility.toDbValue();
+		newLibrary.setVisibility(normalizedVisibility);
 
 		LOG.info("library creata");
 

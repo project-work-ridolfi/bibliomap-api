@@ -1,7 +1,9 @@
 package it.unipegaso.database.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
@@ -24,6 +26,7 @@ public class User {
 	private String visibility; //all, logged-in, no one
 	private int blurRadius;
 	private List<String> collections;
+	private List<Map<String, Object>> history;
 	
 	public String getId() {
 		return id;
@@ -91,6 +94,18 @@ public class User {
 	public void setCollections(List<String> collections) {
 		this.collections = collections;
 	}
-	
+	public List<Map<String, Object>> getHistory() {
+		return history;
+	}
+	public void setHistory(List<Map<String, Object>> history) {
+		this.history = history;
+	}
+	public void addToHistory(Map<String, Object> map) {
+		if(history == null) {
+			history = new ArrayList<>();
+		}
+		
+		history.add(map);
+	}
 	
 }

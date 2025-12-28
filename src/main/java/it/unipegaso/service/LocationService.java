@@ -1,5 +1,9 @@
 package it.unipegaso.service;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.jboss.logging.Logger;
 
 import com.mongodb.client.model.geojson.Point;
@@ -34,7 +38,7 @@ public class LocationService {
 		Point geoPoint = createGeoJsonPoint(dto);
 
 		Location newLocation = new Location();
-		newLocation.location = geoPoint;
+		newLocation.setLocation(geoPoint);
 
 		String id = null;
 
@@ -46,5 +50,26 @@ public class LocationService {
 		}
 
 		return id;
+	}
+
+
+	public Map<String, Object> getLocationMap(String locationId) {
+	    Optional<Location> op = locationRepository.get(locationId);
+
+	    if (op.isPresent()) {
+	        Location loc = op.get();
+	        Point point = loc.getLocation();
+	        
+	        if (point != null && point.getCoordinates() != null) {
+	            Map<String, Object> coords = new HashMap<>();
+	            
+	            // INDICE 0 = Longitudine, INDICE 1 = Latitudine
+	            coords.put("longitude", point.getCoordinates().getValues().get(0));
+	            coords.put("latitude", point.getCoordinates().getValues().get(1));
+	            
+	            return coords;
+	        }
+	    }
+	    return null;
 	}
 }

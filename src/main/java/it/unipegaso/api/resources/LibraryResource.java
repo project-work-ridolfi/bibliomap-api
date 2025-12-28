@@ -3,6 +3,7 @@ package it.unipegaso.api.resources;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
@@ -47,10 +48,10 @@ public class LibraryResource {
 
 	@Inject
 	BookService bookService;
-	
+
 	@Inject
 	UsersRepository usersRepository;
-	
+
 	@POST
 	public Response createLibrary(LibraryDTO request, @Context HttpHeaders headers) {
 
@@ -76,6 +77,10 @@ public class LibraryResource {
 					.build();
 		}catch(NotAuthorizedException e) {
 			return e.getResponse();
+		}catch(NoSuchElementException e) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ErrorResponse("BAD_REQUEST", "visibility non valida"))
+					.build();
 		} catch (IllegalStateException e) {
 			LOG.errorf("errore logica: %s", e.getMessage());
 			return Response.status(Response.Status.UNAUTHORIZED) // 401 se l'utente non e' valido
@@ -112,18 +117,18 @@ public class LibraryResource {
 		}
 
 		List<BookDetailDTO> books = bookService.getBooksByLibrary(libraryId);
-		
-		
+
+
 		// costruisco la risposta includendo i libri
 		Map<String, Object> response = new HashMap<>();
-		
+
 		response.put("id", library.getId());
 		response.put("name", library.getName());
 		response.put("visibility", library.getVisibility());
 		response.put("books", books);
 
 		Optional<User> opOwner = usersRepository.get(library.getOwnerId());
-		
+
 		if(opOwner.isPresent()) {
 			User owner = opOwner.get();
 			if(!owner.getVisibility().equals("private")) {
@@ -131,7 +136,7 @@ public class LibraryResource {
 				response.put("ownerId", owner.getId());
 			}
 		}
-		
+
 		return Response.ok(response).build();
 	}
 

@@ -8,9 +8,27 @@ import com.mongodb.client.model.geojson.Point;
 public class Location {
 	
 	@BsonId
-	public String id; 
+	private String id; 
 
 	// Oggetto GeoJSON standard di MongoDB per il campo indicizzato '2dsphere'
     @BsonProperty("geolocation")
-    public Point location;
+    private Point location;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Point getLocation() {
+		return location;
+	}
+
+	public void setLocation(Point location) {
+		this.location = location;
+	}
+    
+    
 }

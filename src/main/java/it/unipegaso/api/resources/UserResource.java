@@ -1,6 +1,8 @@
 package it.unipegaso.api.resources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
+import it.unipegaso.database.model.VisibilityOptions;
 import it.unipegaso.service.EmailService;
 import it.unipegaso.service.LibraryService;
 import it.unipegaso.service.LocationService;
@@ -75,6 +78,44 @@ public class UserResource {
 
 		return Response.ok(new CheckExistsResponse(exists)).build();
 	}
+	
+	@PUT
+	@Path("/{id}/username")
+	public Response updateUsername(@PathParam("id") String userId, Map<String, Object> data, @Context HttpHeaders headers) {
+		
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User user = userService.getUserFromSession(sessionId);
+
+			// verifica che l'utente modifichi se stesso
+			if (!user.getId().equals(userId)) {
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
+
+			if (!data.containsKey("username")) {
+				return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorResponse("BAD REQUEST", "username is mandatory")).build();
+			}
+
+			String newUsername = (String) data.get("username");
+			String oldUsername = user.getUsername();
+			
+            // se l'username e' diverso, aggiorna anche la sessione su redis
+            if (!newUsername.equals(oldUsername)) {
+            	Map<String, Object> history = getHistoryEntry("username", newUsername, oldUsername, "USERNAME_UPDATED");
+
+            	user.addToHistory(history);
+                user.setUsername(newUsername);
+                // fondamentale: aggiorna il valore in redis per le chiamate future
+                sessionDataService.updateField(sessionId, "username", newUsername);
+                LOG.infof("Sessione aggiornata con nuovo username: %s", newUsername);
+            }
+
+			userRepository.update(user);
+			return Response.ok(user).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+	}
 
 	@PUT
 	@Path("/{id}/privacy")
@@ -87,20 +128,37 @@ public class UserResource {
 			if (!user.getId().equals(userId)) {
 				return Response.status(Response.Status.FORBIDDEN).build();
 			}
+			
+        	
+        	String visibilityInput = (String)data.getOrDefault("visibility", "");
 
-			if (data.containsKey("username")) {
-				user.setUsername((String) data.get("username"));
-			}
+			if (!visibilityInput.isBlank()) {
+				//controllo che visibility sia corretta
+				VisibilityOptions visibility;
+				try {
+				    visibility = VisibilityOptions.fromString(visibilityInput)
+				            .orElseThrow();
+				} catch (Exception e) {
+				    return Response.status(Response.Status.BAD_REQUEST)
+				            .entity(new ErrorResponse("BAD_REQUEST", "visibility " + visibilityInput + " non valida"))
+				            .build();
+				}
 
-			if (data.containsKey("visibility")) {
-				user.setVisibility((String) data.get("visibility"));
+				String normalizedVisibility = visibility.toDbValue();
+
+				Map<String, Object> history = getHistoryEntry("visibility", normalizedVisibility, user.getVisibility(), "VISIBILITY_UPDATED");
+				user.setVisibility(normalizedVisibility);
+				user.addToHistory(history);
 			}
 
 			if (data.containsKey("blurRadius")) {
 				Number blur = (Number) data.get("blurRadius");
-				user.setBlurRadius(blur.intValue());
-			}
+            	Map<String, Object> history = getHistoryEntry("blurRadius", ""+blur.intValue(), ""+ user.getBlurRadius(), "BLUR_RADIUS_UPDATED");
 
+				user.setBlurRadius(blur.intValue());
+				user.addToHistory(history);
+			}
+			
 			userRepository.update(user);
 			return Response.ok(user).build();
 		} catch (Exception e) {
@@ -130,7 +188,7 @@ public class UserResource {
 			}
 
 			String oldPwd = data.getOrDefault("old", "");
-			String newPwd = data.getOrDefault("new", "");
+			String newPwd = BcryptUtil.bcryptHash(data.getOrDefault("new", ""));
 
 			if (oldPwd.isBlank() || newPwd.isBlank()) {
 				return Response.status(Response.Status.BAD_REQUEST)
@@ -144,7 +202,10 @@ public class UserResource {
 			}
 
 			// aggiornamento con nuovo hash
-			user.setHashedPassword(BcryptUtil.bcryptHash(newPwd));
+			user.setHashedPassword(newPwd);
+    		Map<String, Object> historyEntry = getHistoryEntry("password", newPwd, oldPwd, "PASSWORD_CHANGED");
+
+			user.addToHistory(historyEntry);
 			userRepository.update(user);
 
 			return Response.ok().build();
@@ -180,12 +241,31 @@ public class UserResource {
 		} catch (NotAuthorizedException | NotFoundException e) {
 			return e.getResponse();
 		}
+		
+		//controllo che visibility sia corretta
+		String visibilityInput = request.visibility();
+
+		VisibilityOptions visibility;
+		try {
+		    visibility = VisibilityOptions.fromString(visibilityInput)
+		            .orElseThrow();
+		} catch (Exception e) {
+		    return Response.status(Response.Status.BAD_REQUEST)
+		            .entity(new ErrorResponse("BAD_REQUEST", "visibility " + visibilityInput + " non valida"))
+		            .build();
+		}
+
+		String normalizedVisibility = visibility.toDbValue();
 
 		// AGGIORNAMENTO UTENTE CON IL LOCATION ID E I SETTING
-		user.setLocationId(locationId);
-		user.setVisibility(request.visibility());
-		user.setBlurRadius(request.blurRadius());
+		
+		Map<String, Object> historyEntry = getHistoryEntry("locationId", locationId, user.getLocationId(), "LOCATION_UPDATED");
 
+		user.setLocationId(locationId);
+		user.setVisibility(normalizedVisibility);
+		user.setBlurRadius(request.blurRadius());
+		user.addToHistory(historyEntry);
+		
 		boolean updateSuccess = userRepository.update(user);
 
 		if(updateSuccess) {
@@ -217,7 +297,15 @@ public class UserResource {
 			responseBody.put("email", user.getEmail());
 			responseBody.put("visibility", user.getVisibility()); 
 			responseBody.put("blurRadius", user.getBlurRadius()); 
+			responseBody.put("locationId", user.getLocationId());
 
+	        // Recuperiamo le coordinate reali se l'utente ha una posizione
+	        if (user.getLocationId() != null) {
+	        	Map<String, Object> coords = locationService.getLocationMap(user.getLocationId());
+	            if (coords != null) {
+	                responseBody.putAll(coords); // Aggiunge latitude e longitude al body
+	            }
+	        }
 			LOG.infof("profilo caricato con successo per: %s", user.getUsername());
 			return Response.ok(responseBody).build();
 
@@ -319,5 +407,19 @@ public class UserResource {
 		}
 	}
 
+	
+	private Map<String, Object> getHistoryEntry(String field, String newValue, String oldValue, String action){
+		
+		Map<String, Object> entry = new HashMap<>();
+	    entry.put("action", action);
+	    entry.put("field", field);
+	    entry.put("from", oldValue);
+	    entry.put("to", newValue);
+	    entry.put("changedOn", new Date());
+	    
+	    return entry;
+		
+	}
+	
 
 }
