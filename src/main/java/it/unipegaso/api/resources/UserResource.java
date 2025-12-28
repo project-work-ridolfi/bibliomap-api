@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.jboss.logging.Logger;
 
+import io.quarkus.elytron.security.common.BcryptUtil;
 import it.unipegaso.api.dto.CheckExistsResponse;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.SetLocationDTO;
@@ -55,10 +56,10 @@ public class UserResource {
 
 	@Inject
 	SessionDataService sessionDataService;
-	
+
 	@Inject
 	LibraryService libraryService;
-	
+
 	@Inject
 	EmailService emailService;
 
@@ -74,40 +75,40 @@ public class UserResource {
 
 		return Response.ok(new CheckExistsResponse(exists)).build();
 	}
-	
+
 	@PUT
 	@Path("/{id}/privacy")
 	public Response updatePrivacySettings(@PathParam("id") String userId, Map<String, Object> data, @Context HttpHeaders headers) {
-	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-	    try {
-	        User user = userService.getUserFromSession(sessionId);
-	        
-	        // verifica che l'utente modifichi se stesso
-	        if (!user.getId().equals(userId)) {
-	            return Response.status(Response.Status.FORBIDDEN).build();
-	        }
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User user = userService.getUserFromSession(sessionId);
 
-	        if (data.containsKey("username")) {
-	        	user.setUsername((String) data.get("username"));
-	        }
-	        
-	        if (data.containsKey("visibility")) {
-	        	user.setVisibility((String) data.get("visibility"));
-	        }
-	        
-	        if (data.containsKey("blurRadius")) {
-	            Number blur = (Number) data.get("blurRadius");
-	            user.setBlurRadius(blur.intValue());
-	        }
+			// verifica che l'utente modifichi se stesso
+			if (!user.getId().equals(userId)) {
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
 
-	        userRepository.update(user);
-	        return Response.ok(user).build();
-	    } catch (Exception e) {
-	        return Response.status(Response.Status.UNAUTHORIZED).build();
-	    }
+			if (data.containsKey("username")) {
+				user.setUsername((String) data.get("username"));
+			}
+
+			if (data.containsKey("visibility")) {
+				user.setVisibility((String) data.get("visibility"));
+			}
+
+			if (data.containsKey("blurRadius")) {
+				Number blur = (Number) data.get("blurRadius");
+				user.setBlurRadius(blur.intValue());
+			}
+
+			userRepository.update(user);
+			return Response.ok(user).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
 	}
 
-	
+
 	@GET
 	@Path("/{id}")
 	public Response getUserProfile(@PathParam("id") String userId) {
@@ -115,6 +116,44 @@ public class UserResource {
 		return Response.ok("{\"username\": \"user" + userId + "\", \"displayName\": \"TODO\"}").build();
 	}
 
+
+	@PUT
+	@Path("/{id}/password")
+	public Response changePassword(@PathParam("id") String userId, Map<String, String> data, @Context HttpHeaders headers) {
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User user = userService.getUserFromSession(sessionId);
+
+			// id nel path deve corrispondere alla sessione
+			if (user == null || !user.getId().equals(userId)) {
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
+
+			String oldPwd = data.getOrDefault("old", "");
+			String newPwd = data.getOrDefault("new", "");
+
+			if (oldPwd.isBlank() || newPwd.isBlank()) {
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(new ErrorResponse("BAD_REQUEST", "dati mancanti")).build();
+			}
+
+			// verifica password attuale
+			if (!BcryptUtil.matches(oldPwd, user.getHashedPassword())) {
+				return Response.status(Response.Status.NOT_ACCEPTABLE)
+						.entity(new ErrorResponse("NOT_ACCEPTABLE", "password attuale errata")).build();
+			}
+
+			// aggiornamento con nuovo hash
+			user.setHashedPassword(BcryptUtil.bcryptHash(newPwd));
+			userRepository.update(user);
+
+			return Response.ok().build();
+		} catch (NotAuthorizedException e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		} catch (Exception e) {
+			return Response.serverError().build();
+		}
+	}
 
 	@POST
 	@Path("/set-location")
@@ -173,11 +212,11 @@ public class UserResource {
 
 			// se il controllo arriva qui senza eccezioni, l'utente e' autenticato 
 			Map<String, Object> responseBody = new HashMap<>();
-	        responseBody.put("id", user.getId());
-	        responseBody.put("username", user.getUsername());
-	        responseBody.put("email", user.getEmail());
-	        responseBody.put("visibility", user.getVisibility()); 
-	        responseBody.put("blurRadius", user.getBlurRadius()); 
+			responseBody.put("id", user.getId());
+			responseBody.put("username", user.getUsername());
+			responseBody.put("email", user.getEmail());
+			responseBody.put("visibility", user.getVisibility()); 
+			responseBody.put("blurRadius", user.getBlurRadius()); 
 
 			LOG.infof("profilo caricato con successo per: %s", user.getUsername());
 			return Response.ok(responseBody).build();
@@ -196,88 +235,88 @@ public class UserResource {
 	@Path("/me/libraries")
 	public Response getUserLibraries(@Context HttpHeaders headers) {
 
-	    LOG.info("GET LIBRARIES");
+		LOG.info("GET LIBRARIES");
 
-	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
 
-	    try {
-	        User user = userService.getUserFromSession(sessionId); 
+		try {
+			User user = userService.getUserFromSession(sessionId); 
 
-	        String userId = user.getId();
+			String userId = user.getId();
 
-	        List<Library> userLibraries = libraryService.getUserLibraries(userId); 
-	        
-	        List<Map<String, String>> librariesDTO = new ArrayList<>();
-	        
-	        for(Library lib : userLibraries) {
-	        	
-	        	Map<String, String> namesIdsMap = new HashMap<>();
-	        	namesIdsMap.put("id", lib.getId());
-	        	namesIdsMap.put("name", lib.getName());
-	        	librariesDTO.add(namesIdsMap);
-	        	
-	        }
+			List<Library> userLibraries = libraryService.getUserLibraries(userId); 
 
-	        // Se la lista e' vuota (0 librerie), lo stato è comunque 200 OK
-	        return Response.ok(Map.of("libraries", librariesDTO, "count", librariesDTO.size())).build();
-	    
-	    }catch(NotAuthorizedException e) {
-	        // Errore di autenticazione/sessione (401)
-	        return e.getResponse();
-	    } catch (Exception e) {
-	        // Errore grave (es. fallimento del database)
-	        LOG.error("errore sconosciuto durante il recupero delle librerie", e);
-	        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-	                .entity(new ErrorResponse("SERVER_ERROR", "errore interno durante il recupero delle librerie."))
-	                .build();
-	    }
+			List<Map<String, String>> librariesDTO = new ArrayList<>();
+
+			for(Library lib : userLibraries) {
+
+				Map<String, String> namesIdsMap = new HashMap<>();
+				namesIdsMap.put("id", lib.getId());
+				namesIdsMap.put("name", lib.getName());
+				librariesDTO.add(namesIdsMap);
+
+			}
+
+			// Se la lista e' vuota (0 librerie), lo stato è comunque 200 OK
+			return Response.ok(Map.of("libraries", librariesDTO, "count", librariesDTO.size())).build();
+
+		}catch(NotAuthorizedException e) {
+			// Errore di autenticazione/sessione (401)
+			return e.getResponse();
+		} catch (Exception e) {
+			// Errore grave (es. fallimento del database)
+			LOG.error("errore sconosciuto durante il recupero delle librerie", e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ErrorResponse("SERVER_ERROR", "errore interno durante il recupero delle librerie."))
+					.build();
+		}
 	}
 
-	
+
 	@GET
-    @Path("/export")
-    public Response exportUserData(@Context HttpHeaders headers) {
-        String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-        try {
-            User user = userService.getUserFromSession(sessionId);
-            
-            // in un sistema reale qui si avvierebbe un job asincrono
-            // per ora simuliamo l'invio della mail
-            LOG.infof("Richiesta export dati per utente: %s", user.getEmail());
-            
-            // TODO: implementare servizio email sendExportData(user)
-            
-            return Response.ok(Map.of("message", "La richiesta è stata presa in carico. Riceverai un'email con il dump dei tuoi dati.")).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-    }
+	@Path("/export")
+	public Response exportUserData(@Context HttpHeaders headers) {
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User user = userService.getUserFromSession(sessionId);
+
+			// in un sistema reale qui si avvierebbe un job asincrono
+			// per ora simuliamo l'invio della mail
+			LOG.infof("Richiesta export dati per utente: %s", user.getEmail());
+
+			// TODO: implementare servizio email sendExportData(user)
+
+			return Response.ok(Map.of("message", "La richiesta è stata presa in carico. Riceverai un'email con il dump dei tuoi dati.")).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+	}
 
 	@DELETE
 	@Path("/me")
 	public Response deleteAccount(@Context HttpHeaders headers) {
-	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-	    try {
-	        User user = userService.getUserFromSession(sessionId);
-	        
-	        UserService.DeletionResult result = userService.tryFullDeleteUser(user.getId());
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User user = userService.getUserFromSession(sessionId);
 
-	        if (result.success) {
-	            emailService.sendAccountDeletedEmail(user.getEmail(), user.getUsername());
-	            sessionDataService.delete(sessionId);
-	            return Response.noContent().build();
-	        } else {
-	            // Notifichiamo l'utente via email sui prestiti bloccanti
-	            emailService.sendDeletionBlockedEmail(user.getEmail(), user.getUsername(), result.blockingLoans);
-	            
-	            // Ritorniamo un 409 Conflict per dire al frontend che non si può fare
-	            return Response.status(Response.Status.CONFLICT)
-	                    .entity(Map.of("message", "Prestiti attivi in corso", "loans", result.blockingLoans))
-	                    .build();
-	        }
-	    } catch (Exception e) {
-	        return Response.status(Response.Status.UNAUTHORIZED).build();
-	    }
+			UserService.DeletionResult result = userService.tryFullDeleteUser(user.getId());
+
+			if (result.success) {
+				emailService.sendAccountDeletedEmail(user.getEmail(), user.getUsername());
+				sessionDataService.delete(sessionId);
+				return Response.noContent().build();
+			} else {
+				// Notifichiamo l'utente via email sui prestiti bloccanti
+				emailService.sendDeletionBlockedEmail(user.getEmail(), user.getUsername(), result.blockingLoans);
+
+				// Ritorniamo un 409 Conflict per dire al frontend che non si può fare
+				return Response.status(Response.Status.CONFLICT)
+						.entity(Map.of("message", "Prestiti attivi in corso", "loans", result.blockingLoans))
+						.build();
+			}
+		} catch (Exception e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
 	}
 
 
