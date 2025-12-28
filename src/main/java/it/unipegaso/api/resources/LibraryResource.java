@@ -8,10 +8,13 @@ import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
+import io.quarkus.logging.Log;
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.LibraryDTO;
 import it.unipegaso.api.util.SessionIDProvider;
+import it.unipegaso.database.CopiesRepository;
+import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
@@ -28,6 +31,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
@@ -51,7 +55,13 @@ public class LibraryResource {
 
 	@Inject
 	UsersRepository usersRepository;
+	
+	@Inject
+	CopiesRepository copiesRepository;
 
+	@Inject 
+	LibrariesRepository librariesRepository;
+	
 	@POST
 	public Response createLibrary(LibraryDTO request, @Context HttpHeaders headers) {
 
@@ -146,21 +156,50 @@ public class LibraryResource {
 	 */
 	@PUT
 	@Path("/{id}")
-	public Response updateLibrary(
-			@PathParam("id") String libraryId,
-			Object libraryDto) {
+	public Response updateLibrary( @PathParam("id") String libraryId, @Context HttpHeaders headers, Object libraryDto) {
 		// TODO: verificare ownership + aggiornare
 		return Response.ok("{\"message\": \"Collection updated (TODO)\"}").build();
 	}
 
 	/**
 	 * DELETE /api/libraries/{id}
-	 * Elimina collezione (solo owner, non elimina i libri).
+	 * Elimina collezione (solo owner, non elimina i libri ma le copie).
 	 */
 	@DELETE
 	@Path("/{id}")
-	public Response deleteLibrary(@PathParam("id") String libraryId) {
-		// TODO: verificare ownership + delete
-		return Response.noContent().build();
+	public Response deleteLibrary(@PathParam("id") String libraryId, @Context HttpHeaders headers) {
+		
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User user = userService.getUserFromSession(sessionId); 
+
+			String userId = user.getId();
+			
+			Library library = libraryService.getLibraryDetail(libraryId, userId);
+
+			if (library == null) {
+				LOG.info("LIBRERIA DA ELIMINARE NON TROVATA");
+				return Response.noContent().build();
+			}
+			
+			if(!userId.equals(library.getOwnerId())) {
+				//non si dovrebbe mai finire qui, ma per essere certi al 100%
+				return Response.status(Response.Status.FORBIDDEN).entity(new ErrorResponse("ACTION FORBIDDEN", "l'utente non e' il proprietario della libreria")).build();
+			}
+
+			//cancelliamo tutte le copie con quel library id
+			copiesRepository.deleteByLibraryId(libraryId);
+			// elimina la libreria stessa
+			librariesRepository.delete(libraryId);
+
+			return Response.noContent().build();
+		}catch(NotAuthorizedException e) {
+			return e.getResponse();
+		}catch (WebApplicationException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 }

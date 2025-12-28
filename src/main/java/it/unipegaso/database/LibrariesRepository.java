@@ -10,6 +10,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 
 import it.unipegaso.database.model.Library;
@@ -80,8 +81,21 @@ public class LibrariesRepository implements IRepository<Library> {
 
 	@Override
 	public boolean delete(String id) {
-		// TODO Auto-generated method stub
-		return false;
+		DeleteResult result = libraries.deleteOne(Filters.eq(ID, id));
+
+		if (result.wasAcknowledged()) {
+			if (result.getDeletedCount() > 0) {
+				LOG.infof("Utente con '%s' '%s' eliminato con successo.", ID, id);
+				return true;
+			} else {
+				LOG.warnf("Nessun utente trovato con '%s' '%s'.", ID, id);
+				//ritorno sempre true perche' comunque l'utente non esiste piu' che e' il risultato desiderato
+				return true;
+			}
+		} else {
+			LOG.errorf("Eliminazione dell'utente con '%s' '%s' non riconosciuta dal database.",ID, id);
+			return false;
+		}
 	}
 
 
