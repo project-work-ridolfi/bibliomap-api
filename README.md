@@ -156,21 +156,21 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 - [ ] definisci flusso di ricerca
 - [ ] definisci flusso di prestito
 - [ ] pagina aggiunta libro (da finire e testare), deve avere:
- - [ ] controllo su openlibrary
- - [ ] inserimento isbn
- - [ ] sblocco camera per isbn
+ - [x] controllo su google books
+ - [x] inserimento isbn
+ - [x] sblocco camera per isbn
  - [ ] condizione opzionale ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
- - [ ] caricamento copertina (drag or choose, cerca su google, camera??, scegli icona)
- - [ ] lista di tag (si può scegliere da una lista fissa, alcuni suggeriti dal libro stesso, oppure inserire un tag nuovo)
+ - [x] caricamento copertina (drag or choose, cerca su google, camera??, scegli icona)
+ - [x] lista di tag (si può scegliere da una lista fissa, alcuni suggeriti dal libro stesso, oppure inserire un tag nuovo)
  - [ ] da definire bene logica tag e copertina
  - [x] GET /api/users/me/libraries
   - [x] recupera lista librerie dell'utente loggato (id, nome) per il menu a tendina
  - [x] GET /api/books/external/lookup-metadata
- - [ ] GET /api/books/external/search-isbn
+ - [x] GET /api/books/external/search-isbn
  - [ ] POST /api/books/add-composite
-- [ ] pagina libro per proprietario con modifiche abilitate (gestione copia/libro, modificabili solo proprietà della copia, la copertina forse diventa proprietà della copia)
+- [x] pagina libro per proprietario con modifiche abilitate (gestione copia/libro, modificabili solo proprietà della copia, la copertina forse diventa proprietà della copia)
 - [ ] gestione libri, sposta da libreria a libreria, duplica
-- [ ] pagina libro per utente che la vede, bottone per richiedere il prestito -> manda email
+- [x] pagina libro per utente che la vede, bottone per richiedere il prestito -> manda email
 - [ ] libreria da aggiungere la gestione di una location sua
 - [ ] libreria va messa la possibilità di una visibilità diversa da quella dell'utente
 - [ ] fuzzy level (da ricontrollare se è vero)
