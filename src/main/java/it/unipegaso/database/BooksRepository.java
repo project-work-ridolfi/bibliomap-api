@@ -1,7 +1,17 @@
 package it.unipegaso.database;
 
+import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Sorts.descending;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
@@ -62,5 +72,23 @@ public class BooksRepository implements IRepository<Book> {
 	public boolean delete(String id) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public long count() {
+		return 	books.countDocuments();
+	}
+	
+	public Map<String, Long> getBooksByLanguage() {
+	    List<Bson> pipeline = Arrays.asList(
+	        group("$language", sum("count", 1)),
+	        sort(descending("count"))
+	    );
+
+	    Map<String, Long> stats = new HashMap<>();
+	    books.withDocumentClass(Document.class)
+	         .aggregate(pipeline)
+	         .forEach(doc -> stats.put(doc.getString("_id"), doc.getInteger("count").longValue()));
+	    return stats;
 	}
 }

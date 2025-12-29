@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
-import io.quarkus.logging.Log;
 import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.LibraryDTO;

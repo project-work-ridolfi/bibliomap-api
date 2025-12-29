@@ -136,4 +136,5 @@ public class UserService {
 			this.blockingLoans = blockingLoans;
 		}
 	}
+
 }

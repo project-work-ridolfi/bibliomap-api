@@ -11,9 +11,10 @@ import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.model.Book;
 import it.unipegaso.service.BookService;
 import it.unipegaso.service.GoogleBooksService;
+import it.unipegaso.service.LibraryService;
+import it.unipegaso.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -35,6 +36,13 @@ public class BookResource {
 
 	@Inject
 	BooksRepository bookRepository;
+	
+	@Inject 
+	UserService userService;
+	
+	@Inject
+	LibraryService libraryService;
+
 
 	@GET
 	@Path("/nearby")
@@ -61,6 +69,8 @@ public class BookResource {
 
 		return Response.ok(books).build();
 	}
+	
+	
 
 	@POST
 	@Path("/save")

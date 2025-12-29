@@ -10,7 +10,8 @@ import com.mongodb.client.FindIterable;
 public interface IRepository<T> {
 	
     public static final String ID = "_id";
-	
+    public static final String VISIBILITY = "visibility";
+
 	String create(T obj) throws MongoWriteException;
 	
 	Optional<T> get(String id);
@@ -20,5 +21,7 @@ public interface IRepository<T> {
 	boolean delete (String id);
 	
 	FindIterable<T> find(Bson filter);
+	
+	long count();
 
 }

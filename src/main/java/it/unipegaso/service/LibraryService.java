@@ -8,10 +8,13 @@ import java.util.Optional;
 import org.jboss.logging.Logger;
 
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Filters;
 
 import it.unipegaso.api.dto.LibraryDTO;
+import it.unipegaso.database.CopiesRepository;
 import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.UsersRepository;
+import it.unipegaso.database.model.Copy;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
 import it.unipegaso.database.model.VisibilityOptions;
@@ -33,6 +36,9 @@ public class LibraryService {
 	@Inject
 	SessionDataService sessionDataService; // per recuperare username
 
+	@Inject
+	CopiesRepository copiesRepository;
+	
 	/**
 	 * Crea una nuova libreria e la collega all'utente e alla sua posizione.
 	 * @return id libreria creata
@@ -110,5 +116,13 @@ public class LibraryService {
 	    }
 	
 	    return lib;
+	}
+	
+	
+	public long countCopies(String userId, boolean logged) {
+	    
+		List<String> visibleIds = librariesRepository.getVisibleLibraryIds(logged, userId);
+	    
+	    return copiesRepository.countByLibraryIds(visibleIds);
 	}
 }

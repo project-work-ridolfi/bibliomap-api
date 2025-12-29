@@ -16,6 +16,7 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 
 import it.unipegaso.database.model.User;
+import it.unipegaso.database.model.VisibilityOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -139,7 +140,7 @@ public class UsersRepository implements IRepository<User>{
 		user.setModifiedAt(LocalDateTime.now());
 
 		String id = user.getId();
-		
+
 		try {
 			Bson query = Filters.eq(ID, id); 
 			UpdateResult result = users.replaceOne(query, user);
@@ -167,6 +168,31 @@ public class UsersRepository implements IRepository<User>{
 	@Override
 	public FindIterable<User> find(Bson filter) {
 		return users.find(filter);
+	}
+
+	@Override
+	public long count() {
+		return users.countDocuments();
+	}
+
+	public long count(String userID, boolean logged) {
+
+		Bson filter;
+
+		if (logged) {
+			filter = Filters.or(
+					Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue()),
+					Filters.eq(VISIBILITY, VisibilityOptions.LOGGED_IN.toDbValue()),
+		            Filters.eq(ID, userID)
+
+					);
+		} else {
+			filter = Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue());
+
+		}
+
+		return users.countDocuments(filter);
+
 	}
 
 

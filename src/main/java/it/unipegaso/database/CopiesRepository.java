@@ -1,10 +1,20 @@
 package it.unipegaso.database;
 
+import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.limit;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Aggregates.unwind;
+import static com.mongodb.client.model.Sorts.descending;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
@@ -27,7 +37,7 @@ public class CopiesRepository implements IRepository<Copy> {
 
 	@Inject
 	MongoCollection<Copy> copies;
-	
+
 	private static final String LIBRARY_ID = "libraryId";
 
 	@Override
@@ -58,6 +68,16 @@ public class CopiesRepository implements IRepository<Copy> {
 		return find(filter).into(new ArrayList<>());
 	}
 
+	public long countByLibraryIds(List<String> libraryIds) {
+
+		if (libraryIds == null || libraryIds.isEmpty()) {
+			return 0;
+		}
+
+		// conta i documenti che hanno libraryId contenuto nella lista fornita
+		return copies.countDocuments(Filters.in("libraryId", libraryIds));
+	}
+
 	public boolean delete(String id) {
 
 		if (id == null || id.trim().isEmpty()) {
@@ -79,7 +99,7 @@ public class CopiesRepository implements IRepository<Copy> {
 
 		return result.wasAcknowledged();
 	}
-	
+
 	@Override
 	public boolean update(Copy copy) throws MongoWriteException {
 
@@ -94,5 +114,27 @@ public class CopiesRepository implements IRepository<Copy> {
 	@Override
 	public FindIterable<Copy> find(Bson filter) {
 		return copies.find(filter);
+	}
+
+
+	@Override
+	public long count() {
+		return copies.countDocuments();
+	}
+
+	public String findTopTagByUser(String userId) {
+	    List<Bson> pipeline = Arrays.asList(
+	        match(Filters.eq("ownerId", userId)),
+	        unwind("$tags"),
+	        group("$tags", sum("count", 1)),
+	        sort(descending("count")),
+	        limit(1)
+	    );
+
+	    Document res = copies.withDocumentClass(Document.class)
+	                         .aggregate(pipeline)
+	                         .first();
+	                             
+	    return res != null ? res.getString("_id") : "nessuno";
 	}
 }

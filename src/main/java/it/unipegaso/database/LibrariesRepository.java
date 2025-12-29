@@ -1,5 +1,7 @@
 package it.unipegaso.database;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,10 +12,12 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 
 import it.unipegaso.database.model.Library;
+import it.unipegaso.database.model.VisibilityOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -60,6 +64,27 @@ public class LibrariesRepository implements IRepository<Library> {
 	}
 
 
+	public List<String> getVisibleLibraryIds(boolean logged, String userId) {
+	    Bson filter;
+	    
+	    if (logged) {
+	        filter = Filters.or(
+	            Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue()),
+	            Filters.eq(VISIBILITY, VisibilityOptions.LOGGED_IN.toDbValue()),
+	            Filters.eq(OWNER_ID, userId)
+	        );
+	    } else {
+	        filter = Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue());
+	    }
+	    
+	    List<String> ids = new ArrayList<>();
+	    
+	    libraries.find(filter).projection(Projections.include(ID))
+	    .forEach(lib -> {
+	        ids.add(lib.getId());
+	    });
+	    return ids;
+	}
 
 	public FindIterable<Library> getAll(String userId){
 
@@ -103,4 +128,10 @@ public class LibrariesRepository implements IRepository<Library> {
 	public FindIterable<Library> find(Bson filter) {
 		return libraries.find(filter);
 	}
+	
+	@Override
+	public long count() {
+		return libraries.countDocuments();
+	}
+	
 }
