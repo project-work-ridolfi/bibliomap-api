@@ -80,6 +80,66 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
   Esposizione delle metriche di servizio.
 * **SmallRye JWT Build**
   API per la creazione e firma di token JWT.
+
+## MONGO DB (todo da spostare in doc totale)
+
+### ESEMPIO UTENTE
+```json
+{
+  "_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+  "acceptedTerms": true,
+  "blurRadius": 100,
+  "createdAt": {
+    "$date": "2025-12-23T15:59:45.947Z"
+  },
+  "email": "gandalf@middlearth.com",
+  "hashedPassword": "$2a$10$9W2txKtJJCyyMEnCinatvu05WcWy2qMvtSCHYT9/IowVeyR71szbe",
+  "history": [
+    {
+      "field": "username",
+      "action": "USERNAME_UPDATED",
+      "from": "gandalf_the_grey",
+      "to": "gandalf_the_white",
+      "changedOn": {
+        "$date": "2025-12-28T11:44:12.840Z"
+      }
+    },
+    {
+      "field": "visibility",
+      "action": "VISIBILITY_UPDATED",
+      "from": "logged-in",
+      "to": "all",
+      "changedOn": {
+        "$date": "2025-12-28T11:45:27.059Z"
+      }
+    },
+    {
+      "field": "blurRadius",
+      "action": "BLUR_RADIUS_UPDATED",
+      "from": "220",
+      "to": "220",
+      "changedOn": {
+        "$date": "2025-12-28T11:45:27.060Z"
+      }
+    },
+    {
+      "field": "blurRadius",
+      "action": "BLUR_RADIUS_UPDATED",
+      "from": "220",
+      "to": "100",
+      "changedOn": {
+        "$date": "2025-12-28T12:34:29.988Z"
+      }
+    }
+  ],
+  "locationId": "1e2437c9-aaa1-4bf1-8edf-e4b53781bd51",
+  "modifiedAt": {
+    "$date": "2025-12-28T13:34:29.988Z"
+  },
+  "username": "gandalf_the_white",
+  "visibility": "all"
+}
+```
   
 ## TODO
  - [x] controllo su click multiplo per get otp

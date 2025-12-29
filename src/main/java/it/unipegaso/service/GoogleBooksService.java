@@ -91,6 +91,7 @@ public class GoogleBooksService {
 
 			if (totalItems == 0) {
 				// nessun libro trovato per questo isbn
+				LOG.error("NON SONO PRESENTI LIBRI CON QUESTO ISBN" + isbn);
 				return null;
 			}
 
@@ -162,53 +163,53 @@ public class GoogleBooksService {
 	}
 
 
-	public List<Book> lookUpIsbn(String title, String author, String publisher, int year){
-
+	public List<Book> lookUpIsbn(String title, String author, String publisher, int year) {
+	    
 		List<Book> books = new ArrayList<>();
+	    String query = buildGoogleBooksQuery(title, author, publisher, year);
+	    String reqUrl = String.format("%s?q=%s&key=%s", url, query, apiKey);
 
-		String query =  buildGoogleBooksQuery(title, author, publisher, year);
-		String reqUrl = String.format("%s?q=%s&key=%s", url, query, apiKey);
+	    HttpRequest request = HttpRequest.newBuilder()
+	            .uri(URI.create(reqUrl))
+	            .GET()
+	            .build();
 
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(reqUrl))
-				.GET()
-				.build();
+	    try {
+	        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-		try {
-			// esegue chiamata sincrona
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	        if (response.statusCode() != 200) {
+	            LOG.error("error fetching from google books: " + response.statusCode());
+	            return books;
+	        }
 
-			if (response.statusCode() != 200) {
-				LOG.error("error fetching from google books: " + response.statusCode());
-				return books;
-			}
+	        JsonNode root = objectMapper.readTree(response.body());
+	        JsonNode items = root.path("items");
 
+	        if (items.isMissingNode() || !items.isArray()) {
+	            return books;
+	        }
 
-			// parsa risposta json
-			JsonNode root = objectMapper.readTree(response.body());
-			int totalItems = root.path("totalItems").asInt(0);
+	        // ci fermiamo non appena ne abbiamo trovati 5 validi
+	        for (int i = 0; i < items.size(); i++) {
+	            if (books.size() >= 5) break; 
 
-			LOG.debug("GOOGLE RESPONSE " + root);
+	            Book book = extractBook(root, i);
+	            
+	            // Verifichiamo che il libro estratto abbia un ISBN valido
+	            if (book != null && book.getIsbn() != null && !book.getIsbn().isEmpty()) {
+	                books.add(book);
+	                LOG.debug("Aggiunto libro valido: " + book.getTitle() + " ISBN: " + book.getIsbn());
+	            } else {
+	                LOG.debug("Scartato risultato all'indice " + i + " perché privo di ISBN_13");
+	            }
+	        }
 
-			if (totalItems == 0) {
-				// nessun libro trovato 
-				return books;
-			}
+	        return books;
 
-			//prendo i primi 5 risultati per evitare di averne troppi
-			for(int i = 0; i<totalItems && i<5; i++) {
-
-				books.add(extractBook(root, i));
-
-			}
-
-
-			return books;
-
-		}catch (Exception e) {
-			LOG.error("eccezione durante lookup google books", e);
-			return books;
-		}
+	    } catch (Exception e) {
+	        LOG.error("eccezione durante lookup google books", e);
+	        return books;
+	    }
 	}
 
 
@@ -229,6 +230,10 @@ public class GoogleBooksService {
 			if("ISBN_13".equals(node.get("type").asText())) {
 				isbn = node.get("identifier").asText(null);
 			}
+		}
+		
+		if (isbn == null) {
+			return null;
 		}
 
 		// gestisce autori (da array a stringa singola)
