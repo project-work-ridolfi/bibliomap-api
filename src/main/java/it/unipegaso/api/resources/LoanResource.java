@@ -508,7 +508,32 @@ public class LoanResource {
 	}
 
 
+	@POST
+	@Path("/{id}/contact")
+	public Response notifyOwner(@PathParam("id") String loanId, @Context HttpHeaders headers, Map<String, String> request) {
+	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+	    try {
+	        User requester = userService.getUserFromSession(sessionId);
+	        Optional<Loan> opLoan = loansRepository.get(loanId);
+	        
+	        if (opLoan.isPresent()) {
+	            Loan loan = opLoan.get();
+	            Optional<User> opOwner = userRepository.get(loan.getOwnerId());
+	            
+	            if (opOwner.isPresent()) {
+	                User owner = opOwner.get();
+	                
 
+	                // Invia una mail predefinita al proprietario senza mostrare l'indirizzo al richiedente
+	                emailService.sendContactRequestEmail(owner.getEmail(), owner.getUsername(), requester.getUsername(), loan.getTitle(), request);
+	                return Response.ok().build();
+	            }
+	        }
+	        return Response.status(Response.Status.NOT_FOUND).build();
+	    } catch (Exception e) {
+	        return Response.serverError().build();
+	    }
+	}
 
 	@GET
 	@Path("/active")

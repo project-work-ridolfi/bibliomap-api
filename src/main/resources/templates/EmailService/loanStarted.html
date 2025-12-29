@@ -1,0 +1,17 @@
+<div style="font-family: sans-serif; color: #333;">
+    <h2>bibliomap - conferma prestito</h2>
+    <p>Ciao {recipientName},</p>
+    <p>lo scambio per il libro <strong>{bookTitle}</strong> è avvenuto con successo.</p>
+    <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #629677;">
+        {#if isOwner}
+            hai consegnato il libro a: <strong>{partnerName}</strong>
+        {#else}
+            hai ricevuto il libro da: <strong>{partnerName}</strong>
+        {/if}
+        <br>
+        la data di restituzione prevista è <strong>{returnDate.format('dd/MM/yyyy')}</strong>
+    </div>
+    {#if !isOwner}
+        <p>Mi raccomando, ricordati di restituire il libro entro la data indicata!</p>
+    {/if}
+</div>

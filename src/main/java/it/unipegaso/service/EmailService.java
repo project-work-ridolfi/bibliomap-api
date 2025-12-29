@@ -14,6 +14,7 @@ import io.quarkus.mailer.Mailer;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import it.unipegaso.database.model.Loan;
+import it.unipegaso.database.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -41,6 +42,10 @@ public class EmailService {
 	@Inject
 	@Location("EmailService/accountDeletionBlocked.html")
 	Template accountDeletionBlockedTemplate;
+	
+	@Inject
+	@Location("EmailService/loanStarted.html")
+	Template loanStartedTemplate;
 
 	@Inject
 	@Location("EmailService/returnConfirmation.html")
@@ -50,6 +55,11 @@ public class EmailService {
 	@Location("EmailService/overdueReminder.html")
 	Template overdueReminderTemplate;
 
+	
+	@Inject
+	@Location("EmailService/conctatUser.html")
+	Template conctactUserTemplate;
+	
 	@Inject
 	@ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
 	boolean debugEmail;
@@ -191,6 +201,64 @@ public class EmailService {
 	    String subject = "Azione richiesta: non puoi ancora eliminare il tuo account Bibliomap";
 
 	    return sendEmail(recipientEmail, subject, htmlBody, "Eliminazione bloccata");
+	}
+	
+	public void sendLoanStartedEmail(Loan loan, User owner, User requester) {
+	    // Email per il richiedente
+	    Map<String, Object> reqData = new HashMap<>();
+	    reqData.put("recipientName", requester.getUsername());
+	    reqData.put("bookTitle", loan.getTitle());
+	    reqData.put("partnerName", owner.getUsername());
+	    reqData.put("returnDate", loan.getExpectedReturnDate());
+	    reqData.put("isOwner", false);
+	    
+	    String htmlBody = loanStartedTemplate
+	            .data(reqData)
+	            .render();
+	    
+	    sendEmail(requester.getEmail(), "Prestito iniziato: " + loan.getTitle(), htmlBody, "Inizio prestito per richiedente");
+
+	    // Email per il proprietario
+	    Map<String, Object> ownerData = new HashMap<>();
+	    ownerData.put("recipientName", owner.getUsername());
+	    ownerData.put("bookTitle", loan.getTitle());
+	    ownerData.put("partnerName", requester.getUsername());
+	    ownerData.put("returnDate", loan.getExpectedReturnDate());
+	    ownerData.put("isOwner", true);
+	    
+	    
+	    htmlBody = loanStartedTemplate
+	            .data(ownerData)
+	            .render();
+	   
+	    sendEmail(owner.getEmail(), "Conferma consegna: " + loan.getTitle(), htmlBody, "Inizio prestito per proprietario");
+	}
+	
+	public void sendContactRequestEmail(String email, String toUsername, String fromUsername, String title,
+			Map<String, String> request) {
+
+		
+		String notes = request.getOrDefault("notes", "");
+		String selectedDays = request.getOrDefault("days", "");  
+		String selectedSlots = request.getOrDefault("slots", ""); 
+		
+	    Map<String, Object> data = new HashMap<>();
+	    data.put("recipientName", fromUsername);
+	    data.put("ownerName", toUsername);
+	    data.put("title", title); 
+	    data.put("notes", notes);
+	    data.put("selectedDays", selectedDays); 
+	    data.put("selectedSlots", selectedSlots);
+	    
+	    String subject = request.getOrDefault("subject", "Richiesta di contatto da " + fromUsername);
+	    
+	    String htmlBody = conctactUserTemplate
+	            .data(data)
+	            .render();
+	    
+	    sendEmail(email, subject , htmlBody, "Richiesta di contatto");
+
+		
 	}
 
 	private boolean sendEmail(String to, String subject, String body, String logType) {
