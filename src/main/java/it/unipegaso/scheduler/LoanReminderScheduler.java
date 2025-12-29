@@ -29,7 +29,7 @@ public class LoanReminderScheduler {
 	@Inject
 	EmailService emailService;
 
-	@Scheduled(cron = "0 0 9 * * ?")
+	@Scheduled(cron = "{quarkus.loan.scheduler}")
 	void checkOverdueLoans() {
 		LOG.info("esecuzione scheduler solleciti prestiti");
 

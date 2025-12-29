@@ -2,12 +2,14 @@
 <html lang="it">
 <head>
     <style>
-        .container { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; }
+        .container { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; line-height: 1.6; }
         .header { padding: 20px 0; border-bottom: 2px solid #ddd; }
         .content { padding: 20px 0; }
         .status-box { padding: 15px; border-radius: 5px; margin: 20px 0; font-weight: bold; text-align: center; color: white;}
-        .accepted { background-color: #629677; } /* Zomp color */
-        .rejected { background-color: #d9534f; } /* Red color */
+        .accepted { background-color: #629677; }
+        .rejected { background-color: #d9534f; }
+        .info-section { background-color: #f8f9fa; border-left: 4px solid #629677; padding: 15px; margin: 15px 0; }
+        .label { font-size: 11px; text-transform: uppercase; color: #777; font-weight: bold; display: block; margin-bottom: 5px; }
         .footer { font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; }
     </style>
 </head>
@@ -18,33 +20,45 @@
         </div>
 
         <div class="content">
-            <p>Ciao <strong>{recipientName}</strong>,</p>
-
-            <p>Ci sono novità riguardo la tua richiesta per il libro: <em>"{bookTitle}"</em>.</p>
+            <p>ciao <strong>{recipientName}</strong>,</p>
+            <p>ci sono novità riguardo la tua richiesta per il libro: <em>"{bookTitle}"</em>.</p>
 
             {#if isAccepted}
-                <div class="status-box accepted">
-                    LA TUA RICHIESTA È STATA ACCETTATA!
+                <div class="status-box accepted">LA TUA RICHIESTA E STATA ACCETTATA</div>
+                <p>il proprietario ha accettato il prestito. ecco i dettagli per l'incontro:</p>
+
+                {#if ownerNotes}
+                <div class="info-section">
+                    <span class="label">messaggio del proprietario</span>
+                    <div style="white-space: pre-wrap;">{ownerNotes}</div>
                 </div>
-                <p>
-                    Il proprietario ha accettato di prestarti il libro. 
-                    Controlla la tua <strong>Dashboard</strong> per i dettagli e per metterti d'accordo sulla consegna.
-                </p>
+                {/if}
+
+                {#if days}
+                <div class="info-section">
+                    <span class="label">giorni disponibili</span>
+                    <div>{days}</div>
+                </div>
+                {/if}
+
+                {#if slots}
+                <div class="info-section">
+                    <span class="label">fasce orarie</span>
+                    <div>{slots}</div>
+                </div>
+                {/if}
+
+                <p>controlla la tua dashboard per confermare la ricezione del libro.</p>
             {#else}
-                <div class="status-box rejected">
-                    LA TUA RICHIESTA È STATA RIFIUTATA
-                </div>
-                <p>
-                    Ci dispiace, ma il proprietario non può prestare questo libro al momento.
-                    Non scoraggiarti, cerca altre copie disponibili sulla mappa!
-                </p>
+                <div class="status-box rejected">LA TUA RICHIESTA E STATA RIFIUTATA</div>
+                <p>ci dispiace, ma il proprietario non può prestare questo libro al momento.</p>
             {/if}
 
-            <p>A presto,<br>Il team di Bibliomap</p>
+            <p>a presto,<br>il team di bibliomap</p>
         </div>
 
         <div class="footer">
-            Questa è una notifica automatica, per favore non rispondere a questa email.
+            notifica automatica, non rispondere a questa email.
         </div>
     </div>
 </body>

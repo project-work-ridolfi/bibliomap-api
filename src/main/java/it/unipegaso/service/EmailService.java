@@ -63,7 +63,7 @@ public class EmailService {
 	Mailer mailer;
 
 	// Invia notifica di esito (accettazione/rifiuto) al richiedente.
-	public boolean sendRequestResponseEmail(String recipientEmail, String recipientName, String bookTitle, String action) {
+	public boolean sendRequestResponseEmail(String recipientEmail, String recipientName, String bookTitle, String action, String ownerNotes, String days, String slots) {
 
 		boolean isAccepted = "accepted".equalsIgnoreCase(action) || "accept".equalsIgnoreCase(action) || "true".equalsIgnoreCase(action);
 
@@ -71,6 +71,9 @@ public class EmailService {
 		data.put("recipientName", recipientName);
 		data.put("bookTitle", bookTitle);
 		data.put("isAccepted", isAccepted);
+		data.put("ownerNotes", ownerNotes); 
+		data.put("days", days);   // nuovo
+	    data.put("slots", slots); // nuovo
 		// Link alla dashboard per vedere i dettagli
 		data.put("dashboardUrl", baseUrl + "dashboard");
 

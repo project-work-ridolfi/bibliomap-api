@@ -28,6 +28,7 @@ import it.unipegaso.database.model.User;
 import it.unipegaso.service.EmailService;
 import it.unipegaso.service.UserService;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.PATCH;
@@ -66,6 +67,9 @@ public class LoanResource {
 
 	@Inject
 	LoansRepository loansRepository;
+	
+	@ConfigProperty(name = "quarkus.loan.duration", defaultValue = "30")
+    int loanDuration;
 
 
 	@POST
@@ -191,92 +195,89 @@ public class LoanResource {
 	@Path("/{id}/start")
 	public Response startLoan(@Context HttpHeaders headers, @PathParam("id") String loanId) {
 
-		LOG.debug("START LOAN");
+	    LOG.debug("START LOAN");
 
-		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
 
-		try {
-			User currentUser = userService.getUserFromSession(sessionId);
+	    try {
+	        User currentUser = userService.getUserFromSession(sessionId);
 
-			// check loan id
-			if (StringUtils.isEmpty(loanId)) {
-				return Response.status(Response.Status.BAD_REQUEST)
-						.entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
-			}
+	        if (StringUtils.isEmpty(loanId)) {
+	            return Response.status(Response.Status.BAD_REQUEST)
+	                    .entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
+	        }
 
-			Optional<Loan> opLoan = loansRepository.get(loanId);
-			if (opLoan.isEmpty()) {
-				return Response.status(Response.Status.NOT_FOUND).build();
-			}
+	        Optional<Loan> opLoan = loansRepository.get(loanId);
+	        if (opLoan.isEmpty()) {
+	            return Response.status(Response.Status.NOT_FOUND).build();
+	        }
 
-			Loan loan = opLoan.get();
+	        Loan loan = opLoan.get();
 
-			// verifica che sia il proprietario del libro
-			if (!loan.getOwnerId().equals(currentUser.getId())) {
-				LOG.warn("Utente " + currentUser.getId() + " ha tentato di gestire prestito non suo: " + loanId);
-				return Response.status(Response.Status.FORBIDDEN)
-						.entity(new ErrorResponse("FORBIDDEN", "Non sei il proprietario di questo prestito")).build();
-			}
+	        // verifica che sia il proprietario OPPURE il richiedente
+	        boolean isOwner = loan.getOwnerId().equals(currentUser.getId());
+	        boolean isRequester = loan.getRequesterId().equals(currentUser.getId());
 
-			// verifica status
-			if (!LoanStatus.ACCEPTED.toString().equals(loan.getStatus())) {
-				return Response.status(Response.Status.CONFLICT)
-						.entity(new ErrorResponse("CONFLICT", "La richiesta è già stata processata")).build();
-			}
+	        if (!isOwner && !isRequester) {
+	            LOG.warn("Utente " + currentUser.getId() + " non autorizzato per prestito: " + loanId);
+	            return Response.status(Response.Status.FORBIDDEN)
+	                    .entity(new ErrorResponse("FORBIDDEN", "Non sei parte di questo prestito")).build();
+	        }
 
-			String copyId = loan.getCopyId();
-			Optional<Copy> opCopy = copiesRepository.get(copyId);
+	        // verifica status (deve essere ACCEPTED per poter iniziare)
+	        if (!LoanStatus.ACCEPTED.toString().equals(loan.getStatus())) {
+	            return Response.status(Response.Status.CONFLICT)
+	                    .entity(new ErrorResponse("CONFLICT", "Il prestito non è in stato accettato")).build();
+	        }
 
-			// controlla copia
-			if (opCopy.isEmpty()) {
+	        String copyId = loan.getCopyId();
+	        Optional<Copy> opCopy = copiesRepository.get(copyId);
 
-				loan.setStatus(LoanStatus.ERROR.toString());
-				loansRepository.update(loan);
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(new ErrorResponse("NOT_FOUND", "La copia del libro non e' stata trovata")).build();
-			}
+	        if (opCopy.isEmpty()) {
+	            loan.setStatus(LoanStatus.ERROR.toString());
+	            loansRepository.update(loan);
+	            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+	                    .entity(new ErrorResponse("NOT_FOUND", "La copia del libro non è stata trovata")).build();
+	        }
 
-			// update loan status e aggiunte date
-			Calendar cal = Calendar.getInstance();
-			loan.setLoanStartDate(cal.getTime());
+	        // Update loan status e aggiunta date (30 giorni)
+	        Calendar cal = Calendar.getInstance();
+	        loan.setLoanStartDate(cal.getTime());
+	        cal.add(Calendar.DAY_OF_MONTH, loanDuration); 
+	        loan.setExpectedReturnDate(cal.getTime());
+	        loan.setStatus(LoanStatus.ON_LOAN.toString());
 
-			cal.add(Calendar.DAY_OF_MONTH, 30); //il prestito dura 30 giorni
-			loan.setExpectedReturnDate(cal.getTime());
+	        boolean success = loansRepository.update(loan);
+	        if (!success) {
+	            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+	        }
 
-			loan.setStatus(LoanStatus.ON_LOAN.toString());
+	        // Aggiornamento stato copia a "on_loan"
+	        Copy copy = opCopy.get();
+	        copy.setStatus("on_loan");
 
-			boolean success = loansRepository.update(loan);
+	        success = copiesRepository.update(copy);
 
-			if (!success) {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-			}
+	        // Se fallisce l'aggiornamento della copia, facciamo rollback del prestito
+	        if (!success) {
+	            LOG.warn("IMPOSSIBILE AGGIORNARE COPIA - ROLLBACK");
+	            loan.setStatus(LoanStatus.ACCEPTED.toString());
+	            loan.setLoanStartDate(null);
+	            loan.setExpectedReturnDate(null);
+	            loansRepository.update(loan);
 
-			Copy copy = opCopy.get();
-			copy.setStatus("on_loan");
+	            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+	                    .entity(new ErrorResponse("UPDATE_FAILED", "Impossibile aggiornare stato copia, operazione annullata")).build();
+	        }
 
-			success = copiesRepository.update(copy);
+	        return Response.ok().build();
 
-			// handle copy update failure
-			if (!success) {
-				LOG.warn("IMPOSSIBILE AGGIORNARE COPIA");
-				// manual rollback
-				loan.setStatus(LoanStatus.ACCEPTED.toString());
-				loan.setLoanStartDate(null);
-				loan.setExpectedReturnDate(null);
-				loansRepository.update(loan);
-
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-						.entity(new ErrorResponse("UPDATE_FAILED", "Impossibile aggiornare stato copia, operazione annullata")).build();
-			}
-
-			return Response.ok().build();
-
-		} catch (NotAuthorizedException e) {
-			return e.getResponse();
-		} catch (Exception e) {
-			LOG.error("errore sconosciuto manage request", e);
-			return Response.serverError().build();
-		}
+	    } catch (NotAuthorizedException e) {
+	        return e.getResponse();
+	    } catch (Exception e) {
+	        LOG.error("errore sconosciuto start loan", e);
+	        return Response.serverError().build();
+	    }
 	}
 
 
@@ -356,8 +357,10 @@ public class LoanResource {
 
 			User requester = opRequester.get();
 			String title = loan.getTitle();
-
-			success = emailService.sendRequestResponseEmail(requester.getEmail(), requester.getUsername(), title, action);
+			String selectedDays = request.getOrDefault("days", "");   // es: "lun, mer"
+			String selectedSlots = request.getOrDefault("slots", ""); // es: "pomeriggio, sera"
+			
+			success = emailService.sendRequestResponseEmail(requester.getEmail(), requester.getUsername(), title, action, notes, selectedDays, selectedSlots);
 
 			if(!success) {
 				LOG.error("impossibile inviare email, rollback sul db");
