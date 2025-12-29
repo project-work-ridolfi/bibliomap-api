@@ -1,5 +1,6 @@
 package it.unipegaso.api.resources;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import org.jboss.logging.Logger;
 
 import it.unipegaso.api.dto.ErrorResponse;
+import it.unipegaso.api.dto.LoanDTO;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.api.util.StringUtils;
 import it.unipegaso.database.BooksRepository;
@@ -374,7 +376,7 @@ public class LoanResource {
 			return Response.serverError().build();
 		}
 	}
-	
+
 	@POST
 	@Path("/{id}/return")
 	public Response closeLoan(@Context HttpHeaders headers, @PathParam("id") String loanId, Map<String, String> request) {
@@ -446,7 +448,7 @@ public class LoanResource {
 				loan.setStatus(oldStatus);
 				loan.setActualReturnDate(null);
 				loansRepository.update(loan);
-				
+
 				// rollback stato copia
 				if (opCopy.isPresent()) {
 					Copy copy = opCopy.get();
@@ -468,7 +470,7 @@ public class LoanResource {
 		}
 	}
 
-	
+
 	@GET
 	@Path("/requests/incoming")
 	public Response getIncomingRequests(@Context HttpHeaders headers) {
@@ -483,7 +485,16 @@ public class LoanResource {
 			// recupera richieste dove l'utente e' proprietario e lo stato e' PENDING
 			List<Loan> requests = loansRepository.findIncomingByOwner(currentUser.getId());
 
-			return Response.ok(requests).build();
+			List<LoanDTO> response = new ArrayList<>();
+
+			for (Loan loan: requests) {
+
+				LoanDTO dto = loanToDTO(loan);
+
+				response.add(dto);
+			}
+
+			return Response.ok(response).build();
 
 		} catch (NotAuthorizedException e) {
 			return e.getResponse();
@@ -492,6 +503,9 @@ public class LoanResource {
 			return Response.serverError().build();
 		}
 	}
+
+
+
 
 	@GET
 	@Path("/active")
@@ -506,8 +520,16 @@ public class LoanResource {
 
 			// recupera prestiti in corso (stato ON_LOAN) sia come proprietario che come richiedente
 			List<Loan> activeLoans = loansRepository.findActiveByUser(currentUser.getId());
+			
+			List<LoanDTO> response = new ArrayList<>();
 
-			return Response.ok(activeLoans).build();
+			for (Loan loan: activeLoans) {
+
+				LoanDTO dto = loanToDTO(loan);
+				response.add(dto);
+			}
+			
+			return Response.ok(response).build();
 
 		} catch (NotAuthorizedException e) {
 			return e.getResponse();
@@ -516,7 +538,7 @@ public class LoanResource {
 			return Response.serverError().build();
 		}
 	}
-	
+
 	@GET
 	@Path("/all")
 	public Response getAllLoans(@Context HttpHeaders headers) {
@@ -529,9 +551,17 @@ public class LoanResource {
 			User currentUser = userService.getUserFromSession(sessionId);
 
 			// recupera tutti prestiti sia come proprietario che come richiedente
-			List<Loan> activeLoans = loansRepository.findAllUserLoans(currentUser.getId());
+			List<Loan> allLoans = loansRepository.findAllUserLoans(currentUser.getId());
 
-			return Response.ok(activeLoans).build();
+			List<LoanDTO> response = new ArrayList<>();
+
+			for (Loan loan: allLoans) {
+
+				LoanDTO dto = loanToDTO(loan);
+				response.add(dto);
+			}
+
+			return Response.ok(response).build();
 
 		} catch (NotAuthorizedException e) {
 			return e.getResponse();
@@ -539,6 +569,40 @@ public class LoanResource {
 			LOG.error("errore recupero prestiti", e);
 			return Response.serverError().build();
 		}
+	}
+
+	private LoanDTO loanToDTO(Loan loan) {
+
+		String requesterId = loan.getRequesterId();
+		Optional<User> opRequester = userRepository.get(requesterId);
+		String requesterUsername = "utente anonimo";
+
+		if(opRequester.isPresent()) {
+			requesterUsername = opRequester.get().getUsername();
+		}
+
+		String ownerId = loan.getOwnerId();
+		Optional<User> opOwner = userRepository.get(ownerId);
+
+		String ownerUsername = "utente anonimo";
+
+		if(opOwner.isPresent()) {
+			ownerUsername = opOwner.get().getUsername();
+		}
+
+		LoanDTO dto = new LoanDTO(
+				loan.getId(),
+				loan.getTitle(),
+				requesterId,
+				ownerId,
+				loan.getCopyId(), 
+				loan.getStatus(), 
+				loan.getLoanStartDate(), 
+				loan.getExpectedReturnDate(),
+				loan.getOwnerNotes(), 
+				ownerUsername, 
+				requesterUsername);
+		return dto;
 	}
 
 }

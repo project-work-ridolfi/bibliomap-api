@@ -143,3 +143,4 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
     - Per ogni prestito, invia Email di sollecito al `requesterId`
 - [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
 - [ ] documentazione
+- [ ] crea email gmail apposita con foto profilo bibliomap da usare al posto di quella universitaria
