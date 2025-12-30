@@ -140,6 +140,97 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
   "visibility": "all"
 }
 ```
+
+### ricerca punto vicino
+
+```json
+db.locations.aggregate([
+  {
+    $geoNear: {
+      near: {
+        type: "Point",
+        coordinates: [12.477304088827793, 41.890917165114445]
+      },
+      distanceField: "distance",
+      maxDistance: 16021.674122191978,
+      spherical: true
+    }
+  },
+  {
+    $lookup: {
+      from: "libraries",
+      localField: "_id",
+      foreignField: "locationId",
+      as: "library"
+    }
+  },
+  {
+    $unwind: "$library"
+  },
+  {
+    $match: {
+      "library.visibility": { $in: ["all"] },
+      "library.ownerId": { $ne: "1e496285-8361-4887-b08e-2dff78e391fe" }
+    }
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "library.ownerId",
+      foreignField: "_id",
+      as: "ownerInfo"
+    }
+  },
+  {
+    $unwind: {
+      path: "$ownerInfo",
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $lookup: {
+      from: "copies",
+      localField: "library._id",
+      foreignField: "libraryId",
+      as: "copy"
+    }
+  },
+  {
+    $unwind: "$copy"
+  },
+  {
+    $lookup: {
+      from: "books",
+      localField: "copy.book_isbn",
+      foreignField: "_id",
+      as: "bookInfo"
+    }
+  },
+  {
+    $unwind: "$bookInfo"
+  },
+  {
+    $sort: {
+      distance: 1
+    }
+  }
+])
+```
+
+Questa pipeline esegue una ricerca di posizioni geografiche vicine a un punto dato e costruisce un risultato arricchito tramite join su piu collezioni correlate.
+
+In sintesi la pipeline:
+
+1. Cerca le location entro una distanza massima dal punto geografico specificato
+2. Calcola la distanza di ogni location dal punto di partenza
+3. Collega ogni location alle librerie associate
+4. Filtra le librerie visibili a tutti ed esclude quelle appartenenti a uno specifico proprietario
+5. Recupera le informazioni del proprietario della libreria
+6. Recupera le copie dei libri presenti in ciascuna libreria
+7. Recupera le informazioni dei libri associati alle copie
+8. Ordina il risultato finale per distanza crescente dalla posizione di partenza
+
+Il risultato e' un elenco di libri disponibili in librerie vicine con informazioni complete su location libreria proprietario e libro ordinate per prossimita' geografica.
   
 ## TODO
  - [x] controllo su click multiplo per get otp

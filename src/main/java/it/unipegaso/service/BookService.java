@@ -133,6 +133,7 @@ public class BookService {
 
 		List<BookMapDTO> results = new ArrayList<>();
 		Random rand = new Random();
+		
 
 		for (Document doc : locationsCol.aggregate(pipeline)) {
 			try {
