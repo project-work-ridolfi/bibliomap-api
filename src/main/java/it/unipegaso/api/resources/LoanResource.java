@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import it.unipegaso.api.dto.ErrorResponse;
@@ -28,7 +29,7 @@ import it.unipegaso.database.model.User;
 import it.unipegaso.service.EmailService;
 import it.unipegaso.service.UserService;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.PATCH;
@@ -67,9 +68,9 @@ public class LoanResource {
 
 	@Inject
 	LoansRepository loansRepository;
-	
+
 	@ConfigProperty(name = "quarkus.loan.duration", defaultValue = "30")
-    int loanDuration;
+	int loanDuration;
 
 
 	@POST
@@ -195,89 +196,89 @@ public class LoanResource {
 	@Path("/{id}/start")
 	public Response startLoan(@Context HttpHeaders headers, @PathParam("id") String loanId) {
 
-	    LOG.debug("START LOAN");
+		LOG.debug("START LOAN");
 
-	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
 
-	    try {
-	        User currentUser = userService.getUserFromSession(sessionId);
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
 
-	        if (StringUtils.isEmpty(loanId)) {
-	            return Response.status(Response.Status.BAD_REQUEST)
-	                    .entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
-	        }
+			if (StringUtils.isEmpty(loanId)) {
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(new ErrorResponse("BAD_REQUEST", "loan id mandatory")).build();
+			}
 
-	        Optional<Loan> opLoan = loansRepository.get(loanId);
-	        if (opLoan.isEmpty()) {
-	            return Response.status(Response.Status.NOT_FOUND).build();
-	        }
+			Optional<Loan> opLoan = loansRepository.get(loanId);
+			if (opLoan.isEmpty()) {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
 
-	        Loan loan = opLoan.get();
+			Loan loan = opLoan.get();
 
-	        // verifica che sia il proprietario OPPURE il richiedente
-	        boolean isOwner = loan.getOwnerId().equals(currentUser.getId());
-	        boolean isRequester = loan.getRequesterId().equals(currentUser.getId());
+			// verifica che sia il proprietario OPPURE il richiedente
+			boolean isOwner = loan.getOwnerId().equals(currentUser.getId());
+			boolean isRequester = loan.getRequesterId().equals(currentUser.getId());
 
-	        if (!isOwner && !isRequester) {
-	            LOG.warn("Utente " + currentUser.getId() + " non autorizzato per prestito: " + loanId);
-	            return Response.status(Response.Status.FORBIDDEN)
-	                    .entity(new ErrorResponse("FORBIDDEN", "Non sei parte di questo prestito")).build();
-	        }
+			if (!isOwner && !isRequester) {
+				LOG.warn("Utente " + currentUser.getId() + " non autorizzato per prestito: " + loanId);
+				return Response.status(Response.Status.FORBIDDEN)
+						.entity(new ErrorResponse("FORBIDDEN", "Non sei parte di questo prestito")).build();
+			}
 
-	        // verifica status (deve essere ACCEPTED per poter iniziare)
-	        if (!LoanStatus.ACCEPTED.toString().equals(loan.getStatus())) {
-	            return Response.status(Response.Status.CONFLICT)
-	                    .entity(new ErrorResponse("CONFLICT", "Il prestito non è in stato accettato")).build();
-	        }
+			// verifica status (deve essere ACCEPTED per poter iniziare)
+			if (!LoanStatus.ACCEPTED.toString().equals(loan.getStatus())) {
+				return Response.status(Response.Status.CONFLICT)
+						.entity(new ErrorResponse("CONFLICT", "Il prestito non è in stato accettato")).build();
+			}
 
-	        String copyId = loan.getCopyId();
-	        Optional<Copy> opCopy = copiesRepository.get(copyId);
+			String copyId = loan.getCopyId();
+			Optional<Copy> opCopy = copiesRepository.get(copyId);
 
-	        if (opCopy.isEmpty()) {
-	            loan.setStatus(LoanStatus.ERROR.toString());
-	            loansRepository.update(loan);
-	            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-	                    .entity(new ErrorResponse("NOT_FOUND", "La copia del libro non è stata trovata")).build();
-	        }
+			if (opCopy.isEmpty()) {
+				loan.setStatus(LoanStatus.ERROR.toString());
+				loansRepository.update(loan);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(new ErrorResponse("NOT_FOUND", "La copia del libro non è stata trovata")).build();
+			}
 
-	        // Update loan status e aggiunta date (30 giorni)
-	        Calendar cal = Calendar.getInstance();
-	        loan.setLoanStartDate(cal.getTime());
-	        cal.add(Calendar.DAY_OF_MONTH, loanDuration); 
-	        loan.setExpectedReturnDate(cal.getTime());
-	        loan.setStatus(LoanStatus.ON_LOAN.toString());
+			// Update loan status e aggiunta date (30 giorni)
+			Calendar cal = Calendar.getInstance();
+			loan.setLoanStartDate(cal.getTime());
+			cal.add(Calendar.DAY_OF_MONTH, loanDuration); 
+			loan.setExpectedReturnDate(cal.getTime());
+			loan.setStatus(LoanStatus.ON_LOAN.toString());
 
-	        boolean success = loansRepository.update(loan);
-	        if (!success) {
-	            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-	        }
+			boolean success = loansRepository.update(loan);
+			if (!success) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
 
-	        // Aggiornamento stato copia a "on_loan"
-	        Copy copy = opCopy.get();
-	        copy.setStatus("on_loan");
+			// Aggiornamento stato copia a "on_loan"
+			Copy copy = opCopy.get();
+			copy.setStatus("on_loan");
 
-	        success = copiesRepository.update(copy);
+			success = copiesRepository.update(copy);
 
-	        // Se fallisce l'aggiornamento della copia, facciamo rollback del prestito
-	        if (!success) {
-	            LOG.warn("IMPOSSIBILE AGGIORNARE COPIA - ROLLBACK");
-	            loan.setStatus(LoanStatus.ACCEPTED.toString());
-	            loan.setLoanStartDate(null);
-	            loan.setExpectedReturnDate(null);
-	            loansRepository.update(loan);
+			// Se fallisce l'aggiornamento della copia, facciamo rollback del prestito
+			if (!success) {
+				LOG.warn("IMPOSSIBILE AGGIORNARE COPIA - ROLLBACK");
+				loan.setStatus(LoanStatus.ACCEPTED.toString());
+				loan.setLoanStartDate(null);
+				loan.setExpectedReturnDate(null);
+				loansRepository.update(loan);
 
-	            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-	                    .entity(new ErrorResponse("UPDATE_FAILED", "Impossibile aggiornare stato copia, operazione annullata")).build();
-	        }
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity(new ErrorResponse("UPDATE_FAILED", "Impossibile aggiornare stato copia, operazione annullata")).build();
+			}
 
-	        return Response.ok().build();
+			return Response.ok().build();
 
-	    } catch (NotAuthorizedException e) {
-	        return e.getResponse();
-	    } catch (Exception e) {
-	        LOG.error("errore sconosciuto start loan", e);
-	        return Response.serverError().build();
-	    }
+		} catch (NotAuthorizedException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			LOG.error("errore sconosciuto start loan", e);
+			return Response.serverError().build();
+		}
 	}
 
 
@@ -359,7 +360,7 @@ public class LoanResource {
 			String title = loan.getTitle();
 			String selectedDays = request.getOrDefault("days", "");   // es: "lun, mer"
 			String selectedSlots = request.getOrDefault("slots", ""); // es: "pomeriggio, sera"
-			
+
 			success = emailService.sendRequestResponseEmail(requester.getEmail(), requester.getUsername(), title, action, notes, selectedDays, selectedSlots);
 
 			if(!success) {
@@ -511,28 +512,28 @@ public class LoanResource {
 	@POST
 	@Path("/{id}/contact")
 	public Response notifyOwner(@PathParam("id") String loanId, @Context HttpHeaders headers, Map<String, String> request) {
-	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-	    try {
-	        User requester = userService.getUserFromSession(sessionId);
-	        Optional<Loan> opLoan = loansRepository.get(loanId);
-	        
-	        if (opLoan.isPresent()) {
-	            Loan loan = opLoan.get();
-	            Optional<User> opOwner = userRepository.get(loan.getOwnerId());
-	            
-	            if (opOwner.isPresent()) {
-	                User owner = opOwner.get();
-	                
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User requester = userService.getUserFromSession(sessionId);
+			Optional<Loan> opLoan = loansRepository.get(loanId);
 
-	                // Invia una mail predefinita al proprietario senza mostrare l'indirizzo al richiedente
-	                emailService.sendContactRequestEmail(owner.getEmail(), owner.getUsername(), requester.getUsername(), loan.getTitle(), request);
-	                return Response.ok().build();
-	            }
-	        }
-	        return Response.status(Response.Status.NOT_FOUND).build();
-	    } catch (Exception e) {
-	        return Response.serverError().build();
-	    }
+			if (opLoan.isPresent()) {
+				Loan loan = opLoan.get();
+				Optional<User> opOwner = userRepository.get(loan.getOwnerId());
+
+				if (opOwner.isPresent()) {
+					User owner = opOwner.get();
+
+
+					// Invia una mail predefinita al proprietario senza mostrare l'indirizzo al richiedente
+					emailService.sendContactRequestEmail(owner.getEmail(), owner.getUsername(), requester.getUsername(), loan.getTitle(), request);
+					return Response.ok().build();
+				}
+			}
+			return Response.status(Response.Status.NOT_FOUND).build();
+		} catch (Exception e) {
+			return Response.serverError().build();
+		}
 	}
 
 	@GET
@@ -548,7 +549,7 @@ public class LoanResource {
 
 			// recupera prestiti in corso (stato ON_LOAN) sia come proprietario che come richiedente
 			List<Loan> activeLoans = loansRepository.findActiveByUser(currentUser.getId());
-			
+
 			List<LoanDTO> response = new ArrayList<>();
 
 			for (Loan loan: activeLoans) {
@@ -556,7 +557,7 @@ public class LoanResource {
 				LoanDTO dto = loanToDTO(loan);
 				response.add(dto);
 			}
-			
+
 			return Response.ok(response).build();
 
 		} catch (NotAuthorizedException e) {
@@ -595,6 +596,41 @@ public class LoanResource {
 			return e.getResponse();
 		} catch (Exception e) {
 			LOG.error("errore recupero prestiti", e);
+			return Response.serverError().build();
+		}
+	}
+
+
+	@PATCH
+	@Path("/{id}/extend")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response extendLoan(@Context HttpHeaders headers, @PathParam("id") String loanId, Map<String, Integer> request) {
+		LOG.debug("EXTEND LOAN " + loanId);
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+			Optional<Loan> opLoan = loansRepository.get(loanId);
+
+			if (opLoan.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
+			Loan loan = opLoan.get();
+
+			if (!loan.getOwnerId().equals(currentUser.getId())) {
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
+
+			// Recuperiamo i giorni dalla modale FE, default 7
+			int daysToAdd = request.getOrDefault("days", 7);
+
+			Calendar cal = Calendar.getInstance();
+			// Partiamo dalla data di scadenza precedente
+			cal.setTime(loan.getExpectedReturnDate());
+			cal.add(Calendar.DAY_OF_MONTH, daysToAdd); 
+			loan.setExpectedReturnDate(cal.getTime());
+
+			loansRepository.update(loan);
+			return Response.ok().build();
+		} catch (Exception e) {
+			LOG.error("Errore estensione prestito", e);
 			return Response.serverError().build();
 		}
 	}
