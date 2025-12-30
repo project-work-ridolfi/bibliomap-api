@@ -8,6 +8,7 @@ public record BookMapDTO(
     String author,      // Autore
     String libraryName, // Nome Libreria
     String libraryId,
+    String status,
     double lat,         // Latitudine
     double lng,         // Longitudine
     double distance,    // Distanza in km

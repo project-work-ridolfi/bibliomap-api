@@ -170,6 +170,7 @@ public class BookService {
 						book.getString("author"),
 						lib.getString("name"),
 						lib.getString("_id"),
+						copy.getString("status"),
 						finalLat,
 						finalLng,
 						doc.getDouble("distance") / 1000.0,
