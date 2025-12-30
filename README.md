@@ -243,46 +243,45 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [x] riorganizza registration dto, usa solo uno con valori nullable
 - [x] usa error message sempre nei casi di errore (no mappa)
 - [x] crea oggetti model per Books, Copies, Locations e Libraries
-- [ ] per le cover usiamo anche google books, da togliere com'è ora nel fe
+- [x] per le cover usiamo anche google books, da togliere com'è ora nel fe
 - [ ] definisci flusso di ricerca
 - [ ] definisci flusso di prestito
 - [ ] pagina aggiunta libro (da finire e testare), deve avere:
  - [x] controllo su google books
  - [x] inserimento isbn
  - [x] sblocco camera per isbn
- - [ ] condizione opzionale ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
+ - [ ] condizione ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
  - [x] caricamento copertina (drag or choose, cerca su google, camera??, scegli icona)
  - [x] lista di tag (si può scegliere da una lista fissa, alcuni suggeriti dal libro stesso, oppure inserire un tag nuovo)
- - [ ] da definire bene logica tag e copertina
+ - [x] da definire bene logica tag e copertina
  - [x] GET /api/users/me/libraries
   - [x] recupera lista librerie dell'utente loggato (id, nome) per il menu a tendina
  - [x] GET /api/books/external/lookup-metadata
  - [x] GET /api/books/external/search-isbn
- - [ ] POST /api/books/add-composite
 - [x] pagina libro per proprietario con modifiche abilitate (gestione copia/libro, modificabili solo proprietà della copia, la copertina forse diventa proprietà della copia)
-- [ ] gestione libri, sposta da libreria a libreria, duplica
+- [x] gestione libri, sposta da libreria a libreria
 - [x] pagina libro per utente che la vede, bottone per richiedere il prestito -> manda email
-- [ ] libreria da aggiungere la gestione di una location sua
-- [ ] libreria va messa la possibilità di una visibilità diversa da quella dell'utente
+- [x] libreria da aggiungere la gestione di una location sua
+- [x] libreria va messa la possibilità di una visibilità diversa da quella dell'utente
 - [ ] fuzzy level (da ricontrollare se è vero)
 - [x] Creare Enum `LoanStatus`: `PENDING`, `ACCEPTED`, `ON_LOAN`, `RETURNED`, `REJECTED`, `CANCELLED`
 - [x] Creare Entity `Loan` nella collection `loans`:
 - [x] Creare `LoanRepository`:
 - [x] Implementare `createLoanRequest(requesterId, copyId)`:
-    - Verifica che la copia esista e `status == 'available'`
-    - Salva `Loan` con stato `PENDING`
-    - Invia Email notifica al proprietario
+    - [x] Verifica che la copia esista e `status == 'available'`
+    - [x] Salva `Loan` con stato `PENDING`
+    - [x] Invia Email notifica al proprietario
 - [x] Implementare `manageRequest(loanId, ownerId, action)`:
-    - Action `ACCEPT`: aggiorna stato a `ACCEPTED`, notifica richiedente
-    - Action `REJECT`: aggiorna stato a `REJECTED`, notifica richiedente
+    - [x] Action `ACCEPT`: aggiorna stato a `ACCEPTED`, notifica richiedente
+    - [x] Action `REJECT`: aggiorna stato a `REJECTED`, notifica richiedente
 - [x] Implementare `startLoan(loanId, ownerId)` (Consegna fisica):
-    - Verifica che stato sia `ACCEPTED`
-    - Aggiorna `Loan`: stato `ON_LOAN`, `loanStartDate` = now, `expectedReturnDate` = now + 30gg
-    - **SIDE EFFECT**: Aggiorna `Copy`: `status` = `on_loan`
+    - [x] Verifica che stato sia `ACCEPTED`
+    - [x] Aggiorna `Loan`: stato `ON_LOAN`, `loanStartDate` = now, `expectedReturnDate` = now + 30gg
+    - [x] **SIDE EFFECT**: Aggiorna `Copy`: `status` = `on_loan`
 - [x] Implementare `closeLoan(loanId, ownerId, conditionEnd)` (Restituzione):
-    - Verifica che stato sia `ON_LOAN`
-    - Aggiorna `Loan`: stato `RETURNED`, `actualReturnDate` = now, `conditionEnd`
-    - **SIDE EFFECT**: Aggiorna `Copy`: `status` = `available`, `condition` = `conditionEnd`
+    - [x] Verifica che stato sia `ON_LOAN`
+    - [x] Aggiorna `Loan`: stato `RETURNED`, `actualReturnDate` = now, `conditionEnd`
+    - [x] **SIDE EFFECT**: Aggiorna `Copy`: `status` = `available`, `condition` = `conditionEnd`
 - [x] `POST /api/loans/request`: Body `{ copyId }`
 - [x] `PATCH /api/loans/{id}/status`: Body `{ status: 'ACCEPTED'|'REJECTED' }`
 - [x] `POST /api/loans/{id}/start`: Endpoint per segnare l'inizio del prestito
@@ -290,8 +289,8 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [x] `GET /api/loans/requests/incoming`: Richieste da approvare
 - [x] `GET /api/loans/active`: Prestiti in corso (sia dati che ricevuti)
 - [x] Creare Scheduler `@Scheduled(cron = "0 0 9 * * ?")` (ogni giorno alle 9):
-    - Cerca prestiti scaduti (`ON_LOAN` && `expectedReturnDate` passata)
-    - Per ogni prestito, invia Email di sollecito al `requesterId`
+    - [x] Cerca prestiti scaduti (`ON_LOAN` && `expectedReturnDate` passata)
+    - [x] Per ogni prestito, invia Email di sollecito al `requesterId`
 - [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
 - [ ] documentazione
 - [ ] crea email gmail apposita con foto profilo bibliomap da usare al posto di quella universitaria
