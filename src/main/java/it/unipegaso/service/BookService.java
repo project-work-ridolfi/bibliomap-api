@@ -267,44 +267,47 @@ public class BookService {
 
 
 	public boolean saveBookWithBase64Cover(BookDetailDTO dto, FileUpload coverFile) {
-		// Validazione LibraryID
-		if (dto.libraryId() == null) {
-			return false;
-		}
+	    if (dto.libraryId() == null) {
+	        return false;
+	    }
 
-		try {
-			Book book = findOrCreateBook(dto, coverFile);
+	    try {
+	        // Trova o crea il libro 
+	        Book book = findOrCreateBook(dto);
 
-			Optional<Library> libraryOpt = librariesRepository.get(dto.libraryId());
-			if (libraryOpt.isEmpty()) {
-				LOG.warn("Tentativo di salvataggio su libreria inesistente: " + dto.libraryId());
-				return false;
-			}
+	        Optional<Library> libraryOpt = librariesRepository.get(dto.libraryId());
+	        if (libraryOpt.isEmpty()) {
+	            return false;
+	        }
 
-			Copy copy = new Copy();
+	        // 2. Crea la copia
+	        Copy copy = new Copy();
+	        copy.setId(java.util.UUID.randomUUID().toString());
+	        copy.setBookIsbn(book.getIsbn());
+	        copy.setLibraryId(dto.libraryId());
+	        copy.setCondition(dto.condition());
+	        copy.setStatus(dto.status());
+	        copy.setOwnerNotes(dto.ownerNotes());
+	        if (dto.tags() != null) {
+	            copy.setTags(dto.tags());
+	        }
 
-			copy.setId(java.util.UUID.randomUUID().toString());
+	        // Se l'utente ha caricato un file (foto scattata o upload), lo salviamo sulla copia
+	        if (coverFile != null) {
+	            String base64Image = processImageToBase64(coverFile);
+	            copy.setCustomCover(base64Image);
+	        }
 
-			copy.setBookIsbn(book.getIsbn()); // Link foreign key logica verso Book
-			copy.setLibraryId(dto.libraryId()); // Link foreign key logica verso Library
+	        copiesRepository.create(copy);
+	        return true;
 
-			copy.setCondition(dto.condition());
-			copy.setStatus(dto.status());
-			copy.setOwnerNotes(dto.ownerNotes());
-			if (dto.tags() != null) {
-				copy.setTags(dto.tags());
-			}
-
-			copiesRepository.create(copy);
-			return true;
-
-		} catch (Exception e) {
-			LOG.error("Errore salvataggio libro/copia", e);
-			return false;
-		}
+	    } catch (Exception e) {
+	        LOG.error("Errore salvataggio libro/copia", e);
+	        return false;
+	    }
 	}
 
-	private Book findOrCreateBook(BookDetailDTO dto, FileUpload coverFile) {
+	private Book findOrCreateBook(BookDetailDTO dto) {
 		Book book = null;
 
 		// cerca per ISBN (Primary Key)
@@ -327,14 +330,8 @@ public class BookService {
 			book.setPublication_year(dto.publicationYear() != null ? dto.publicationYear() : 0);
 			book.setLanguage(dto.language());
 
-			// --- LOGICA IMMAGINE BASE64 ---
-			String base64Image = processImageToBase64(coverFile);
-
-			if (base64Image != null) {
-				// Salviamo direttamente la stringa base64 nel campo 'cover'
-				book.setCover(base64Image);
-			} else if (dto.coverUrl() != null) {
-				// Fallback URL esterno
+			if (dto.coverUrl() != null) {
+				// Fallback URL esterno se non c'e' immagine b64 della copia
 				book.setCover(dto.coverUrl());
 			}
 
@@ -345,7 +342,9 @@ public class BookService {
 	}
 
 	private String processImageToBase64(FileUpload file) {
-		if (file == null || file.fileName() == null) return null;
+		if (file == null || file.fileName() == null) {
+			return null;
+		}
 
 		java.nio.file.Path tempPath = file.uploadedFile();
 

@@ -271,7 +271,11 @@ public class GoogleBooksService {
 		book.setAuthor(author);
 		book.setCover(cover);
 		book.setLanguage(StringUtils.getFullLanguage(language));
-		book.setPublication_year(publicationYear);
+		
+		if(publicationYear != null) {
+			book.setPublication_year(publicationYear);
+		}
+		
 		book.setPublisher(publisher);
 		book.setTitle(title);
 

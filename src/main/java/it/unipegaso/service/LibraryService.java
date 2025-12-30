@@ -8,14 +8,16 @@ import java.util.Optional;
 import org.jboss.logging.Logger;
 
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 
 import it.unipegaso.api.dto.LibraryDTO;
 import it.unipegaso.database.CopiesRepository;
 import it.unipegaso.database.LibrariesRepository;
+import it.unipegaso.database.LocationsRepository;
 import it.unipegaso.database.UsersRepository;
-import it.unipegaso.database.model.Copy;
 import it.unipegaso.database.model.Library;
+import it.unipegaso.database.model.Location;
 import it.unipegaso.database.model.User;
 import it.unipegaso.database.model.VisibilityOptions;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,6 +40,9 @@ public class LibraryService {
 
 	@Inject
 	CopiesRepository copiesRepository;
+	
+	@Inject
+	LocationsRepository locationsRepository;
 	
 	/**
 	 * Crea una nuova libreria e la collega all'utente e alla sua posizione.
@@ -63,14 +68,20 @@ public class LibraryService {
 
 		LOG.info("library creata");
 
-		// collegamento della posizione del profilo
-		if ("user_default".equals(libraryDTO.locationType()) && user.getLocationId() != null) {
-
-			LOG.debug("user default");
-			newLibrary.setLocationId(user.getLocationId());
-		} 
-		// TODO: Gestire "new_location" navigando a un altro endpoint di creazione posizione.
-
+		if ("new_location".equals(libraryDTO.locationType()) && libraryDTO.latitude() != null) {
+		    // Creiamo una nuova entry nella collection locations
+		    Location newLoc = new Location();
+		    Point point = new Point( new Position(libraryDTO.longitude(), libraryDTO.latitude()));
+		    newLoc.setLocation(point);
+		    
+		    // Salviamo tramite il repository delle location
+		    String newLocationId = locationsRepository.create(newLoc);
+		    newLibrary.setLocationId(newLocationId);
+		} else if ("user_default".equals(libraryDTO.locationType())) {
+			// collegamento della posizione del profilo
+		    newLibrary.setLocationId(user.getLocationId());
+		}
+		
 		LocalDateTime now = LocalDateTime.now();
 		newLibrary.setCreatedAt(now);
 		newLibrary.setModifiedAt(now);

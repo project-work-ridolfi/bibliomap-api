@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -36,8 +37,9 @@ public class BooksRepository implements IRepository<Book> {
     @Override
     public String create(Book book) throws MongoWriteException {
         if (book.getIsbn() == null || book.getIsbn().isEmpty()) {
-            LOG.error("Tentativo di inserire libro senza ISBN");
-            return null;
+            LOG.error("Tentativo di inserire libro senza ISBN, ne vien creato uno ad hoc");
+            
+            book.setIsbn("fake_isbn_" + UUID.randomUUID().toString());
         }
 
         InsertOneResult result = books.insertOne(book);
