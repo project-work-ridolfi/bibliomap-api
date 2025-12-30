@@ -21,6 +21,7 @@ import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.LoansRepository;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Book;
+import it.unipegaso.database.model.ConditionOptions;
 import it.unipegaso.database.model.Copy;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.Loan;
@@ -414,11 +415,11 @@ public class LoanResource {
 						.entity(new ErrorResponse("CONFLICT", "il prestito non e' in corso")).build();
 			}
 
-			String conditionEnd = request.getOrDefault("condition", "ottimo");
+			String conditionEnd = request.getOrDefault("condition", ConditionOptions.GREAT.toString().toLowerCase());
 			String oldStatus = loan.getStatus();
 
 			// aggiornamento dati prestito
-			loan.setStatus("RETURNED");
+			loan.setStatus(LoanStatus.RETURNED.toString());
 			loan.setActualReturnDate(new Date());
 
 			if (!loansRepository.update(loan)) {

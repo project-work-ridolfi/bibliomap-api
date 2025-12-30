@@ -7,6 +7,7 @@ import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Sorts.descending;
+import static com.mongodb.client.model.Sorts.ascending;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ import jakarta.inject.Inject;
 public class LoansRepository implements IRepository<Loan> {
 
 	private static final Logger LOG = Logger.getLogger(LoansRepository.class);
-	
+
 	private static final String REQUESTER_ID = "requester_id";
 	private static final String OWNER_ID = "owner_id";
 
@@ -94,7 +95,7 @@ public class LoansRepository implements IRepository<Loan> {
 
 		return result.wasAcknowledged();
 	}
-	
+
 
 	@Override
 	public FindIterable<Loan> find(Bson filter) {
@@ -127,17 +128,17 @@ public class LoansRepository implements IRepository<Loan> {
 
 		return loans.find(filter).into(new ArrayList<>());
 	}
-	
+
 	public List<Loan> findOverdue(Date date) {
-	    // stato ON_LOAN e data di ritorno prevista minore di adesso
-	    Bson filter = Filters.and(
-	        Filters.eq("status", LoanStatus.ON_LOAN.toString()),
-	        Filters.lt("expected_return_date", date)
-	    );
-	    
-	    List<Loan> result = new ArrayList<>();
-	    find(filter).forEach(result::add);
-	    return result;
+		// stato ON_LOAN e data di ritorno prevista minore di adesso
+		Bson filter = Filters.and(
+				Filters.eq("status", LoanStatus.ON_LOAN.toString()),
+				Filters.lt("expected_return_date", date)
+				);
+
+		List<Loan> result = new ArrayList<>();
+		find(filter).forEach(result::add);
+		return result;
 	}
 
 	public void deletePendingByUserId(String userId) {
@@ -147,118 +148,159 @@ public class LoansRepository implements IRepository<Loan> {
 				);
 
 		loans.deleteMany(filter);
-		
+
 	}
-	
+
 	public long count( String userId, boolean isOwner) {
-		
+
 		Bson filter;
-		
+
 		if(isOwner) {
 			filter = Filters.eq(OWNER_ID, userId);
 		}else {
 			filter = Filters.eq(REQUESTER_ID, userId);
 		}
-		
+
 		return loans.countDocuments(filter);
-		
+
 	}
 
 	@Override
 	public long count() {
 		return loans.countDocuments();
 	}
-	
-	public Map<String, Long> getTitlesRanking(String userId) {
-	    List<Bson> pipeline = Arrays.asList(
-	        match(eq("ownerId", userId)),
-	        group("$title", sum("count", 1)),
-	        sort(descending("count"))
-	    );
 
-	    Map<String, Long> ranking = new LinkedHashMap<>();
-	    
-	    loans.withDocumentClass(Document.class)
-	         .aggregate(pipeline)
-	         .forEach(doc -> {
-	             Number count = doc.get("count", Number.class);
-	             ranking.put(doc.getString("_id"), count.longValue());
-	         });
-	              
-	    return ranking;
+	public Map<String, Long> getTitlesRanking(String userId) {
+		List<Bson> pipeline = new ArrayList<>();
+
+		// null per conteggi globali
+		if (userId != null) {
+			pipeline.add(match(eq(OWNER_ID, userId)));
+		}
+
+		pipeline.add(group("$title", sum("count", 1)));
+
+		pipeline.add(sort(descending("count")));
+
+		Map<String, Long> ranking = new LinkedHashMap<>();
+
+		loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(
+				doc -> {
+					Number count = doc.get("count", Number.class);
+					ranking.put(doc.getString("_id"), count.longValue());
+				});
+
+		return ranking;
 	}
+
 
 	public Map<String, Long> getTopRequesters(String userId) {
-	    List<Bson> pipeline = Arrays.asList(
-	        match(eq("ownerId", userId)),
-	        group("$requesterUsername", sum("count", 1)), // usiamo lo username per comodità del grafico
-	        sort(descending("count")),
-	        limit(5)
-	    );
+		List<Bson> pipeline = Arrays.asList(
+				match(eq("ownerId", userId)),
+				group("$requesterUsername", sum("count", 1)), // usiamo lo username per comodità del grafico
+				sort(descending("count")),
+				limit(5)
+				);
 
-	    Map<String, Long> topUsers = new LinkedHashMap<>();
-	    loans.withDocumentClass(Document.class)
-	         .aggregate(pipeline)
-	         .forEach(doc -> {
-	             Number count = doc.get("count", Number.class);
-	             topUsers.put(doc.getString("_id"), count.longValue());
-	         });
-	    return topUsers;
+		Map<String, Long> topUsers = new LinkedHashMap<>();
+		loans.withDocumentClass(Document.class)
+		.aggregate(pipeline)
+		.forEach(doc -> {
+			Number count = doc.get("count", Number.class);
+			topUsers.put(doc.getString("_id"), count.longValue());
+		});
+		return topUsers;
 	}
-	
-	// Trova il partner con cui l'utente ha scambiato più libri
-	public String findTopPartner(String userId) {
+
+	// Trova l'utente con cui l'utente ha scambiato più libri
+	public String findTopPartnerId(String userId) {
 	    List<Bson> pipeline = Arrays.asList(
 	        match(Filters.eq(OWNER_ID, userId)),
-	        group("$requester_username", sum("count", 1)),
+	        group("$requester_id", sum("count", 1)),
 	        sort(descending("count")),
 	        limit(1)
 	    );
 	    Document res = loans.withDocumentClass(Document.class).aggregate(pipeline).first();
-	    return res != null ? res.getString("_id") : "nessuno";
+	    
+	    // Ritorna l'ID (che è dentro _id dopo il group) o null
+	    return res != null ? res.getString("_id") : null;
 	}
 
-	// Calcola la distanza massima tra tutti i prestiti dell'utente
+	// prende tutti i prestiti completati dall'utente
 	public List<Loan> findFinishedByOwner(String userId) {
-	    Bson filter = Filters.and(
-	        Filters.eq(OWNER_ID, userId),
-	        Filters.eq("status", LoanStatus.RETURNED.toString()) 
-	    );
-	    return loans.find(filter).into(new ArrayList<>());
+		Bson filter = Filters.and(
+				Filters.eq(OWNER_ID, userId),
+				Filters.eq("status", LoanStatus.RETURNED.toString()) 
+				);
+		return loans.find(filter).into(new ArrayList<>());
 	}
 
-	// Trend prestiti: raggruppa per mese/anno
-	public Map<String, Long> getMonthlyTrend(String userId) {
-	    List<Bson> pipeline = Arrays.asList(
-	        match(Filters.eq(OWNER_ID, userId)),
-	        group(new Document("month", new Document("$month", "$loan_start_date"))
-	                   .append("year", new Document("$year", "$loan_start_date")),
-	              sum("count", 1)),
-	        sort(descending("_id.year", "_id.month")),
-	        limit(6)
-	    );
-	    Map<String, Long> trend = new LinkedHashMap<>();
-	    loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(doc -> {
-	        Document id = doc.get("_id", Document.class);
-	        String label = id.getInteger("month") + "/" + id.getInteger("year");
-	        trend.put(label, doc.getInteger("count").longValue());
-	    });
-	    return trend;
+
+	// prende tutti i prestiti completati 
+	public List<Loan> findFinished() {
+
+		return loans.find(Filters.eq("status", LoanStatus.RETURNED.toString())).into(new ArrayList<>());
+
 	}
 
-	// Richieste settimanali (ultime 4 settimane)
+	public Map<String, Long> getMonthlyTrend(String ownerId) {
+
+		List<Bson> pipeline = new ArrayList<>();
+
+		// ownerId e' passato a null per i globali
+		if (ownerId != null) {
+			pipeline.add(match(Filters.eq(OWNER_ID, ownerId)));
+		}
+
+		pipeline.add(group(new Document("month", new Document("$month", "$loan_start_date"))
+				.append("year", new Document("$year", "$loan_start_date")),
+				sum("count", 1)
+				)
+				);
+
+		pipeline.add(sort(ascending("_id.year", "_id.month")));
+
+		pipeline.add(limit(6));
+
+		Map<String, Long> trend = new LinkedHashMap<>();
+
+		loans.withDocumentClass(Document.class)
+		.aggregate(pipeline)
+		.forEach(doc -> {
+			Document id = doc.get("_id", Document.class);
+			if (id.getInteger("month") != null && id.getInteger("year") != null) {
+                String label = id.getInteger("month") + "/" + id.getInteger("year");
+                trend.put(label, doc.getInteger("count").longValue());
+                LOG.debug("label: " +  label + " - count " + doc.getInteger("count").longValue());
+            }
+		});
+
+		return trend;
+	}
+
 	public Map<String, Long> getWeeklyRequests(String userId) {
-	    List<Bson> pipeline = Arrays.asList(
-	        match(Filters.eq(OWNER_ID, userId)),
-	        group(new Document("$week", "$createdAt"), sum("count", 1)),
-	        sort(descending("_id")),
-	        limit(4)
-	    );
-	    Map<String, Long> weekly = new LinkedHashMap<>();
-	    loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(doc -> {
-	        weekly.put("Settimana " + doc.get("_id"), doc.getInteger("count").longValue());
-	    });
-	    return weekly;
+
+		List<Bson> pipeline = new ArrayList<>();
+
+		// null per conteggi globali
+		if (userId != null) {
+			pipeline.add(match(Filters.eq(OWNER_ID, userId)));
+		}
+
+		pipeline.add(group(new Document("$week", "$createdAt"), sum("count", 1)));
+
+		pipeline.add(sort(descending("_id")));
+
+		pipeline.add(limit(4));
+
+		Map<String, Long> weekly = new LinkedHashMap<>();
+
+		loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(
+				doc -> weekly.put("Settimana " + doc.get("_id"), doc.getInteger("count").longValue()));
+
+		return weekly;
 	}
+
+
 
 }

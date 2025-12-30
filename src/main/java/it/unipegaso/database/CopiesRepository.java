@@ -10,7 +10,9 @@ import static com.mongodb.client.model.Sorts.descending;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -122,19 +124,64 @@ public class CopiesRepository implements IRepository<Copy> {
 		return copies.countDocuments();
 	}
 
-	public String findTopTagByUser(String userId) {
+	public String findTopTagByLibraryIds (List<String> userLibIds) {
+		// Se l'utente non ha librerie, inutile procedere
+		if (userLibIds == null || userLibIds.isEmpty()) {
+			return "nessuno";
+		}
+
+		// esegue l'aggregazione filtrando per i libraryId ottenuti
+		List<Bson> pipeline = Arrays.asList(
+				// Filtra le copie che appartengono a una delle librerie dell'utente
+				match(Filters.in("libraryId", userLibIds)),
+
+				// Separa l'array dei tags per poterli contare singolarmente
+				unwind("$tags"),
+
+				// Raggruppa per nome del tag e conta le occorrenze
+				group("$tags", sum("count", 1)),
+
+				// Ordina dal più frequente
+				sort(descending("count")),
+
+				// Prende solo il primo
+				limit(1)
+				);
+
+		Document res = copies.withDocumentClass(Document.class)
+				.aggregate(pipeline)
+				.first();
+
+		LOG.debug("TOP TAG RESULT: " + res);  
+
+		// In MongoDB aggregate, l'ID del raggruppamento (il nome del tag) finisce nel campo "_id"
+		return res != null ? res.getString("_id") : "nessuno";
+	}
+
+	public Map<String, Long> getTags(List<String> userLibIds) {
+		
+	    Map<String, Long> tagsMap = new LinkedHashMap<>();
+
+	    if (userLibIds == null || userLibIds.isEmpty()) {
+	        return tagsMap;
+	    }
+
 	    List<Bson> pipeline = Arrays.asList(
-	        match(Filters.eq("ownerId", userId)),
-	        unwind("$tags"),
-	        group("$tags", sum("count", 1)),
-	        sort(descending("count")),
-	        limit(1)
+	            match(Filters.in("libraryId", userLibIds)),
+	            unwind("$tags"),
+	            group("$tags", sum("count", 1)),
+	            sort(descending("count"))
 	    );
 
-	    Document res = copies.withDocumentClass(Document.class)
-	                         .aggregate(pipeline)
-	                         .first();
-	                             
-	    return res != null ? res.getString("_id") : "nessuno";
+	    copies.withDocumentClass(Document.class)
+	            .aggregate(pipeline)
+	            .forEach(doc -> {
+	                String tagName = doc.getString("_id");
+	                Long count = doc.getInteger("count").longValue();
+	                tagsMap.put(tagName, count);
+	            });
+
+	    return tagsMap;
 	}
+
 }

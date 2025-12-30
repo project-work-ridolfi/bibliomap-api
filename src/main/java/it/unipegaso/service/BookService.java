@@ -30,7 +30,6 @@ import it.unipegaso.api.dto.BookMapDTO;
 import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.CopiesRepository;
 import it.unipegaso.database.LibrariesRepository;
-import it.unipegaso.database.LocationsRepository;
 import it.unipegaso.database.model.Book;
 import it.unipegaso.database.model.Copy;
 import it.unipegaso.database.model.Library;

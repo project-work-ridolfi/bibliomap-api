@@ -77,14 +77,26 @@ public class LibrariesRepository implements IRepository<Library> {
 	        filter = Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue());
 	    }
 	    
-	    List<String> ids = new ArrayList<>();
-	    
-	    libraries.find(filter).projection(Projections.include(ID))
-	    .forEach(lib -> {
-	        ids.add(lib.getId());
-	    });
-	    return ids;
+	    return getIds(filter);
 	}
+	
+	public List<String> getUserLibIds(String userId){
+		
+		Bson filter = Filters.eq(OWNER_ID, userId);
+		
+		return getIds(filter);
+	}
+
+
+	private List<String> getIds(Bson filter) {
+		List<String>ids = new ArrayList<>();
+		
+		 libraries.find(filter).projection(Projections.include(ID))
+		    .forEach(lib -> {
+		        ids.add(lib.getId());
+		    });
+		    return ids;
+	};
 
 	public FindIterable<Library> getAll(String userId){
 

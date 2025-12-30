@@ -3,7 +3,6 @@ package it.unipegaso.api.resources;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.unipegaso.api.dto.UserStatsDTO;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.LoansRepository;
@@ -29,80 +28,93 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class StatsResource {
 
-	@Inject
-	BooksRepository bookRepository;
-	
 	@Inject 
-	UserService userService;
-	
-	@Inject
-	LibraryService libraryService;
-	
-	@Inject
-	LoansRepository loansRepository;
-	
-	@Inject
-	UsersRepository usersRepository;
-	
-	@Inject
 	StatsService statsService;
 
-	
+	@Inject 
+	UserService userService;
+
+	@Inject 
+	BooksRepository bookRepository;
+
+	@Inject
+	LibraryService libraryService;
+
+	@Inject 
+	LoansRepository loansRepository;
+
+	@Inject 
+	UsersRepository usersRepository;
+
 	@GET
-    @Path("/user/{id}")
-    public Response getUserStats(@PathParam("id") String userId, @Context HttpHeaders headers) {
-        String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-        try {
-            User currentUser = userService.getUserFromSession(sessionId);
-            
-            // verifica che l'utente chieda le proprie statistiche
-            if (!currentUser.getId().equals(userId)) {
-                return Response.status(Response.Status.FORBIDDEN).build();
-            }
+	@Path("/user/{id}/counters")
+	public Response getUserCounters(@PathParam("id") String userId, @Context HttpHeaders headers) {
 
-            // delega il calcolo complesso al service
-            UserStatsDTO stats = statsService.getAllUserStats(userId);
-            return Response.ok(stats).build();
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
 
-        } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-    }
-    
-    @GET
-	@Path("/total")
-	public Response getTotalBooks( @Context HttpHeaders headers){
+		try {
+			User user = userService.getUserFromSession(sessionId);
+
+			if (!user.getId().equals(userId)) {
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
+
+			Map<String, Long> counts = new HashMap<>();
+			counts.put("myBooksCount", libraryService.countUserCopies(userId));
+			counts.put("totalLoansOut", loansRepository.count(userId, true));
+			counts.put("totalLoansIn", loansRepository.count(userId, false));
+			return Response.ok(counts).build();
+		
+		} catch (Exception e) { 
+			return Response.status(Response.Status.UNAUTHORIZED).build(); 
+		}
+	}
+
+	@GET
+	@Path("/user/{id}/full")
+	public Response getUserStatsFull(@PathParam("id") String userId, @Context HttpHeaders headers) {
+
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		try {
+			User user = userService.getUserFromSession(sessionId);
+			if (!user.getId().equals(userId)) {
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
+
+			return Response.ok(statsService.getAllUserStats(userId)).build();
+		
+		} catch (Exception e) { 
+			return Response.status(Response.Status.UNAUTHORIZED).build(); 
+		}
+	}
+
+	@GET
+	@Path("/global/counters")
+	public Response getGlobalCounters() {
+		
+		Map<String, Long> response = new HashMap<>();
+		response.put("books", bookRepository.count());
+		response.put("copies", libraryService.countCopies(null, false));
+		response.put("loans", loansRepository.count());
+		return Response.ok(response).build();
+	
+	}
+
+	@GET
+	@Path("/global/full")
+	public Response getGlobalStatsFull(@Context HttpHeaders headers) {
 		
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-		String currentUserId = "*";
+		String userId = null;
 		boolean logged = false;
+
 		try {
 			User currentUser = userService.getUserFromSession(sessionId);
-			currentUserId = currentUser.getId();
+			userId = currentUser.getId();
 			logged = true;
-			
 		} catch (Exception e) {
-			// utente non loggato, procediamo come guest (currentUserId resta null), non si vedranno i libri con visibilita' limitata
+			// utente non loggato, procediamo come guest (currentUserId resta null)
 		}
-		
-		//riprendo totale libri
-		long totalBooks = bookRepository.count();
-		
-		long totalCopies = libraryService.countCopies(currentUserId, logged);
-		
-		long totalLoans = loansRepository.count();
-		
-		long totalUsers = usersRepository.count(currentUserId,logged);
-		
-		Map<String, String> response = new HashMap<>();
-		response.put("books", "" + totalBooks);
-		response.put("copies", "" + totalCopies);
-		response.put("loans", "" + totalLoans);
-		response.put("users", "" + totalUsers);
-
-		return Response.status(Response.Status.OK).entity(response).build();
-		
+		return Response.ok(statsService.getGlobalStats(logged, userId)).build(); 
 	}
-    
-    
 }

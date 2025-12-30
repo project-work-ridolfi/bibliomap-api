@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.client.FindIterable;
@@ -135,5 +136,13 @@ public class LibraryService {
 		List<String> visibleIds = librariesRepository.getVisibleLibraryIds(logged, userId);
 	    
 	    return copiesRepository.countByLibraryIds(visibleIds);
+	}
+
+	public Long countUserCopies(String userId) {
+		
+		List<String> userLibrariesIds = librariesRepository.getUserLibIds(userId);
+		
+	    return copiesRepository.countByLibraryIds(userLibrariesIds);
+
 	}
 }

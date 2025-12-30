@@ -1,6 +1,6 @@
 package it.unipegaso.database.model;
 
-public enum ContitionOptions {
+public enum ConditionOptions {
 	NEW,
 	GREAT,
 	GOOD,
