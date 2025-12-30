@@ -156,6 +156,7 @@ public class BookResource {
 					book.getTitle(),
 					book.getAuthor(),
 					book.getCover(),
+					null,
 					book.getPublication_year(),
 					book.getLanguage(),
 					book.getCover_type(), 

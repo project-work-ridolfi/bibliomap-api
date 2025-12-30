@@ -17,7 +17,7 @@ public class Book {
 	private int publication_year;
 	private String publisher;
 	private String cover_type;
-	private String cover; //TODO
+	private String cover; 
 	
 	
 	public String getIsbn() {

@@ -12,6 +12,7 @@ public record BookDetailDTO(
 		String title,
 		String author,
 		String coverUrl,
+		String customCover,
 		Integer publicationYear,
 		String language,
 		String coverType,

@@ -220,37 +220,49 @@ public class BookService {
 	}
 
 	private BookDetailDTO mapToDetailDTO(Document doc) {
-		Document book = doc.get("bookInfo", Document.class);
-		Document lib = doc.get("libraryInfo", Document.class);
-		Document owner = doc.get("ownerInfo", Document.class);
+	    Document book = doc.get("bookInfo", Document.class);
+	    Document lib = doc.get("libraryInfo", Document.class);
+	    Document owner = doc.get("ownerInfo", Document.class);
 
-		// Controllo se è base64 o url
-		String rawCover = book.getString("cover");
-		String finalCover = null;
-		if (rawCover != null && !rawCover.isEmpty()) {
-			finalCover = rawCover.startsWith("http") ? rawCover : (rawCover.startsWith("data:") ? rawCover : "data:image/jpeg;base64," + rawCover);
-		}
+	    // gestione Cover Ufficiale (dal libro)
+	    String rawBookCover = book.getString("cover");
+	    String bookCoverUrl = null;
+	    if (rawBookCover != null && rawBookCover.startsWith("http")) {
+	        bookCoverUrl = rawBookCover;
+	    }
 
-		String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
+	    // gestione Custom Cover (dalla copia)
+	    // Il campo nel DB della copia è "custom_cover"
+	    String rawCustomCover = doc.getString("custom_cover");
+	    String finalCustomCover = null;
+	    if (rawCustomCover != null && !rawCustomCover.isEmpty()) {
+	        // Se non ha già il prefisso data:, lo aggiungiamo
+	        finalCustomCover = rawCustomCover.startsWith("data:") 
+	            ? rawCustomCover 
+	            : "data:image/jpeg;base64," + rawCustomCover;
+	    }
 
-		return new BookDetailDTO(
-				doc.getString("_id"),
-				book.getString("_id"), // ISBN
-				book.getString("title"),
-				book.getString("author"),
-				finalCover,
-				book.getInteger("publication_year", 0),
-				book.getString("language"),
-				book.getString("cover_type"),
-				book.getString("publisher"),
-				lib.getString("name"),
-				lib.getString("_id"),
-				lib.getString("ownerId"),
-				username,
-				doc.getString("condition"),
-				doc.getString("status"),
-				doc.getString("owner_notes"),
-				doc.getList("tags", String.class));
+	    String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
+
+	    return new BookDetailDTO(
+	            doc.getString("_id"),         // id copia
+	            book.getString("_id"),        // isbn
+	            book.getString("title"),
+	            book.getString("author"),
+	            bookCoverUrl,                 // coverUrl (Google)
+	            finalCustomCover,             // customCover (Base64)
+	            book.getInteger("publication_year", 0),
+	            book.getString("language"),
+	            book.getString("cover_type"),
+	            book.getString("publisher"),
+	            lib.getString("name"),
+	            lib.getString("_id"),
+	            lib.getString("ownerId"),
+	            username,
+	            doc.getString("condition"),
+	            doc.getString("status"),
+	            doc.getString("owner_notes"),
+	            doc.getList("tags", String.class));
 	}
 
 	public List<Book> findExistingBooks(String author, String title, int year, String publisher, String language) {
@@ -421,6 +433,7 @@ public class BookService {
 						book.getTitle(),
 						book.getAuthor(),
 						book.getCover(), // cover del libro base
+						copy.getCustomCover(),
 						book.getPublication_year(),
 						book.getLanguage(),
 						book.getCover_type(),

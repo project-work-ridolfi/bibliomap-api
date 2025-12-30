@@ -3,6 +3,7 @@ package it.unipegaso.api.resources;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
@@ -17,13 +18,12 @@ import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.User;
 import it.unipegaso.service.LibraryService;
 import it.unipegaso.service.UserService;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.NotAuthorizedException;
-import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -186,6 +186,46 @@ public class CopyResource {
         } catch (Exception e) {
             LOG.error("error updating copy", e);
             return Response.serverError().entity(new ErrorResponse("ERR", "update failed")).build();
+        }
+    }
+    
+    @PATCH
+    @Path("/{id}/move")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response moveCopy(@PathParam("id") String copyId, Map<String, String> payload, @Context HttpHeaders headers) {
+
+        String newLibraryId = payload.get("libraryId");
+        
+        if (newLibraryId == null) {
+        	return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+        try {
+            User user = userService.getUserFromSession(sessionId);
+            Optional<Copy> opCopy = copiesRepository.get(copyId);
+
+            if (opCopy.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
+            Copy copy = opCopy.get();
+
+            // verifica che l'utente sia proprietario della libreria di destinazione
+            boolean ownsTarget = libraryService.getUserLibraries(user.getId()).stream()
+                    .anyMatch(lib -> lib.getId().equals(newLibraryId));
+
+            if (!ownsTarget) {
+            	return Response.status(Response.Status.FORBIDDEN).build();
+            }
+
+            // Update solo del campo libraryId
+            copy.setLibraryId(newLibraryId);
+            copiesRepository.update(copy);
+
+            return Response.ok().build();
+
+        } catch (Exception e) {
+            LOG.error("error moving copy", e);
+            return Response.serverError().build();
         }
     }
     

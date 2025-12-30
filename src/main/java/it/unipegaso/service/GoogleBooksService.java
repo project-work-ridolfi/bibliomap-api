@@ -142,6 +142,7 @@ public class GoogleBooksService {
 					title,
 					author,
 					cover,
+					null,
 					publicationYear,
 					StringUtils.getFullLanguage(language),
 					"paperback", // default o null
