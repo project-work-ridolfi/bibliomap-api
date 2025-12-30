@@ -43,8 +43,6 @@ public class BookService {
 	private static final Logger LOG = Logger.getLogger(BookService.class);
 	private static final int MAX_IMG_SIZE = 400; // Pixel lato massimo
 
-	@Inject
-	LocationsRepository locationsRepository;
 
 	@Inject
 	BooksRepository booksRepository;

@@ -53,7 +53,7 @@ public class LocationService {
 	}
 
 
-	public Map<String, Object> getLocationMap(String locationId) {
+	public Map<String, Double> getLocationMap(String locationId) {
 	    Optional<Location> op = locationRepository.get(locationId);
 
 	    if (op.isPresent()) {
@@ -61,7 +61,7 @@ public class LocationService {
 	        Point point = loc.getLocation();
 	        
 	        if (point != null && point.getCoordinates() != null) {
-	            Map<String, Object> coords = new HashMap<>();
+	            Map<String, Double> coords = new HashMap<>();
 	            
 	            // INDICE 0 = Longitudine, INDICE 1 = Latitudine
 	            coords.put("longitude", point.getCoordinates().getValues().get(0));

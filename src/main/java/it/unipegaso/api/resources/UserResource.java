@@ -300,7 +300,7 @@ public class UserResource {
 
 	        // Recuperiamo le coordinate reali se l'utente ha una posizione
 	        if (user.getLocationId() != null) {
-	        	Map<String, Object> coords = locationService.getLocationMap(user.getLocationId());
+	        	Map<String, Double> coords = locationService.getLocationMap(user.getLocationId());
 	            if (coords != null) {
 	                responseBody.putAll(coords); // Aggiunge latitude e longitude al body
 	            }

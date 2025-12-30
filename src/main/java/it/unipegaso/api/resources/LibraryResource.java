@@ -16,9 +16,11 @@ import it.unipegaso.database.CopiesRepository;
 import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
+import it.unipegaso.database.model.Location;
 import it.unipegaso.database.model.User;
 import it.unipegaso.service.BookService;
 import it.unipegaso.service.LibraryService;
+import it.unipegaso.service.LocationService;
 import it.unipegaso.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -60,6 +62,9 @@ public class LibraryResource {
 
 	@Inject 
 	LibrariesRepository librariesRepository;
+	
+	@Inject
+	LocationService locationService;
 	
 	@POST
 	public Response createLibrary(LibraryDTO request, @Context HttpHeaders headers) {
@@ -127,14 +132,20 @@ public class LibraryResource {
 
 		List<BookDetailDTO> books = bookService.getBooksByLibrary(libraryId);
 
-
-		// costruisco la risposta includendo i libri
+		// costruisco la risposta includendo i libri e la posizione
 		Map<String, Object> response = new HashMap<>();
 
 		response.put("id", library.getId());
 		response.put("name", library.getName());
 		response.put("visibility", library.getVisibility());
 		response.put("books", books);
+		
+		Map<String, Double> cords = locationService.getLocationMap(library.getLocationId());
+		
+		if(cords != null && !cords.isEmpty()) {
+			response.putAll(cords);
+		}
+		
 
 		Optional<User> opOwner = usersRepository.get(library.getOwnerId());
 
