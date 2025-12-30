@@ -171,26 +171,32 @@ public class LoansRepository implements IRepository<Loan> {
 	}
 
 	public Map<String, Long> getTitlesRanking(String userId) {
-		List<Bson> pipeline = new ArrayList<>();
+	    List<Bson> pipeline = new ArrayList<>();
 
-		// null per conteggi globali
-		if (userId != null) {
-			pipeline.add(match(eq(OWNER_ID, userId)));
-		}
+	    //null per conteggi globali
+	    if (userId != null) {
+	        pipeline.add(match(eq(OWNER_ID, userId)));
+	    }
 
-		pipeline.add(group("$title", sum("count", 1)));
+	    // Concateniamo copy_id e title usando l'operatore $concat di MongoDB
+	    // "ID_COPIA:TITOLO_LIBRO"
+	    pipeline.add(group(
+	        new Document("$concat", Arrays.asList("$copy_id", ":", "$title")), 
+	        sum("count", 1)
+	    ));
 
-		pipeline.add(sort(descending("count")));
+	    pipeline.add(sort(descending("count")));
+	    pipeline.add(limit(5));
 
-		Map<String, Long> ranking = new LinkedHashMap<>();
+	    Map<String, Long> ranking = new LinkedHashMap<>();
 
-		loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(
-				doc -> {
-					Number count = doc.get("count", Number.class);
-					ranking.put(doc.getString("_id"), count.longValue());
-				});
+	    loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(doc -> {
+	        String combinedKey = doc.getString("_id");
+	        Number count = doc.get("count", Number.class);
+	        ranking.put(combinedKey, count.longValue());
+	    });
 
-		return ranking;
+	    return ranking;
 	}
 
 
