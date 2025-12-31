@@ -27,6 +27,9 @@ public class Copy {
 	@BsonProperty("custom_cover")
 	private String customCover;
 	
+	@BsonProperty("views_counter")
+	private long viewsCounter;
+	
 	private List<String> tags;
 
 	public String getId() {
@@ -92,7 +95,9 @@ public class Copy {
 	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
-	
-	
+
+	public long getViewsCounter() {
+		return viewsCounter;
+	}
 
 }

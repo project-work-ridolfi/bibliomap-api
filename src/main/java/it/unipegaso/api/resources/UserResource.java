@@ -12,6 +12,7 @@ import io.quarkus.elytron.security.common.BcryptUtil;
 import it.unipegaso.api.dto.CheckExistsResponse;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.SetLocationDTO;
+import it.unipegaso.api.dto.UserProfileDTO;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
@@ -168,9 +169,29 @@ public class UserResource {
 
 	@GET
 	@Path("/{id}")
-	public Response getUserProfile(@PathParam("id") String userId) {
-		// TODO: fetch user + filtrare campi sensibili in base privacy mode
-		return Response.ok("{\"username\": \"user" + userId + "\", \"displayName\": \"TODO\"}").build();
+	public Response getUserProfile(@PathParam("id") String userId, @Context HttpHeaders headers) {
+		
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		String currentUserId = null;
+		boolean logged = false;
+		boolean isProfileOwner = false;
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+			currentUserId = currentUser.getId();
+			isProfileOwner = userId.equals(currentUserId);
+			logged = true;
+		} catch (Exception e) {
+			// utente non loggato, procediamo come guest (currentUserId resta null)
+		}
+
+		UserProfileDTO userProfileDTO = userService.getProfile(userId, logged, isProfileOwner);
+		
+		if(userProfileDTO == null) {
+			Response.status(Response.Status.NOT_FOUND).build();
+		}
+		
+		return Response.ok().entity(userProfileDTO).build();
 	}
 
 

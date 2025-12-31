@@ -52,7 +52,7 @@ public class BookService {
 	@Inject
 	LibrariesRepository librariesRepository; 
 
-	
+
 	@Inject
 	MongoClient mongoClient;
 
@@ -130,7 +130,7 @@ public class BookService {
 
 		List<BookMapDTO> results = new ArrayList<>();
 		Random rand = new Random();
-		
+
 
 		for (Document doc : locationsCol.aggregate(pipeline)) {
 			try {
@@ -168,6 +168,7 @@ public class BookService {
 						lib.getString("name"),
 						lib.getString("_id"),
 						copy.getString("status"),
+						copy.getLong("views_counter"),
 						finalLat,
 						finalLng,
 						doc.getDouble("distance") / 1000.0,
@@ -186,6 +187,12 @@ public class BookService {
 
 	public BookDetailDTO getBookDetails(String copyId) {
 		MongoCollection<Document> copiesCol = mongoClient.getDatabase("bibliomap").getCollection("copies");
+
+		// +1 alle visualizzazioni
+		copiesCol.updateOne(
+				Filters.eq("_id", copyId),
+				new Document("$inc", new Document("views_counter", 1L))
+				);
 		List<Bson> pipeline = new ArrayList<>();
 
 		pipeline.add(Aggregates.match(Filters.eq("_id", copyId)));
@@ -213,55 +220,61 @@ public class BookService {
 		pipeline.add(new Document("$unwind", new Document("path", "$ownerInfo").append("preserveNullAndEmptyArrays", true)));
 
 		Document result = copiesCol.aggregate(pipeline).first();
-		if (result == null) return null;
+
+		if (result == null) {
+			return null;
+		}
 
 		return mapToDetailDTO(result);
 	}
 
 	private BookDetailDTO mapToDetailDTO(Document doc) {
-	    Document book = doc.get("bookInfo", Document.class);
-	    Document lib = doc.get("libraryInfo", Document.class);
-	    Document owner = doc.get("ownerInfo", Document.class);
+		Document book = doc.get("bookInfo", Document.class);
+		Document lib = doc.get("libraryInfo", Document.class);
+		Document owner = doc.get("ownerInfo", Document.class);
 
-	    // gestione Cover Ufficiale (dal libro)
-	    String rawBookCover = book.getString("cover");
-	    String bookCoverUrl = null;
-	    if (rawBookCover != null && rawBookCover.startsWith("http")) {
-	        bookCoverUrl = rawBookCover;
-	    }
+		// gestione Cover Ufficiale (dal libro)
+		String rawBookCover = book.getString("cover");
+		String bookCoverUrl = null;
+		if (rawBookCover != null && rawBookCover.startsWith("http")) {
+			bookCoverUrl = rawBookCover;
+		}
 
-	    // gestione Custom Cover (dalla copia)
-	    // Il campo nel DB della copia è "custom_cover"
-	    String rawCustomCover = doc.getString("custom_cover");
-	    String finalCustomCover = null;
-	    if (rawCustomCover != null && !rawCustomCover.isEmpty()) {
-	        // Se non ha già il prefisso data:, lo aggiungiamo
-	        finalCustomCover = rawCustomCover.startsWith("data:") 
-	            ? rawCustomCover 
-	            : "data:image/jpeg;base64," + rawCustomCover;
-	    }
+		// gestione Custom Cover (dalla copia)
+		// Il campo nel DB della copia è "custom_cover"
+		String rawCustomCover = doc.getString("custom_cover");
+		String finalCustomCover = null;
+		if (rawCustomCover != null && !rawCustomCover.isEmpty()) {
+			// Se non ha già il prefisso data:, lo aggiungiamo
+			finalCustomCover = rawCustomCover.startsWith("data:") 
+					? rawCustomCover 
+							: "data:image/jpeg;base64," + rawCustomCover;
+		}
 
-	    String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
+		long counter = (long) doc.getOrDefault("view_counter", 0L);
 
-	    return new BookDetailDTO(
-	            doc.getString("_id"),         // id copia
-	            book.getString("_id"),        // isbn
-	            book.getString("title"),
-	            book.getString("author"),
-	            bookCoverUrl,                 // coverUrl (Google)
-	            finalCustomCover,             // customCover (Base64)
-	            book.getInteger("publication_year", 0),
-	            book.getString("language"),
-	            book.getString("cover_type"),
-	            book.getString("publisher"),
-	            lib.getString("name"),
-	            lib.getString("_id"),
-	            lib.getString("ownerId"),
-	            username,
-	            doc.getString("condition"),
-	            doc.getString("status"),
-	            doc.getString("owner_notes"),
-	            doc.getList("tags", String.class));
+		String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
+
+		return new BookDetailDTO(
+				doc.getString("_id"),         // id copia
+				book.getString("_id"),        // isbn
+				book.getString("title"),
+				book.getString("author"),
+				bookCoverUrl,                 // coverUrl (Google)
+				finalCustomCover,             // customCover (Base64)
+				book.getInteger("publication_year", 0),
+				book.getString("language"),
+				book.getString("cover_type"),
+				book.getString("publisher"),
+				lib.getString("name"),
+				lib.getString("_id"),
+				lib.getString("ownerId"),
+				username,
+				doc.getString("condition"),
+				doc.getString("status"),
+				doc.getString("owner_notes"),
+				doc.getList("tags", String.class),
+				counter);
 	}
 
 	public List<Book> findExistingBooks(String author, String title, int year, String publisher, String language) {
@@ -278,44 +291,44 @@ public class BookService {
 
 
 	public boolean saveBookWithBase64Cover(BookDetailDTO dto, FileUpload coverFile) {
-	    if (dto.libraryId() == null) {
-	        return false;
-	    }
+		if (dto.libraryId() == null) {
+			return false;
+		}
 
-	    try {
-	        // Trova o crea il libro 
-	        Book book = findOrCreateBook(dto);
+		try {
+			// Trova o crea il libro 
+			Book book = findOrCreateBook(dto);
 
-	        Optional<Library> libraryOpt = librariesRepository.get(dto.libraryId());
-	        if (libraryOpt.isEmpty()) {
-	            return false;
-	        }
+			Optional<Library> libraryOpt = librariesRepository.get(dto.libraryId());
+			if (libraryOpt.isEmpty()) {
+				return false;
+			}
 
-	        // 2. Crea la copia
-	        Copy copy = new Copy();
-	        copy.setId(java.util.UUID.randomUUID().toString());
-	        copy.setBookIsbn(book.getIsbn());
-	        copy.setLibraryId(dto.libraryId());
-	        copy.setCondition(dto.condition());
-	        copy.setStatus(dto.status());
-	        copy.setOwnerNotes(dto.ownerNotes());
-	        if (dto.tags() != null) {
-	            copy.setTags(dto.tags());
-	        }
+			// 2. Crea la copia
+			Copy copy = new Copy();
+			copy.setId(java.util.UUID.randomUUID().toString());
+			copy.setBookIsbn(book.getIsbn());
+			copy.setLibraryId(dto.libraryId());
+			copy.setCondition(dto.condition());
+			copy.setStatus(dto.status());
+			copy.setOwnerNotes(dto.ownerNotes());
+			if (dto.tags() != null) {
+				copy.setTags(dto.tags());
+			}
 
-	        // Se l'utente ha caricato un file (foto scattata o upload), lo salviamo sulla copia
-	        if (coverFile != null) {
-	            String base64Image = processImageToBase64(coverFile);
-	            copy.setCustomCover(base64Image);
-	        }
+			// Se l'utente ha caricato un file (foto scattata o upload), lo salviamo sulla copia
+			if (coverFile != null) {
+				String base64Image = processImageToBase64(coverFile);
+				copy.setCustomCover(base64Image);
+			}
 
-	        copiesRepository.create(copy);
-	        return true;
+			copiesRepository.create(copy);
+			return true;
 
-	    } catch (Exception e) {
-	        LOG.error("Errore salvataggio libro/copia", e);
-	        return false;
-	    }
+		} catch (Exception e) {
+			LOG.error("Errore salvataggio libro/copia", e);
+			return false;
+		}
 	}
 
 	private Book findOrCreateBook(BookDetailDTO dto) {
@@ -417,7 +430,7 @@ public class BookService {
 		List<Copy> copies = copiesRepository.findByLibrary(libraryId);
 		List<BookDetailDTO> results = new ArrayList<>();
 
-		
+
 		for (Copy copy : copies) {
 			// per ogni copia cerco i metadati del libro tramite isbn
 			Optional<Book> bookOpt = booksRepository.get(copy.getBookIsbn());
@@ -444,7 +457,8 @@ public class BookService {
 						copy.getCondition(),
 						copy.getStatus(),
 						copy.getOwnerNotes(),
-						copy.getTags()
+						copy.getTags(),
+						copy.getViewsCounter()
 						));
 			}
 		}

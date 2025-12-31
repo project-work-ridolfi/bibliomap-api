@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.bson.conversions.Bson;
 import org.jboss.logging.Logger;
 
 import com.mongodb.client.FindIterable;
@@ -122,6 +121,8 @@ public class LibraryService {
 	    Library lib = opLib.get();
 	    boolean isOwner = lib.getOwnerId().equals(currentUserId);
 
+	    librariesRepository.addView(libraryId);
+	    
 	    // gestione visibilita
 	    if (!isOwner && "private".equals(lib.getVisibility())) {
 	        return null; // libreria privata
@@ -138,9 +139,9 @@ public class LibraryService {
 	    return copiesRepository.countByLibraryIds(visibleIds);
 	}
 
-	public Long countUserCopies(String userId) {
+	public Long countUserCopies(String userId, boolean logged, boolean isOwner) {
 		
-		List<String> userLibrariesIds = librariesRepository.getUserLibIds(userId);
+		List<String> userLibrariesIds = librariesRepository.getUserLibIds(userId, logged, isOwner);
 		
 	    return copiesRepository.countByLibraryIds(userLibrariesIds);
 

@@ -23,6 +23,8 @@ public class Library {
 	private int blurRadius;
 	private String notes; 
 	private List<String> tags;
+	private long viewsCounter;
+	
 	public String getId() {
 		return id;
 	}
@@ -84,5 +86,7 @@ public class Library {
 		this.tags = tags;
 	}
 	
-	
+	public long getViewsCounter() {
+		return viewsCounter;
+	}
 }

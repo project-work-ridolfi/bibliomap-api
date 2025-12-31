@@ -2,11 +2,13 @@ package it.unipegaso.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
 import it.unipegaso.api.dto.ErrorResponse;
+import it.unipegaso.api.dto.UserProfileDTO;
 import it.unipegaso.database.CopiesRepository;
 import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.LoansRepository;
@@ -14,6 +16,7 @@ import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.Loan;
 import it.unipegaso.database.model.User;
+import it.unipegaso.database.model.VisibilityOptions;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotAuthorizedException;
@@ -39,6 +42,9 @@ public class UserService {
 
 	@Inject
 	CopiesRepository copiesRepository;
+
+	@Inject
+	LocationService locationService;
 
 
 
@@ -73,7 +79,7 @@ public class UserService {
 
 		if(userOpt.isEmpty()) {
 			LOG.errorf("Impossibile trovare User DB tramite username: %s (Sessione: %s)", username, sessionId);
-			
+
 			// usa WebApplicationException per forzare il 500
 			throw new WebApplicationException(
 					Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -84,6 +90,41 @@ public class UserService {
 
 		// Successo
 		return userOpt.get();
+	}
+
+	public UserProfileDTO getProfile (String userId, boolean logged, boolean isOwner) {
+
+		Optional<User> opuser = userRepository.get(userId);
+
+		if(opuser.isEmpty()) {
+			return null;
+		}
+
+		User user = opuser.get();
+
+		String visibility = user.getVisibility();
+		String userName = user.getUsername();
+		int blurRadius = user.getBlurRadius();
+		Map<String, Double> coords = null;
+		List<String> libraryIds = librariesRepository.getUserLibIds(userId, isOwner, logged);
+		Map<String,Long> topTags = copiesRepository.getTags(libraryIds);
+
+		if(visibility.equals(VisibilityOptions.PRIVATE.toDbValue())|| (visibility.equals(VisibilityOptions.LOGGED_IN.toDbValue()) && !logged)) {
+			userName = "utente anonimo";
+		}else if (user.getLocationId() != null) {
+			coords = locationService.getLocationMap(user.getLocationId());
+		}
+
+
+		return new UserProfileDTO(
+				userId,
+				userName,
+				topTags,
+				visibility,
+				coords,
+				blurRadius,
+				libraryIds
+				);
 	}
 
 

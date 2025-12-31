@@ -62,7 +62,7 @@ public class StatsService {
 
 	private static final Logger LOG = Logger.getLogger(StatsService.class);
 
-	public UserStatsDTO getAllUserStats(String userId) {
+	public UserStatsDTO getAllUserStats(String userId, boolean isOwner, boolean isLogged) {
 
 		LOG.debug("******** USER STATS ************");
 		// Conteggi base
@@ -72,7 +72,7 @@ public class StatsService {
 
 		// Analisi Personali
 
-		List<String> userLibIds = librariesRepository.getUserLibIds(userId);
+		List<String> userLibIds = librariesRepository.getUserLibIds(userId, isLogged, isOwner);
 		String topTag = copiesRepository.findTopTagByLibraryIds(userLibIds);
 
 		String bffId = loansRepository.findTopPartnerId(userId);

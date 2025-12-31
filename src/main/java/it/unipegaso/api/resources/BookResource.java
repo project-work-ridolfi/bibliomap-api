@@ -168,7 +168,8 @@ public class BookResource {
 					null, // condition
 					null, // status
 					null, // ownerNotes
-					null  // tags
+					null,  // tags
+					0
 					);
 		}
 		else{

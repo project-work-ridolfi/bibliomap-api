@@ -139,6 +139,7 @@ public class LibraryResource {
 		response.put("name", library.getName());
 		response.put("visibility", library.getVisibility());
 		response.put("books", books);
+		response.put("views", library.getViewsCounter());
 		
 		Map<String, Double> cords = locationService.getLocationMap(library.getLocationId());
 		
@@ -160,16 +161,6 @@ public class LibraryResource {
 		return Response.ok(response).build();
 	}
 
-	/**
-	 * PUT /api/collections/{id}
-	 * Aggiorna collezione (solo owner).
-	 */
-	@PUT
-	@Path("/{id}")
-	public Response updateLibrary( @PathParam("id") String libraryId, @Context HttpHeaders headers, Object libraryDto) {
-		// TODO: verificare ownership + aggiornare
-		return Response.ok("{\"message\": \"Collection updated (TODO)\"}").build();
-	}
 
 	/**
 	 * DELETE /api/libraries/{id}

@@ -80,9 +80,15 @@ public class LibrariesRepository implements IRepository<Library> {
 	    return getIds(filter);
 	}
 	
-	public List<String> getUserLibIds(String userId){
-		
-		Bson filter = Filters.eq(OWNER_ID, userId);
+	public List<String> getUserLibIds(String userId, boolean isOwner, boolean isLogged){
+		Bson filter;
+		if(isOwner) {
+			filter = Filters.eq(OWNER_ID, userId);
+		}else if(isLogged) {
+			filter = Filters.and(Filters.eq(OWNER_ID, userId), Filters.ne(VISIBILITY, VisibilityOptions.PRIVATE.toDbValue()));
+		}else {
+			filter = Filters.and(Filters.eq(OWNER_ID, userId), Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue()));
+		}
 		
 		return getIds(filter);
 	}
@@ -113,6 +119,19 @@ public class LibrariesRepository implements IRepository<Library> {
 	public boolean update(Library obj) throws MongoWriteException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void addView(String id) {
+
+	    if (id == null || id.trim().isEmpty()) {
+	        LOG.warn("ID libreria vuoto, impossibile incrementare views");
+	        return;
+	    }
+
+	    libraries.updateOne(
+	        Filters.eq(ID, id),
+	        new org.bson.Document("$inc", new org.bson.Document("viewsCounter", 1L))
+	    );
 	}
 
 

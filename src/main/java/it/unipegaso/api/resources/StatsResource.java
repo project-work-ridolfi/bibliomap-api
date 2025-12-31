@@ -8,6 +8,7 @@ import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.LoansRepository;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.User;
+import it.unipegaso.database.model.VisibilityOptions;
 import it.unipegaso.service.LibraryService;
 import it.unipegaso.service.StatsService;
 import it.unipegaso.service.UserService;
@@ -54,13 +55,15 @@ public class StatsResource {
 
 		try {
 			User user = userService.getUserFromSession(sessionId);
+			
+			boolean isProfileOwner = user.getId().equals(userId);
 
-			if (!user.getId().equals(userId)) {
+			if (!isProfileOwner && user.getVisibility().equals(VisibilityOptions.PRIVATE.toDbValue())) {
 				return Response.status(Response.Status.FORBIDDEN).build();
 			}
 
 			Map<String, Long> counts = new HashMap<>();
-			counts.put("myBooksCount", libraryService.countUserCopies(userId));
+			counts.put("myBooksCount", libraryService.countUserCopies(userId, true, isProfileOwner));
 			counts.put("totalLoansOut", loansRepository.count(userId, true));
 			counts.put("totalLoansIn", loansRepository.count(userId, false));
 			return Response.ok(counts).build();
@@ -75,13 +78,16 @@ public class StatsResource {
 	public Response getUserStatsFull(@PathParam("id") String userId, @Context HttpHeaders headers) {
 
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		
 		try {
 			User user = userService.getUserFromSession(sessionId);
-			if (!user.getId().equals(userId)) {
+			boolean isProfileOwner = user.getId().equals(userId);
+
+			if (!isProfileOwner && user.getVisibility().equals(VisibilityOptions.PRIVATE.toDbValue())) {
 				return Response.status(Response.Status.FORBIDDEN).build();
 			}
 
-			return Response.ok(statsService.getAllUserStats(userId)).build();
+			return Response.ok(statsService.getAllUserStats(userId, true, isProfileOwner)).build();
 		
 		} catch (Exception e) { 
 			return Response.status(Response.Status.UNAUTHORIZED).build(); 
