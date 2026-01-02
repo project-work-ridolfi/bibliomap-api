@@ -203,7 +203,7 @@ public class StatsService {
 
 		// preparazione Grafici 
 		ChartData trend = mapToChartData(loansRepository.getMonthlyTrend(null));
-		ChartData weekly = mapToChartData(loansRepository.getWeeklyRequests(null));
+		ChartData weekly = mapToChartData(loansRepository.getWeeklyRequests());
 		ChartData pareto = mapToChartData(loansRepository.getTitlesRanking(null));
 		ChartData mostViewedBooks = mapToChartData(calculateMostViewedBooks(visibleLibraryIds)); 
 		ChartData mostVisitedLibraries = mapToChartData(librariesRepository.getAllLibrariesViewsMap(userId, logged));

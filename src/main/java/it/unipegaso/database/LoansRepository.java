@@ -6,11 +6,13 @@ import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Sorts.descending;
 import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -282,29 +284,44 @@ public class LoansRepository implements IRepository<Loan> {
 		return trend;
 	}
 
-	public Map<String, Long> getWeeklyRequests(String userId) {
+	public Map<String, Long> getWeeklyRequests() {
+	    List<Bson> pipeline = new ArrayList<>();
 
-		List<Bson> pipeline = new ArrayList<>();
+	    Document dateTrunc = new Document("$dateTrunc", 
+	        new Document("date", "$created_at")
+	            .append("unit", "week")
+	            .append("startOfWeek", "monday"));
+	    
+	    pipeline.add(group(dateTrunc, sum("count", 1)));
 
-		// null per conteggi globali
-		if (userId != null) {
-			pipeline.add(match(Filters.eq(OWNER_ID, userId)));
-		}
+	    pipeline.add(sort(descending("_id")));
+	    pipeline.add(limit(4));
 
-		pipeline.add(group(new Document("$week", "$createdAt"), sum("count", 1)));
+	    List<Document> results = loans.withDocumentClass(Document.class)
+	                                  .aggregate(pipeline)
+	                                  .into(new ArrayList<>());
+	    
+	    Map<String, Long> weekly = new LinkedHashMap<>();
+	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
 
-		pipeline.add(sort(descending("_id")));
-
-		pipeline.add(limit(4));
-
-		Map<String, Long> weekly = new LinkedHashMap<>();
-
-		loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(
-				doc -> weekly.put("Settimana " + doc.get("_id"), doc.getInteger("count").longValue()));
-
-		return weekly;
+	    for (int i = results.size() - 1; i >= 0; i--) {
+	        Document doc = results.get(i);
+	        Date monday = doc.getDate("_id");
+	        
+	        if (monday != null) {
+	            Calendar cal = Calendar.getInstance();
+	            cal.setTime(monday);
+	            String start = sdf.format(cal.getTime());
+	            cal.add(Calendar.DAY_OF_YEAR, 6);
+	            String end = sdf.format(cal.getTime());
+	            
+	            String label = start + " - " + end;
+	            Long val = ((Number) doc.get("count")).longValue();
+	            weekly.put(label, val);
+	        }
+	    }
+	    return weekly;
 	}
-
 
 
 }
