@@ -2,49 +2,77 @@
 <html lang="it">
 <head>
     <style>
-    	/*TODO MATCH STILE DEL SITO */
+        /* MATCH STILE DEL SITO (Zomp #629677 e Paynes Gray #495D63) */
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #495D63; }
         .button {
             display: inline-block;
-            padding: 10px 20px;
+            padding: 12px 24px;
             margin-top: 20px;
-            background-color: #3b5998; 
+            background-color: #629677; 
             color: #ffffff !important;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-weight: bold;
+        }
+        .otp-box {
+            background-color: #f8f9fa;
+            border: 2px dashed #629677;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .otp-code {
+            font-size: 32px;
+            letter-spacing: 5px;
+            font-weight: bold;
+            color: #495D63;
         }
     </style>
 </head>
-<body >
-    <tr>
-        <td class="content">
-            <h2 style="color: #3b5998; margin-top: 0; font-size: 20px;">Ciao {recipientName}!</h2>
-            <p style="margin-bottom: 20px;">
-                Grazie per esserti registrato. Stai per completare la verifica del tuo account su Bibliomap.
-            </p>
-            <p>
-                Utilizza il codice qui sotto oppure clicca sul pulsante per procedere:
-            </p>
-            
-            <div class="otp-box">
-                <p style="margin: 0; font-size: 14px; color: #555555;">Il tuo Codice OTP</p>
-                <p class="otp-code" style="margin: 5px 0 0 0;">
-                    {otpCode}
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="content">
+                <h2 style="color: #629677; margin-top: 0; font-size: 22px;">Ciao {recipientName}!</h2>
+                
+                {#if isReset}
+                    <p style="margin-bottom: 20px;">
+                        Abbiamo ricevuto una richiesta di <strong>recupero password</strong> per il tuo account su Bibliomap.
+                    </p>
+                    <p>
+                        Inserisci il codice di sicurezza riportato qui sotto per procedere con l'impostazione della nuova password:
+                    </p>
+                {#else}
+                    <p style="margin-bottom: 20px;">
+                        Grazie per esserti registrato! Stai per completare la <strong>verifica del tuo account</strong> su Bibliomap.
+                    </p>
+                    <p>
+                        Utilizza il codice qui sotto per confermare la tua identità e iniziare a scambiare libri:
+                    </p>
+                {/if}
+                
+                <div class="otp-box">
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #777777; text-transform: uppercase; tracking-widest: 1px;">
+                        Il tuo Codice OTP
+                    </p>
+                    <div class="otp-code">
+                        {otpCode}
+                    </div>
+                </div>
+                
+                <p style="margin: 30px 0 0 0;">
+                    Se la pagina sul tuo browser si è chiusa, puoi tornare al sito cliccando qui:
                 </p>
-            </div>
-            
-            <p style="margin: 30px 0 0 0;">
-                Se preferisci, clicca qui per inserire il codice sul sito:
-            </p>
-            <a href="{verificationUrl}" target="_blank" class="button">
-                Inserisci il Codice di Verifica
-            </a>
+                <a href="{verificationUrl}" target="_blank" class="button">
+                    {#if isReset}Recupera Password{#else}Verifica Account{/if}
+                </a>
 
-            <p style="font-style: italic; font-size: 14px; color: #777777; margin-top: 30px;">
-                Il codice **{otpCode}** è valido per un breve periodo di tempo.
-            </p>
-        </td>
-    </tr>
-
-    </body>
+				<p style="font-style: italic; font-size: 13px; color: #999999; margin-top: 40px; border-top: 1px solid #eeeeee; padding-top: 20px;">                    Se non hai richiesto tu questo codice, ignora questa email o contatta il supporto. 
+                    Il codice è valido per {otpDurationMinutes} minuti.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
 </html>

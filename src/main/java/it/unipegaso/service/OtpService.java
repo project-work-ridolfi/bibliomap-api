@@ -65,7 +65,7 @@ public class OtpService {
     	return otpDebugMode;
     }
 
-    public String generateAndSendOtp(String email, String sessionId, String username) {
+    public String generateAndSendOtp(String email, String sessionId, String username, boolean hasForgottenPassword) {
         
     	String secret = secretKeyStrategy.load(email + sessionId);
         long counter = counterStrategy.getCounter(); // Ottiene il counter basato sul tempo
@@ -89,7 +89,7 @@ public class OtpService {
             if (otpDebugMode) {
                 return otp;
             } else {
-                boolean success = emailService.sendOtpEmail(email, otp, username);
+                boolean success = emailService.sendOtpEmail(email, otp, username, hasForgottenPassword);
                 LOG.info("SEND EMAIL " + success);
                 if (success) {
                     return otp; 

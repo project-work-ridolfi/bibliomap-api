@@ -67,6 +67,9 @@ public class EmailService {
 	@ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
 	boolean debugEmail;
 
+	@Inject
+	@ConfigProperty(name = "quarkus.auth.otp.duration-minutes", defaultValue = "5")
+	long otpDurationMinutes;
 
 	@Inject
 	@ConfigProperty(name = "quarkus.email.base-url", defaultValue = "http://localhost:5173/")
@@ -160,24 +163,26 @@ public class EmailService {
 	}
 
 	// Invia un'email all'utente con il codice OTP per la verifica.
-	public boolean sendOtpEmail(String recipientEmail, String otpCode, String recipientName) {
+	public boolean sendOtpEmail(String recipientEmail, String otpCode, String recipientName, boolean hasForgottenPassword) {
+	    String verificationUrl = baseUrl + "login"; 
 
-		String verificationUrl = baseUrl + "verify-otp?email=" + recipientEmail; // TODO
+	    Map<String, Object> data = new HashMap<>();
+	    data.put("recipientName", recipientName);
+	    data.put("otpCode", otpCode);
+	    data.put("verificationUrl", verificationUrl);
+	    data.put("isReset", hasForgottenPassword);
+	    data.put("otpDurationMinutes", otpDurationMinutes); 
 
-		Map<String, Object> data = new HashMap<>();
-		data.put("recipientName", recipientName);
-		data.put("otpCode", otpCode);
-		data.put("verificationUrl", verificationUrl);
+	    String htmlBody = otpEmailTemplate
+	            .data(data)
+	            .render();
 
-		String htmlBody = otpEmailTemplate
-				.data(data)
-				.render();
+	    String subject = hasForgottenPassword 
+	        ? "[Bibliomap] Recupero password - Codice OTP: " + otpCode
+	        : "[Bibliomap] Benvenuto! Verifica il tuo account - Codice OTP: " + otpCode;
 
-		String subject = "[Bibliomap] Il tuo codice di verifica OTP: " + otpCode;
-
-		return sendEmail(recipientEmail, subject, htmlBody, "Codice OTP");
+	    return sendEmail(recipientEmail, subject, htmlBody, "Codice OTP");
 	}
-
 	// invia notifica di conferma eliminazione account
 	public boolean sendAccountDeletedEmail(String recipientEmail, String recipientName) {
 	    Map<String, Object> data = new HashMap<>();
