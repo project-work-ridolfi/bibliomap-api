@@ -292,7 +292,7 @@ public class EmailService {
 
 	    try {
 	        mailer.send(Mail.withHtml(recipientEmail, subject, htmlBody)
-	                .setFrom("Bibliomap <adriana.ridolfi@studenti.unipegaso.it>")
+	                .setFrom("Bibliomap <noreply.bibliomap@gmail.com>")
 	                .addAttachment("bibliomap_export.pdf", pdfBytes, "application/pdf"));
 	        LOG.infof("Email [Export Dati] inviata con successo a %s", recipientEmail);
 	        return true;
@@ -315,7 +315,7 @@ public class EmailService {
 
 		try {
 			mailer.send(Mail.withHtml(to, subject, body)
-					.setFrom("Bibliomap <adriana.ridolfi@studenti.unipegaso.it>")
+					.setFrom("Bibliomap <noreply.bibliomap@gmail.com>")
 					.setReplyTo("noreply@invalid.local"));
 			LOG.infof("Email [%s] inviata con successo a %s", logType, to);
 			return true;
