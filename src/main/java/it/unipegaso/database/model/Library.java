@@ -1,6 +1,6 @@
 package it.unipegaso.database.model;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.codecs.pojo.annotations.BsonId;
@@ -15,8 +15,8 @@ public class Library {
 	private String id; 
 
 	private String name;
-	private LocalDateTime createdAt; 
-	private LocalDateTime modifiedAt;
+	private Date createdAt; 
+	private Date modifiedAt;
 	private String ownerId; 
 	private String locationId; 
 	private String visibility; //all, logged-in, private
@@ -37,16 +37,16 @@ public class Library {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public LocalDateTime getCreatedAt() {
+	public Date getCreatedAt() {
 		return createdAt;
 	}
-	public void setCreatedAt(LocalDateTime createdAt) {
+	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
-	public LocalDateTime getModifiedAt() {
+	public Date getModifiedAt() {
 		return modifiedAt;
 	}
-	public void setModifiedAt(LocalDateTime modifiedAt) {
+	public void setModifiedAt(Date modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
 	public String getOwnerId() {

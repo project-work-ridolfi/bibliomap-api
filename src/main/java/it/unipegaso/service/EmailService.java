@@ -1,5 +1,8 @@
 package it.unipegaso.service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -259,6 +262,39 @@ public class EmailService {
 	    sendEmail(email, subject , htmlBody, "Richiesta di contatto");
 
 		
+	}
+	
+	public boolean sendExportEmail(String recipientEmail, String recipientName, byte[] pdfBytes) {
+	    String htmlBody = "<p>Ciao " + recipientName + ",</p><p>In allegato trovi il documento PDF con tutti i tuoi dati registrati su Bibliomap.</p>";
+	    String subject = "Export Dati Bibliomap";
+
+	    if (debugEmail) {
+	        LOG.info("--------------------------------------------------");
+	        LOG.infof("DEBUG EMAIL [Export Dati] to: %s", recipientEmail);
+	        LOG.info("Body: " + htmlBody);
+	        LOG.infof("Allegato: bibliomap_export.pdf (%d bytes)", pdfBytes.length);
+	        try {
+	            Path path = Paths.get("target", "export_" + recipientName + "_" + System.currentTimeMillis() + ".pdf");
+	            
+	            Files.write(path, pdfBytes);
+	            
+	            LOG.infof("FILE DI DEBUG CREATO: %s", path.toAbsolutePath().toString());
+	        } catch (java.io.IOException e) {
+	            LOG.error("Errore durante la creazione del file PDF di debug", e);
+	        }	        LOG.info("--------------------------------------------------");
+	        return true;
+	    }
+
+	    try {
+	        mailer.send(Mail.withHtml(recipientEmail, subject, htmlBody)
+	                .setFrom("Bibliomap <adriana.ridolfi@studenti.unipegaso.it>")
+	                .addAttachment("bibliomap_export.pdf", pdfBytes, "application/pdf"));
+	        LOG.infof("Email [Export Dati] inviata con successo a %s", recipientEmail);
+	        return true;
+	    } catch (Exception e) {
+	        LOG.errorf(e, "ERRORE SMTP invio [Export Dati] a %s", recipientEmail);
+	        return false;
+	    }
 	}
 
 	private boolean sendEmail(String to, String subject, String body, String logType) {

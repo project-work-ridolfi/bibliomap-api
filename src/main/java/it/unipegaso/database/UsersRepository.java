@@ -1,6 +1,7 @@
 package it.unipegaso.database;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,7 +68,7 @@ public class UsersRepository implements IRepository<User>{
 			}else {
 				id = newUser.getId();
 			}
-			LocalDateTime now = LocalDateTime.now();
+			Date now = new Date();
 			newUser.setCreatedAt(now);
 			newUser.setModifiedAt(now);
 
@@ -137,7 +138,7 @@ public class UsersRepository implements IRepository<User>{
 		}
 
 		// Aggiorna il timestamp di modifica prima della sostituzione
-		user.setModifiedAt(LocalDateTime.now());
+		user.setModifiedAt( new Date());
 
 		String id = user.getId();
 

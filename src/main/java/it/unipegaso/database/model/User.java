@@ -1,7 +1,7 @@
 package it.unipegaso.database.model;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,8 +20,8 @@ public class User {
 	private String email;
 	private String hashedPassword;
 	private boolean acceptedTerms; 
-	private LocalDateTime createdAt; 
-	private LocalDateTime modifiedAt;
+	private Date createdAt; 
+	private Date modifiedAt;
 	private String locationId; 
 	private String visibility; //all, logged-in, no one
 	private int blurRadius;
@@ -58,16 +58,16 @@ public class User {
 	public void setAcceptedTerms(boolean acceptedTerms) {
 		this.acceptedTerms = acceptedTerms;
 	}
-	public LocalDateTime getCreatedAt() {
+	public Date getCreatedAt() {
 		return createdAt;
 	}
-	public void setCreatedAt(LocalDateTime createdAt) {
+	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
-	public LocalDateTime getModifiedAt() {
+	public Date getModifiedAt() {
 		return modifiedAt;
 	}
-	public void setModifiedAt(LocalDateTime modifiedAt) {
+	public void setModifiedAt(Date modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
 	public String getLocationId() {

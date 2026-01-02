@@ -13,6 +13,7 @@ import it.unipegaso.api.dto.CheckExistsResponse;
 import it.unipegaso.api.dto.ErrorResponse;
 import it.unipegaso.api.dto.SetLocationDTO;
 import it.unipegaso.api.dto.UserProfileDTO;
+import it.unipegaso.api.util.PdfGenerator;
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
@@ -384,22 +385,26 @@ public class UserResource {
 	@GET
 	@Path("/export")
 	public Response exportUserData(@Context HttpHeaders headers) {
-		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-		try {
-			User user = userService.getUserFromSession(sessionId);
+	    String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+	    try {
+	        User user = userService.getUserFromSession(sessionId);
+	        
+	        LOG.info("EMAIL     "+user.getEmail());
+	        
+	        // Recupero dati
+	        Map<String, Object> allData = userService.collectFullUserData(user);
+	        
+	        // Genero il PDF
+	        byte[] pdfContent = PdfGenerator.generateUserExportPdf(allData);
+	        
+	        // Invio email
+	        emailService.sendExportEmail(user.getEmail(), user.getUsername(), pdfContent);
 
-			// in un sistema reale qui si avvierebbe un job asincrono
-			// per ora simuliamo l'invio della mail
-			LOG.infof("Richiesta export dati per utente: %s", user.getEmail());
-
-			// TODO: implementare servizio email sendExportData(user)
-
-			return Response.ok(Map.of("message", "La richiesta è stata presa in carico. Riceverai un'email con il dump dei tuoi dati.")).build();
-		} catch (Exception e) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
-		}
+	        return Response.ok(Map.of("message", "Export inviato alla tua email!")).build();
+	    } catch (Exception e) {
+	        return Response.status(Response.Status.UNAUTHORIZED).build();
+	    }
 	}
-
 	@DELETE
 	@Path("/me")
 	public Response deleteAccount(@Context HttpHeaders headers) {

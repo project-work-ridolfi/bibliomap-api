@@ -2,9 +2,8 @@ package it.unipegaso.service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
@@ -84,7 +83,7 @@ public class LibraryService {
 			newLibrary.setLocationId(user.getLocationId());
 		}
 
-		LocalDateTime now = LocalDateTime.now();
+		Date now = new Date();
 		newLibrary.setCreatedAt(now);
 		newLibrary.setModifiedAt(now);
 
@@ -101,7 +100,7 @@ public class LibraryService {
 	public boolean updateLibrary(LibraryDTO libraryDTO, Library library) {
 
 		LOG.debug("update library init");
-		
+
 		LOG.debug("LOCATION TYPE " + libraryDTO.locationType());
 
 		library.setName(libraryDTO.name());
@@ -114,7 +113,7 @@ public class LibraryService {
 
 		String normalizedVisibility = visibility.toDbValue();
 		library.setVisibility(normalizedVisibility);
-		
+
 		library.setBlurRadius(libraryDTO.blurRadius());
 
 
@@ -130,7 +129,7 @@ public class LibraryService {
 			LOG.debug("update library location");
 		}
 
-		LocalDateTime now = LocalDateTime.now();
+		Date now = new Date();
 		library.setModifiedAt(now);
 
 		try {

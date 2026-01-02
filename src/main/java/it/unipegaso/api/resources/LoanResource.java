@@ -102,7 +102,6 @@ public class LoanResource {
 			String status = copy.getStatus();
 			String bookId = copy.getBookIsbn();
 
-			// se non è disponibile TODO usa enum
 			if(!"available".equals(status)) {
 				LOG.info("copy not available");
 				return Response.status(Response.Status.CONFLICT)

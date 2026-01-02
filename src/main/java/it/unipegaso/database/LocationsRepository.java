@@ -11,6 +11,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 
 import it.unipegaso.database.model.Location;
@@ -46,15 +47,20 @@ public class LocationsRepository implements IRepository<Location> {
 
 	@Override
 	public boolean update(Location obj) throws MongoWriteException {
-		// TODO Auto-generated method stub
+		LOG.error("le location non si aggiornano");
 		return false;
 	}
 
 	@Override
 	public boolean delete(String id) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+
+		if (id == null || id.trim().isEmpty()) {
+			return false;
+		}
+
+		DeleteResult result = locations.deleteOne(Filters.eq(ID, id));
+
+		return result.wasAcknowledged();	}
 
 	@Override
 	public FindIterable<Location> find(Bson filter) {
@@ -68,9 +74,6 @@ public class LocationsRepository implements IRepository<Location> {
 
 	public double[] getCoordinates(String locationId) {
 		return get(locationId).map(loc -> {
-			// getLocation() restituisce un Point
-			// .getCoordinates() restituisce un oggetto Position
-			// .getValues() restituisce la List<Double> [longitude, latitude]
 			List<Double> coords = loc.getLocation().getCoordinates().getValues();
 
 			if (coords.size() >= 2) {
