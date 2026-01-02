@@ -160,6 +160,48 @@ public class LibraryResource {
 
 		return Response.ok(response).build();
 	}
+	
+	
+	@PUT
+	@Path("/id")
+	public Response updateLibrary(@PathParam("id") String libraryId, @Context HttpHeaders headers, LibraryDTO request) {
+		
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+
+		try {
+			User user = userService.getUserFromSession(sessionId); 
+
+			String userId = user.getId();
+			
+			Library library = libraryService.getLibraryDetail(libraryId, userId);
+
+			if (library == null) {
+				LOG.info("LIBRERIA DA MODIFICARE NON TROVATA");
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
+			
+			if(!userId.equals(library.getOwnerId())) {
+				//non si dovrebbe mai finire qui, ma per essere certi al 100%
+				return Response.status(Response.Status.FORBIDDEN).entity(new ErrorResponse("ACTION FORBIDDEN", "l'utente non e' il proprietario della libreria")).build();
+			}
+			
+			//se riusciamo a modificare
+			if(libraryService.updateLibrary(request, library)) {
+				return Response.noContent().build();
+			}
+			else {
+				return Response.serverError().build();
+			}
+
+		}catch(NotAuthorizedException e) {
+			return e.getResponse();
+		}catch (WebApplicationException e) {
+			return e.getResponse();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+		
+	}
 
 
 	/**

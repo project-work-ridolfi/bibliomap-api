@@ -15,6 +15,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.result.UpdateResult;
 
 import it.unipegaso.database.model.Library;
 import it.unipegaso.database.model.VisibilityOptions;
@@ -65,21 +66,21 @@ public class LibrariesRepository implements IRepository<Library> {
 
 
 	public List<String> getVisibleLibraryIds(boolean logged, String userId) {
-	    Bson filter;
-	    
-	    if (logged) {
-	        filter = Filters.or(
-	            Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue()),
-	            Filters.eq(VISIBILITY, VisibilityOptions.LOGGED_IN.toDbValue()),
-	            Filters.eq(OWNER_ID, userId)
-	        );
-	    } else {
-	        filter = Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue());
-	    }
-	    
-	    return getIds(filter);
+		Bson filter;
+
+		if (logged) {
+			filter = Filters.or(
+					Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue()),
+					Filters.eq(VISIBILITY, VisibilityOptions.LOGGED_IN.toDbValue()),
+					Filters.eq(OWNER_ID, userId)
+					);
+		} else {
+			filter = Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue());
+		}
+
+		return getIds(filter);
 	}
-	
+
 	public List<String> getUserLibIds(String userId, boolean isOwner, boolean isLogged){
 		Bson filter;
 		if(isOwner) {
@@ -89,19 +90,19 @@ public class LibrariesRepository implements IRepository<Library> {
 		}else {
 			filter = Filters.and(Filters.eq(OWNER_ID, userId), Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue()));
 		}
-		
+
 		return getIds(filter);
 	}
 
 
 	private List<String> getIds(Bson filter) {
 		List<String>ids = new ArrayList<>();
-		
-		 libraries.find(filter).projection(Projections.include(ID))
-		    .forEach(lib -> {
-		        ids.add(lib.getId());
-		    });
-		    return ids;
+
+		libraries.find(filter).projection(Projections.include(ID))
+		.forEach(lib -> {
+			ids.add(lib.getId());
+		});
+		return ids;
 	};
 
 	public FindIterable<Library> getAll(String userId){
@@ -116,22 +117,27 @@ public class LibrariesRepository implements IRepository<Library> {
 
 
 	@Override
-	public boolean update(Library obj) throws MongoWriteException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean update(Library library) throws MongoWriteException {
+
+		if (library == null || library.getId().isEmpty()) {
+			return false;
+		}
+		UpdateResult result = libraries.replaceOne(Filters.eq(ID, library.getId()), library);
+
+		return result.getMatchedCount() == 1;
 	}
 
 	public void addView(String id) {
 
-	    if (id == null || id.trim().isEmpty()) {
-	        LOG.warn("ID libreria vuoto, impossibile incrementare views");
-	        return;
-	    }
+		if (id == null || id.trim().isEmpty()) {
+			LOG.warn("ID libreria vuoto, impossibile incrementare views");
+			return;
+		}
 
-	    libraries.updateOne(
-	        Filters.eq(ID, id),
-	        new org.bson.Document("$inc", new org.bson.Document("viewsCounter", 1L))
-	    );
+		libraries.updateOne(
+				Filters.eq(ID, id),
+				new org.bson.Document("$inc", new org.bson.Document("viewsCounter", 1L))
+				);
 	}
 
 
@@ -159,10 +165,10 @@ public class LibrariesRepository implements IRepository<Library> {
 	public FindIterable<Library> find(Bson filter) {
 		return libraries.find(filter);
 	}
-	
+
 	@Override
 	public long count() {
 		return libraries.countDocuments();
 	}
-	
+
 }
