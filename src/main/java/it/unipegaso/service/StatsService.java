@@ -102,7 +102,7 @@ public class StatsService {
 		ChartData titlesRanking = mapToChartData(loansRepository.getTitlesRanking(userId));
 		ChartData requesters = mapToChartData(loansRepository.getTopRequesters(userId));
 		ChartData mostViewedBooks = mapToChartData(calculateMostViewedBooks(userLibIds)); 
-		ChartData mostVisitedLibraries = mapToChartData(librariesRepository.getLibrariesViewsMap(userId, isOwner, isLogged));
+		ChartData mostVisitedLibraries = mapToChartData(librariesRepository.getUserLibrariesViewsMap(userId, isOwner, isLogged));
 
 		return new UserStatsDTO(
 				myBooks, loansIn, loansOut, 
@@ -112,35 +112,35 @@ public class StatsService {
 				);
 	}
 
-	private Map<String, Long> calculateMostViewedBooks(List<String> userLibIds) {
+	private Map<String, Long> calculateMostViewedBooks(List<String> libIds) {
+	    Map<String, Long> rawViews = copiesRepository.getViews(libIds);
 
-		Map<String, Long> rawViews = copiesRepository.getViews(userLibIds);
+	    List<String> isbns = rawViews.keySet().stream()
+	            .map(k -> {
+	            	LOG.debug("KEY RAW VIEWS " + k );
+	                String[] parts = k.split("_");
+	                return (parts.length > 1) ? parts[1] : null; 
+	            })
+	            .filter(isbn -> isbn != null && !isbn.equals("null"))
+	            .distinct()
+	            .toList();
 
-		// estrae ISBN unici
-		List<String> isbns = rawViews.keySet().stream()
-		        .map(k -> k.split("_")[1])
-		        .distinct()
-		        .toList();
+	    Map<String, String> titlesMap = booksRepository.getTitlesMap(isbns);
 
-		// recupera mappa ISBN -> titolo
-		Map<String, String> titlesMap = booksRepository.getTitlesMap(isbns);
+	    Map<String, Long> mostViewedBooks = new LinkedHashMap<>();
 
-		// costruisce mappa finale copyId _ titolo
-		Map<String, Long> mostViewedBooks = new LinkedHashMap<>();
+	    rawViews.forEach((key, views) -> {
+	        String[] parts = key.split("_");
+	        String copyId = parts[0];
+	        String isbn = (parts.length > 1) ? parts[1] : "unknown";
 
-		rawViews.forEach((key, views) -> {
-		    String[] parts = key.split("_");
-		    String copyId = parts[0];
-		    String isbn = parts[1];
+	        String title = titlesMap.getOrDefault(isbn, isbn);
+	        String finalKey = copyId + "_" + title;
 
-		    String title = titlesMap.getOrDefault(isbn, isbn);
-		    String finalKey = copyId + "_" + title;
+	        mostViewedBooks.put(finalKey, views);
+	    });
 
-		    mostViewedBooks.put(finalKey, views);
-		});
-
-		
-		return mostViewedBooks;
+	    return mostViewedBooks;
 	}
 
 	private double calculateRealMaxDistance(String userId) {
@@ -196,19 +196,22 @@ public class StatsService {
 		String topRequester = findTopUser(logged, false, userId);
 		String topLoaner = findTopUser(logged, true, userId);
 
-
-		// calcolo Distanza Massima Globale (viaggio più lungo mai fatto)
+		List<String> visibleLibraryIds = librariesRepository.getVisibleLibraryIds(logged, userId);
+		
+		// calcolo Distanza Massima Globale (viaggio piu' lungo mai fatto)
 		double maxDistGlobal = calculateGlobalMaxDistance();
 
-		// preparazione Grafici (Trend mensile globale, richieste settimanali, etc.)
+		// preparazione Grafici 
 		ChartData trend = mapToChartData(loansRepository.getMonthlyTrend(null));
 		ChartData weekly = mapToChartData(loansRepository.getWeeklyRequests(null));
 		ChartData pareto = mapToChartData(loansRepository.getTitlesRanking(null));
+		ChartData mostViewedBooks = mapToChartData(calculateMostViewedBooks(visibleLibraryIds)); 
+		ChartData mostVisitedLibraries = mapToChartData(librariesRepository.getAllLibrariesViewsMap(userId, logged));
 
 		return new GlobalStatsDTO(
 				totalBooks, totalCopies, totalLoans, 
 				topTag, Math.round(maxDistGlobal * 100.0) / 100.0, topRequester, topLoaner,
-				trend, weekly, pareto
+				trend, weekly, pareto, mostViewedBooks, mostVisitedLibraries
 				);
 	}
 
@@ -230,46 +233,44 @@ public class StatsService {
 	}
 
 	public String findTopUser(boolean logged, boolean owner, String userId) {
-
-		//ritorna top user se owner e' vero chi presta di piu' se false chi prende di piu' in prestito
-
+	    
 		MongoDatabase mongoDatabase = mongoClient.getDatabase("bibliomap");
+	    MongoCollection<Document> loans = mongoDatabase.getCollection("loans");
 
-		MongoCollection<Document> loans = mongoDatabase.getCollection("loans");
+	    List<Bson> pipeline = new ArrayList<>();
 
-		String groupField = owner ? "$owner_id" : "$requester_id";
+	    // prende utente
+	    pipeline.add(Aggregates.lookup("users", owner ? "owner_id" : "requester_id", "_id", "user"));
+	    pipeline.add(Aggregates.unwind("$user"));
 
-		List<Bson> pipeline = new ArrayList<>();
+	    //filtra in base alla visibilità
+	    List<Bson> visibilityFilters = new ArrayList<>();
+	    if (logged) {
+	        // se loggato, vedo pubblici, registrati e me stesso
+	        visibilityFilters.add(Filters.in("user.visibility", List.of("all", "logged_in")));
+	        if (userId != null) {
+	            visibilityFilters.add(Filters.eq("user._id", userId));
+	        }
+	    } else {
+	        // se guest, vedo solo i pubblici
+	        visibilityFilters.add(Filters.eq("user.visibility", "all"));
+	    }
+	    pipeline.add(Aggregates.match(Filters.or(visibilityFilters)));
 
-		pipeline.add(Aggregates.group(groupField,Accumulators.sum("count", 1)));
+	    // raggruppa per contare i prestiti/richieste degli utenti visibili
+	    pipeline.add(Aggregates.group("$_id_dell_utente_o_username", 
+	        Accumulators.first("username", "$user.username"),
+	        Accumulators.sum("count", 1)));
 
-		pipeline.add(Aggregates.sort(Sorts.descending("count")));
+	    // sort
+	    pipeline.add(Aggregates.sort(Sorts.descending("count")));
 
-		pipeline.add(Aggregates.limit(1));
+	    // prende il primo
+	    pipeline.add(Aggregates.limit(1));
 
-		pipeline.add(Aggregates.lookup("users","_id","_id","user"));
-
-		pipeline.add(Aggregates.unwind("$user"));
-
-		List<Bson> visibilityFilters = new ArrayList<>();
-
-		//se loggato l'utente stesso e' compreso a prescindere e si vedono anche quelli con visibilita' logged_in
-		if (logged) {
-			visibilityFilters.add(Filters.in("user.visibility", List.of("all", "logged_in")));
-			visibilityFilters.add(Filters.eq("user._id", userId));
-		} else {
-			visibilityFilters.add(Filters.eq("user.visibility", "all"));
-		}
-
-		pipeline.add(Aggregates.match(Filters.or(visibilityFilters)));
-
-		pipeline.add(Aggregates.project(new Document("username", "$user.username")));
-
-		Document result = loans.aggregate(pipeline).first();
-
-		return result != null ? result.getString("username") : null;
+	    Document result = loans.aggregate(pipeline).first();
+	    return result != null ? result.getString("username") : null;
 	}
-
 	private double calculateGlobalMaxDistance() {
 		List<Loan> finishedLoans = loansRepository.findFinished();
 		double max = 0.0;

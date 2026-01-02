@@ -10,6 +10,8 @@ public record GlobalStatsDTO(
 	    String topLoaner,
 	    ChartData loansTrend,
 	    ChartData weeklyRequests,
-	    ChartData paretoBooks) {
+	    ChartData paretoBooks,
+	    ChartData mostViewedBooks,
+	    ChartData mostVisitedLibraries) {
 
 }
