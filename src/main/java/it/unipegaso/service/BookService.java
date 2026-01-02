@@ -168,7 +168,7 @@ public class BookService {
 						lib.getString("name"),
 						lib.getString("_id"),
 						copy.getString("status"),
-						copy.getLong("views_counter"),
+						(long)copy.getOrDefault("views_counter", 0L),
 						finalLat,
 						finalLng,
 						doc.getDouble("distance") / 1000.0,

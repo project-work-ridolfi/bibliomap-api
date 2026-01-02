@@ -61,7 +61,7 @@ public class BookResource {
 					.entity(new ErrorResponse("BAD_REQUEST", "Coordinate mancanti"))
 					.build();
 		}
-		if (radius == null) radius = 10.0; // Aumentiamo un po' il default a 10km
+		if (radius == null) radius = 10.0; 
 		if (visibility == null) visibility = "public";
 		if (sortBy == null) sortBy = "distance"; // Default sorting
 
