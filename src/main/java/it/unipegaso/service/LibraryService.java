@@ -99,6 +99,8 @@ public class LibraryService {
 	public boolean updateLibrary(LibraryDTO libraryDTO, Library library) {
 
 		LOG.debug("update library init");
+		
+		LOG.debug("LOCATION TYPE " + libraryDTO.locationType());
 
 		library.setName(libraryDTO.name());
 
@@ -113,7 +115,6 @@ public class LibraryService {
 		
 		library.setBlurRadius(libraryDTO.blurRadius());
 
-		LOG.info("library creata");
 
 		if ("new_location".equals(libraryDTO.locationType()) && libraryDTO.latitude() != null) {
 			// Creiamo una nuova entry nella collection locations
@@ -124,17 +125,16 @@ public class LibraryService {
 			// Salviamo tramite il repository delle location
 			String newLocationId = locationsRepository.create(newLoc);
 			library.setLocationId(newLocationId);
+			LOG.debug("update library location");
 		}
 
 		LocalDateTime now = LocalDateTime.now();
 		library.setModifiedAt(now);
 
 		try {
-
-			LOG.debug("create library");
 			return librariesRepository.update(library);
 		} catch (Exception e) {
-			throw new RuntimeException("fallimento creazione libreria db", e);
+			throw new RuntimeException("fallimento modifica libreria db", e);
 		}
 	}
 

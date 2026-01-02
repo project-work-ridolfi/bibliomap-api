@@ -163,7 +163,7 @@ public class LibraryResource {
 	
 	
 	@PUT
-	@Path("/id")
+	@Path("/{id}")
 	public Response updateLibrary(@PathParam("id") String libraryId, @Context HttpHeaders headers, LibraryDTO request) {
 		
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
