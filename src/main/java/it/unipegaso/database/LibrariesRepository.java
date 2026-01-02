@@ -1,7 +1,9 @@
 package it.unipegaso.database;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -93,7 +95,40 @@ public class LibrariesRepository implements IRepository<Library> {
 
 		return getIds(filter);
 	}
+	
+	public Map<String, Long> getLibrariesViewsMap(String userId, boolean isOwner, boolean isLogged) {
 
+	    Map<String, Long> result = new HashMap<>();
+	    Bson filter;
+
+	    if (isOwner) {
+	        filter = Filters.eq(OWNER_ID, userId);
+	    } else if (isLogged) {
+	        filter = Filters.and(
+	                Filters.eq(OWNER_ID, userId),
+	                Filters.ne(VISIBILITY, VisibilityOptions.PRIVATE.toDbValue())
+	        );
+	    } else {
+	        filter = Filters.and(
+	                Filters.eq(OWNER_ID, userId),
+	                Filters.eq(VISIBILITY, VisibilityOptions.ALL.toDbValue())
+	        );
+	    }
+
+	    libraries.find(filter)
+	            .projection(Projections.include(ID, "name", "viewsCounter"))
+	            .forEach(lib -> {
+	                String key = lib.getId() + "_" + lib.getName();
+	                Long views = lib.getViewsCounter() != 0 ? lib.getViewsCounter() : 0L;
+	                
+	                LOG.debug("LIBRARY " + key + " VISITATA: " + views);
+	                result.put(key, views);
+	            });
+
+	    return result;
+	}
+
+	
 
 	private List<String> getIds(Bson filter) {
 		List<String>ids = new ArrayList<>();
@@ -128,6 +163,8 @@ public class LibrariesRepository implements IRepository<Library> {
 	}
 
 	public void addView(String id) {
+		
+		LOG.debug("ADD VIEW TO LIBRARY");
 
 		if (id == null || id.trim().isEmpty()) {
 			LOG.warn("ID libreria vuoto, impossibile incrementare views");

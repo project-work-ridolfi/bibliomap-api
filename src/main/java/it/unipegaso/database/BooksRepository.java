@@ -5,6 +5,7 @@ import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Sorts.descending;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -59,20 +60,39 @@ public class BooksRepository implements IRepository<Book> {
         return Optional.ofNullable(books.find(Filters.eq("_id", isbn)).first());
     }
     
+    public Map<String, String> getTitlesMap(List<String> isbns) {
+
+        Map<String, String> titlesMap = new HashMap<>();
+
+        if (isbns == null || isbns.isEmpty()) {
+            return titlesMap;
+        }
+
+        books.find(Filters.in("_id", isbns))
+             .projection(new Document("_id", 1).append("title", 1))
+             .forEach(book -> {
+                 titlesMap.put(book.getIsbn(), book.getTitle());
+             });
+
+        return titlesMap;
+    }
+
+    
     @Override
     public FindIterable<Book>find (Bson filter){
     	return books.find(filter);
     }
 
 	@Override
-	public boolean update(Book obj) throws MongoWriteException {
-		// TODO Auto-generated method stub
+	public boolean update(Book book) throws MongoWriteException {
+		LOG.error(" IL LIBRO NON DOVREBBE MAI ESSERE MODIFICATO");
 		return false;
 	}
 
 	@Override
 	public boolean delete(String id) {
-		// TODO Auto-generated method stub
+		LOG.error(" IL LIBRO NON DOVREBBE MAI ESSERE ELIMINATO");
+		
 		return false;
 	}
 

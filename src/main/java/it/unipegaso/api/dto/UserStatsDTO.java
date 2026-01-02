@@ -8,7 +8,9 @@ public record UserStatsDTO(
 	    double maxDistance,
 	    String topPartner,
 	    ChartData loansTrend,
-	    ChartData weeklyRequests,
-	    ChartData paretoBooks,
-	    ChartData topRequesters
+	    ChartData tags,
+	    ChartData titlesRanking,
+	    ChartData topRequesters,
+	    ChartData mostViewedBooks,
+	    ChartData mostVisitedLibraries
 	) {}

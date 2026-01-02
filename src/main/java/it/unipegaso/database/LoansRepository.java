@@ -178,10 +178,8 @@ public class LoansRepository implements IRepository<Loan> {
 	        pipeline.add(match(eq(OWNER_ID, userId)));
 	    }
 
-	    // Concateniamo copy_id e title usando l'operatore $concat di MongoDB
-	    // "ID_COPIA:TITOLO_LIBRO"
 	    pipeline.add(group(
-	        new Document("$concat", Arrays.asList("$copy_id", ":", "$title")), 
+	        new Document("$concat", Arrays.asList("$copy_id", "_", "$title")), 
 	        sum("count", 1)
 	    ));
 

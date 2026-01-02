@@ -1,6 +1,7 @@
 package it.unipegaso.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,25 +85,62 @@ public class StatsService {
 			Optional<User> op = usersRepository.get(bffId);
 			
 			if(op.isPresent()) {
-				partner = op.get().getUsername();
+				
+				User user = op.get();
+				
+				partner = user.getUsername() + "_" + user.getId();
 			}
 			
 		}
 
 		// Calcolo Distanza Massima Geografica
 		double maxDist = calculateRealMaxDistance(userId);
-
+		
 		// Preparazione Grafici
 		ChartData trend = mapToChartData(loansRepository.getMonthlyTrend(userId));
 		ChartData tags = mapToChartData(copiesRepository.getTags(userLibIds));
-		ChartData pareto = mapToChartData(loansRepository.getTitlesRanking(userId));
+		ChartData titlesRanking = mapToChartData(loansRepository.getTitlesRanking(userId));
 		ChartData requesters = mapToChartData(loansRepository.getTopRequesters(userId));
+		ChartData mostViewedBooks = mapToChartData(calculateMostViewedBooks(userLibIds)); 
+		ChartData mostVisitedLibraries = mapToChartData(librariesRepository.getLibrariesViewsMap(userId, isOwner, isLogged));
 
 		return new UserStatsDTO(
 				myBooks, loansIn, loansOut, 
 				topTag, Math.round(maxDist * 100.0) / 100.0, partner,
-				trend, tags, pareto, requesters
+				trend, tags, titlesRanking, requesters,
+				mostViewedBooks, mostVisitedLibraries
 				);
+	}
+
+	private Map<String, Long> calculateMostViewedBooks(List<String> userLibIds) {
+
+		Map<String, Long> rawViews = copiesRepository.getViews(userLibIds);
+
+		// estrae ISBN unici
+		List<String> isbns = rawViews.keySet().stream()
+		        .map(k -> k.split("_")[1])
+		        .distinct()
+		        .toList();
+
+		// recupera mappa ISBN -> titolo
+		Map<String, String> titlesMap = booksRepository.getTitlesMap(isbns);
+
+		// costruisce mappa finale copyId _ titolo
+		Map<String, Long> mostViewedBooks = new LinkedHashMap<>();
+
+		rawViews.forEach((key, views) -> {
+		    String[] parts = key.split("_");
+		    String copyId = parts[0];
+		    String isbn = parts[1];
+
+		    String title = titlesMap.getOrDefault(isbn, isbn);
+		    String finalKey = copyId + "_" + title;
+
+		    mostViewedBooks.put(finalKey, views);
+		});
+
+		
+		return mostViewedBooks;
 	}
 
 	private double calculateRealMaxDistance(String userId) {

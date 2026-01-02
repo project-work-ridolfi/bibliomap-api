@@ -10,6 +10,7 @@ import static com.mongodb.client.model.Sorts.descending;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,29 +160,66 @@ public class CopiesRepository implements IRepository<Copy> {
 	}
 
 	public Map<String, Long> getTags(List<String> userLibIds) {
-		
-	    Map<String, Long> tagsMap = new LinkedHashMap<>();
 
-	    if (userLibIds == null || userLibIds.isEmpty()) {
-	        return tagsMap;
-	    }
+		Map<String, Long> tagsMap = new LinkedHashMap<>();
 
-	    List<Bson> pipeline = Arrays.asList(
-	            match(Filters.in("libraryId", userLibIds)),
-	            unwind("$tags"),
-	            group("$tags", sum("count", 1)),
-	            sort(descending("count"))
-	    );
+		if (userLibIds == null || userLibIds.isEmpty()) {
+			return tagsMap;
+		}
 
-	    copies.withDocumentClass(Document.class)
-	            .aggregate(pipeline)
-	            .forEach(doc -> {
-	                String tagName = doc.getString("_id");
-	                Long count = doc.getInteger("count").longValue();
-	                tagsMap.put(tagName, count);
-	            });
+		List<Bson> pipeline = Arrays.asList(
+				match(Filters.in("libraryId", userLibIds)),
+				unwind("$tags"),
+				group("$tags", sum("count", 1)),
+				sort(descending("count"))
+				);
 
-	    return tagsMap;
+		copies.withDocumentClass(Document.class)
+		.aggregate(pipeline)
+		.forEach(doc -> {
+			String tagName = doc.getString("_id");
+			Long count = doc.getInteger("count").longValue();
+			tagsMap.put(tagName, count);
+		});
+
+		return tagsMap;
 	}
+
+	public Map<String, Long> getViews(List<String> userLibIds) {
+
+		Map<String, Long> result = new HashMap<>();
+
+		if (userLibIds == null || userLibIds.isEmpty()) {
+			return result;
+		}
+
+		List<Bson> pipeline = Arrays.asList(
+				// prende solo le copie delle librerie del proprietario
+				match(Filters.in(LIBRARY_ID, userLibIds)),
+
+				// proietta solo i campi che servono
+				new Document("$project", new Document()
+						.append("_id", 1)
+						.append("book_isbn", 1)
+						.append("views_counter", 1)
+						),
+
+				sort(descending("views_counter"))
+				);
+
+		copies.withDocumentClass(Document.class)
+		.aggregate(pipeline)
+		.forEach(doc -> {
+			String copyId = doc.getString("_id");
+			String title = doc.getString("book_isbn"); 
+			Long views = doc.getLong("views_counter");
+
+			String key = copyId + "_" + title;
+			result.put(key, views != null ? views : 0L);
+		});
+
+		return result;
+	}
+
 
 }
