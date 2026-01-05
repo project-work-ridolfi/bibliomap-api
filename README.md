@@ -238,7 +238,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
  - [x] controllo visualizzazione messaggio mock
  - [x] email fatta meglio 
     - [x] aggiungi css coerente al fe alle mail
-- [ ] reinvio otp
+- [x] reinvio otp
 - [x] salvataggio dati location
 - [x] riorganizza registration dto, usa solo uno con valori nullable
 - [x] usa error message sempre nei casi di errore (no mappa)

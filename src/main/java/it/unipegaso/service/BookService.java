@@ -79,7 +79,7 @@ public class BookService {
 		// 3. Filtri preliminari su Library
 		List<Bson> libraryFilters = new ArrayList<>();
 		List<String> allowedVisibilities = new ArrayList<>(Arrays.asList("all"));
-		if ("logged-in".equals(visibilityFilter)) allowedVisibilities.add("logged-in");
+		if ("logged_in".equals(visibilityFilter)) allowedVisibilities.add("logged_in");
 		libraryFilters.add(Filters.in("library.visibility", allowedVisibilities));
 
 		if (excludeUserId != null && !excludeUserId.trim().isEmpty()) {
@@ -251,7 +251,7 @@ public class BookService {
 							: "data:image/jpeg;base64," + rawCustomCover;
 		}
 
-		long counter = (long) doc.getOrDefault("view_counter", 0L);
+		long counter = (long) doc.getOrDefault("views_counter", 0L);
 
 		String username = (owner != null) ? owner.getString("username") : "Utente Bibliomap";
 
@@ -464,4 +464,117 @@ public class BookService {
 		}
 		return results;
 	}
+
+	public BookDetailDTO getSimilar(String copyId, String currentUserId, boolean isLogged) {
+        
+		// recupero dettagli della copia di riferimento
+        BookDetailDTO reference = getBookDetails(copyId);
+        if (reference == null) {
+        	return null;
+        }
+
+        // coordinate della libreria 
+        Optional<Library> libOpt = librariesRepository.get(reference.libraryId());
+        if (libOpt.isEmpty()) {
+        	return null;
+        }
+        
+        MongoCollection<Document> locationsCol = mongoClient.getDatabase("bibliomap").getCollection("locations");
+        Document locDoc = locationsCol.find(Filters.eq("_id", libOpt.get().getLocationId())).first();
+        if (locDoc == null) {
+        	return null;
+        }
+
+        Document geo = locDoc.get("geolocation", Document.class);
+        List<Double> coords = geo.getList("coordinates", Double.class);
+        
+        double lng = coords.get(0);
+        double lat = coords.get(1);
+
+        // visibilita' in base a logged
+        List<String> allowedVisibilities = new ArrayList<>();
+        allowedVisibilities.add("all");
+        if (isLogged) {
+            allowedVisibilities.add("logged_in");
+        }
+
+        // ricerca spaziale incrementale 
+        double currentRadius = 0.5; // start 500m
+        double maxRadius = 10.0;    // max 10km
+        double step = 0.5;          // incremento 500m
+
+        while (currentRadius <= maxRadius) {
+            List<Bson> pipeline = new ArrayList<>();
+
+            // GeoNear
+            Document geoNear = new Document("$geoNear", new Document()
+                    .append("near", new Document("type", "Point").append("coordinates", Arrays.asList(lng, lat)))
+                    .append("distanceField", "distance")
+                    .append("maxDistance", currentRadius * 1000)
+                    .append("spherical", true));
+            pipeline.add(geoNear);
+
+            //join con Libraries per visibilita e proprietario
+            pipeline.add(new Document("$lookup", new Document()
+                    .append("from", "libraries")
+                    .append("localField", "_id")
+                    .append("foreignField", "locationId")
+                    .append("as", "library")));
+            pipeline.add(new Document("$unwind", "$library"));
+
+            List<Bson> libraryFilters = new ArrayList<>();
+            libraryFilters.add(Filters.in("library.visibility", allowedVisibilities));
+            
+            // esclude i libri dell'utente se loggato
+            if (currentUserId != null) {
+                libraryFilters.add(Filters.ne("library.ownerId", currentUserId));
+            }
+            pipeline.add(Aggregates.match(Filters.and(libraryFilters)));
+
+            // join con Copies per stato e tag
+            pipeline.add(new Document("$lookup", new Document()
+                    .append("from", "copies")
+                    .append("localField", "library._id")
+                    .append("foreignField", "libraryId")
+                    .append("as", "copy")));
+            pipeline.add(new Document("$unwind", "$copy"));
+            
+            // esclude la copia corrente e mostra solo disponibili
+            pipeline.add(Aggregates.match(Filters.and(
+                    Filters.ne("copy._id", copyId),
+                    Filters.eq("copy.status", "available")
+            )));
+
+            // join con Books per Autore
+            pipeline.add(new Document("$lookup", new Document()
+                    .append("from", "books")
+                    .append("localField", "copy.book_isbn")
+                    .append("foreignField", "_id")
+                    .append("as", "bookInfo")));
+            pipeline.add(new Document("$unwind", "$bookInfo"));
+
+            // filtro Similitudine (Stesso Autore OPPURE uno dei Tag in comune)
+            List<Bson> similarityOr = new ArrayList<>();
+            similarityOr.add(Filters.eq("bookInfo.author", reference.author()));
+            if (reference.tags() != null && !reference.tags().isEmpty()) {
+                similarityOr.add(Filters.in("copy.tags", reference.tags()));
+            }
+            pipeline.add(Aggregates.match(Filters.or(similarityOr)));
+
+            // prende il più vicino
+            pipeline.add(Aggregates.sort(Sorts.ascending("distance")));
+            pipeline.add(Aggregates.limit(1));
+
+            Document result = locationsCol.aggregate(pipeline).first();
+
+            if (result != null) {
+                String foundCopyId = result.get("copy", Document.class).getString("_id");
+                return getBookDetails(foundCopyId);
+            }
+
+            currentRadius += step;
+        }
+
+        return null;
+    }
 }

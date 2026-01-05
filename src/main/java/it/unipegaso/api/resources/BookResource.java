@@ -7,8 +7,10 @@ import it.unipegaso.api.dto.BookDetailDTO;
 import it.unipegaso.api.dto.BookMapDTO;
 import it.unipegaso.api.dto.BookMultipartBody;
 import it.unipegaso.api.dto.ErrorResponse;
+import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.BooksRepository;
 import it.unipegaso.database.model.Book;
+import it.unipegaso.database.model.User;
 import it.unipegaso.service.BookService;
 import it.unipegaso.service.GoogleBooksService;
 import it.unipegaso.service.LibraryService;
@@ -21,6 +23,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -109,6 +113,33 @@ public class BookResource {
 		return Response.ok(detail).build();
 	}
 
+	@GET
+	@Path("/{id}/similar")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSimilarBook(@PathParam("id") String copyId, @Context HttpHeaders headers) {
+		
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		String currentUserId = null;
+		boolean logged = false;
+
+		try {
+			User currentUser = userService.getUserFromSession(sessionId);
+			currentUserId = currentUser.getId();
+			logged = true;
+		} catch (Exception e) {
+			// utente non loggato, procediamo come guest (currentUserId resta null)
+		}
+
+		BookDetailDTO similarBookDetails = bookService.getSimilar(copyId,currentUserId, logged);
+		
+		if (similarBookDetails == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+
+		return Response.ok(similarBookDetails).build();
+		
+	}
+	
 	@GET
 	@Path("/external/search-isbn")
 	@Produces(MediaType.APPLICATION_JSON)
