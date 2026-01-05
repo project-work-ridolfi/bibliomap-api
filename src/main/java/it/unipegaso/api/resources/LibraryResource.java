@@ -130,7 +130,7 @@ public class LibraryResource {
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
-		List<BookDetailDTO> books = bookService.getBooksByLibrary(libraryId);
+		List<BookDetailDTO> books = bookService.getBooksByLibrary(libraryId, 0.0);
 
 		// costruisco la risposta includendo i libri e la posizione
 		Map<String, Object> response = new HashMap<>();

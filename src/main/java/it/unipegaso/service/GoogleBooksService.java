@@ -155,7 +155,8 @@ public class GoogleBooksService {
 					null, // status
 					null, // ownerNotes
 					null,  // tags
-					0
+					0,
+					0.0
 					);
 
 		} catch (Exception e) {

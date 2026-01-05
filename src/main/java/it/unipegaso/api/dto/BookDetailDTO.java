@@ -29,7 +29,8 @@ public record BookDetailDTO(
 		String status,
 		String ownerNotes,
 		List<String> tags,
-		long views
+		long views,
+		double distance
 		) {}
 
 

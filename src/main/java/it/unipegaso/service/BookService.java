@@ -185,7 +185,7 @@ public class BookService {
 		return results;
 	}
 
-	public BookDetailDTO getBookDetails(String copyId) {
+	public BookDetailDTO getBookDetails(String copyId, double distance) {
 		MongoCollection<Document> copiesCol = mongoClient.getDatabase("bibliomap").getCollection("copies");
 
 		// +1 alle visualizzazioni
@@ -225,10 +225,10 @@ public class BookService {
 			return null;
 		}
 
-		return mapToDetailDTO(result);
+		return mapToDetailDTO(result, distance);
 	}
 
-	private BookDetailDTO mapToDetailDTO(Document doc) {
+	private BookDetailDTO mapToDetailDTO(Document doc, double distance) {
 		Document book = doc.get("bookInfo", Document.class);
 		Document lib = doc.get("libraryInfo", Document.class);
 		Document owner = doc.get("ownerInfo", Document.class);
@@ -274,7 +274,8 @@ public class BookService {
 				doc.getString("status"),
 				doc.getString("owner_notes"),
 				doc.getList("tags", String.class),
-				counter);
+				counter,
+				distance);
 	}
 
 	public List<Book> findExistingBooks(String author, String title, int year, String publisher, String language) {
@@ -423,7 +424,7 @@ public class BookService {
 		}
 	}
 
-	public List<BookDetailDTO> getBooksByLibrary(String libraryId) {
+	public List<BookDetailDTO> getBooksByLibrary(String libraryId, double distance) {
 		LOG.debug("recupero libri per libreria: " + libraryId);
 
 		// recupero tutte le copie associate alla libreria
@@ -458,7 +459,8 @@ public class BookService {
 						copy.getStatus(),
 						copy.getOwnerNotes(),
 						copy.getTags(),
-						copy.getViewsCounter()
+						copy.getViewsCounter(),
+						distance
 						));
 			}
 		}
@@ -468,7 +470,7 @@ public class BookService {
 	public BookDetailDTO getSimilar(String copyId, String currentUserId, boolean isLogged) {
         
 		// recupero dettagli della copia di riferimento
-        BookDetailDTO reference = getBookDetails(copyId);
+        BookDetailDTO reference = getBookDetails(copyId, 0L);
         if (reference == null) {
         	return null;
         }
@@ -569,7 +571,7 @@ public class BookService {
 
             if (result != null) {
                 String foundCopyId = result.get("copy", Document.class).getString("_id");
-                return getBookDetails(foundCopyId);
+                return getBookDetails(foundCopyId, currentRadius);
             }
 
             currentRadius += step;

@@ -104,7 +104,7 @@ public class BookResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getBook(@PathParam("id") String copyId) {
 
-		BookDetailDTO detail = bookService.getBookDetails(copyId);
+		BookDetailDTO detail = bookService.getBookDetails(copyId, 0.0);
 
 		if (detail == null) {
 			return Response.status(Response.Status.NOT_FOUND).build();
@@ -200,7 +200,8 @@ public class BookResource {
 					null, // status
 					null, // ownerNotes
 					null,  // tags
-					0
+					0,
+					0.0
 					);
 		}
 		else{
