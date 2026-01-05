@@ -237,7 +237,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
  - [x] accedi
  - [x] controllo visualizzazione messaggio mock
  - [x] email fatta meglio 
-    - [ ] aggiungi css coerente al fe alla mail
+    - [x] aggiungi css coerente al fe alle mail
 - [ ] reinvio otp
 - [x] salvataggio dati location
 - [x] riorganizza registration dto, usa solo uno con valori nullable

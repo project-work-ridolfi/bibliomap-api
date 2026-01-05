@@ -271,6 +271,14 @@ public class LoanResource {
 						.entity(new ErrorResponse("UPDATE_FAILED", "Impossibile aggiornare stato copia, operazione annullata")).build();
 			}
 
+			
+			if(isOwner) {
+				emailService.sendLoanStartedEmail(loan, currentUser, userRepository.get(loan.getRequesterId()).get());
+			}else {
+				emailService.sendLoanStartedEmail(loan, userRepository.get(loan.getOwnerId()).get(), currentUser);
+			}
+			
+			
 			return Response.ok().build();
 
 		} catch (NotAuthorizedException e) {

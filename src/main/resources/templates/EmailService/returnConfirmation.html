@@ -2,28 +2,91 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Prestito Concluso</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: sans-serif; line-height: 1.6; color: #333; }
-        .container { padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; }
-        .header { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        .footer { font-size: 0.8em; color: #7f8c8d; margin-top: 20px; }
-        .button { background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px; }
+        body {
+            background-color: #ffffff;
+            color: #495d63;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .page-wrapper {
+            background-color: #f9fafb;
+            padding: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #d7bcc8;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            padding: 32px 24px 16px 24px;
+            border-bottom: 1px solid #d7bcc8;
+        }
+        .header h1 {
+            color: #629677;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .content {
+            padding: 24px;
+            font-size: 14px;
+        }
+    
+        /* bottone paynes gray come nel sito */
+        .btn-dashboard {
+            display: inline-block;
+            background-color: #495d63;
+            color: #ffffff !important;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 16px 24px;
+            border-top: 1px solid #d7bcc8;
+            font-size: 11px;
+            color: #98b6b1;
+            text-align: center;
+        }
+        .brand {
+            font-weight: bold;
+            color: #495d63;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 class="header">Ciao {recipientName},</h2>
-        <p>Ti informiamo che il prestito del libro <strong>{bookTitle}</strong> è stato ufficialmente concluso dal proprietario.</p>
-        <p>Speriamo che la lettura sia stata piacevole e che l'esperienza di condivisione con Bibliomap ti abbia soddisfatto.</p>
-        
-        <p>Puoi controllare lo storico dei tuoi prestiti o cercarne di nuovi nella tua dashboard:</p>
-        
-        <a href="{dashboardUrl}" class="button">Vai alla Dashboard</a>
-
-        <div class="footer">
-            <p>Grazie per far parte della nostra comunità di lettori.</p>
-            <p>Team Bibliomap </p>
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Prestito Concluso</h1>
+            </div>
+            <div class="content">
+                <p>Ciao {recipientName},</p>
+                <p>Ti informiamo che il prestito di <strong>{bookTitle}</strong> è stato ufficialmente concluso dal proprietario.</p>
+              
+                <p>Speriamo che la lettura sia stata piacevole e che l'esperienza di condivisione con Bibliomap ti abbia soddisfatto.</p>
+                
+                <p>Accedi al sito per controllare lo stato di tutti i tuoi prestiti:</p>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="{dashboardUrl}" class="btn-dashboard">Vai alla Dashboard</a>
+                </div>
+            </div>
+            <div class="footer">
+                <p>Il team di <span class="brand">Bibliomap</span></p>
+            </div>
         </div>
     </div>
 </body>

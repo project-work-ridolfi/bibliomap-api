@@ -183,6 +183,7 @@ public class EmailService {
 
 	    return sendEmail(recipientEmail, subject, htmlBody, "Codice OTP");
 	}
+	
 	// invia notifica di conferma eliminazione account
 	public boolean sendAccountDeletedEmail(String recipientEmail, String recipientName) {
 	    Map<String, Object> data = new HashMap<>();
@@ -212,12 +213,16 @@ public class EmailService {
 	}
 	
 	public void sendLoanStartedEmail(Loan loan, User owner, User requester) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	    String formattedReturnDate = loan.getExpectedReturnDate() != null ? sdf.format(loan.getExpectedReturnDate()) : "N/D";
+
 	    // Email per il richiedente
 	    Map<String, Object> reqData = new HashMap<>();
 	    reqData.put("recipientName", requester.getUsername());
 	    reqData.put("bookTitle", loan.getTitle());
 	    reqData.put("partnerName", owner.getUsername());
-	    reqData.put("returnDate", loan.getExpectedReturnDate());
+	    reqData.put("returnDate", formattedReturnDate);
 	    reqData.put("isOwner", false);
 	    
 	    String htmlBody = loanStartedTemplate
@@ -231,9 +236,8 @@ public class EmailService {
 	    ownerData.put("recipientName", owner.getUsername());
 	    ownerData.put("bookTitle", loan.getTitle());
 	    ownerData.put("partnerName", requester.getUsername());
-	    ownerData.put("returnDate", loan.getExpectedReturnDate());
+	    ownerData.put("returnDate", formattedReturnDate); 
 	    ownerData.put("isOwner", true);
-	    
 	    
 	    htmlBody = loanStartedTemplate
 	            .data(ownerData)

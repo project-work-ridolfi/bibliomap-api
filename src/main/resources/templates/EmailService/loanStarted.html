@@ -1,17 +1,99 @@
-<div style="font-family: sans-serif; color: #333;">
-    <h2>bibliomap - conferma prestito</h2>
-    <p>Ciao {recipientName},</p>
-    <p>lo scambio per il libro <strong>{bookTitle}</strong> è avvenuto con successo.</p>
-    <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #629677;">
-        {#if isOwner}
-            hai consegnato il libro a: <strong>{partnerName}</strong>
-        {#else}
-            hai ricevuto il libro da: <strong>{partnerName}</strong>
-        {/if}
-        <br>
-        la data di restituzione prevista è <strong>{returnDate.format('dd/MM/yyyy')}</strong>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* stile coerente con il frontend */
+        body {
+            background-color: #ffffff;
+            color: #495d63;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .page-wrapper {
+            background-color: #f9fafb;
+            padding: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #d7bcc8;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            padding: 32px 24px 16px 24px;
+            border-bottom: 1px solid #d7bcc8;
+        }
+        .header h1 {
+            color: #629677;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .content {
+            padding: 24px;
+            font-size: 14px;
+        }
+        .loan-status-box {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-left: 4px solid #629677;
+            border-radius: 4px;
+            margin: 20px 0;
+            color: #495d63;
+        }
+        .date-highlight {
+            color: #629677;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 16px 24px;
+            border-top: 1px solid #d7bcc8;
+            font-size: 11px;
+            color: #98b6b1;
+            text-align: center;
+        }
+        .brand {
+            font-weight: bold;
+            color: #495d63;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Conferma Prestito</h1>
+            </div>
+            <div class="content">
+                <p>Ciao {recipientName},</p>
+                <p>lo scambio per il libro <strong>{bookTitle}</strong> è avvenuto con successo.</p>
+                
+                <div class="loan-status-box">
+                    {#if isOwner}
+                        Hai consegnato il libro a: <strong>{partnerName}</strong>
+                    {#else}
+                        Hai ricevuto il libro da: <strong>{partnerName}</strong>
+                    {/if}
+                    <br>
+                    La data di restituzione prevista è <span class="date-highlight">{returnDate}</span>
+                </div>
+
+                {#if !isOwner}
+                    <p>Mi raccomando, ricordati di restituire il libro entro la data indicata!</p>
+                {/if}
+            </div>
+            <div class="footer">
+                Il team di <span class="brand">Bibliomap</span>
+            </div>
+        </div>
     </div>
-    {#if !isOwner}
-        <p>Mi raccomando, ricordati di restituire il libro entro la data indicata!</p>
-    {/if}
-</div>
+</body>
+</html>

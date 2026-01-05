@@ -1,64 +1,138 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        .container { font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto; line-height: 1.6; }
-        .header { padding: 20px 0; border-bottom: 2px solid #ddd; }
-        .content { padding: 20px 0; }
-        .status-box { padding: 15px; border-radius: 5px; margin: 20px 0; font-weight: bold; text-align: center; color: white;}
+        /* stile allineato ai colori e componenti del sito */
+        body {
+            background-color: #ffffff;
+            color: #495d63;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .page-wrapper {
+            background-color: #f9fafb;
+            padding: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #d7bcc8;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            padding: 32px 24px 16px 24px;
+            border-bottom: 1px solid #d7bcc8;
+        }
+        .header h1 {
+            color: #495d63;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .content {
+            padding: 24px;
+            font-size: 14px;
+        }
+        /* box stato basati su zomp per accettazione e tea-rose per rifiuto */
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
         .accepted { background-color: #629677; }
-        .rejected { background-color: #d9534f; }
-        .info-section { background-color: #f8f9fa; border-left: 4px solid #629677; padding: 15px; margin: 15px 0; }
-        .label { font-size: 11px; text-transform: uppercase; color: #777; font-weight: bold; display: block; margin-bottom: 5px; }
-        .footer { font-size: 12px; color: #777; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; }
+        .rejected { background-color: #fac8cd; color: #495d63; }
+        
+        /* sezioni informative basate su ash-gray */
+        .info-section {
+            background-color: #f9fafb;
+            border-left: 4px solid #98b6b1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #98b6b1;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 16px 24px;
+            border-top: 1px solid #d7bcc8;
+            font-size: 11px;
+            color: #98b6b1;
+            text-align: center;
+        }
+        .brand {
+            font-weight: bold;
+            color: #495d63;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2 style="color: #495d63;">Bibliomap - Aggiornamento Prestito</h2>
-        </div>
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Aggiornamento Prestito</h1>
+            </div>
 
-        <div class="content">
-            <p>ciao <strong>{recipientName}</strong>,</p>
-            <p>ci sono novità riguardo la tua richiesta per il libro: <em>"{bookTitle}"</em>.</p>
+            <div class="content">
+                <p>Ciao <strong>{recipientName}</strong>,</p>
+                <p>ci sono novità riguardo la tua richiesta per il libro: <em>"{bookTitle}"</em>.</p>
 
-            {#if isAccepted}
-                <div class="status-box accepted">LA TUA RICHIESTA E STATA ACCETTATA</div>
-                <p>il proprietario ha accettato il prestito. ecco i dettagli per l'incontro:</p>
+                {#if isAccepted}
+                    <div class="status-box accepted">LA TUA RICHIESTA È STATA ACCETTATA</div>
+                    <p>Il proprietario ha accettato il prestito. Ecco i dettagli per l'incontro:</p>
 
-                {#if ownerNotes}
-                <div class="info-section">
-                    <span class="label">messaggio del proprietario</span>
-                    <div style="white-space: pre-wrap;">{ownerNotes}</div>
-                </div>
+                    {#if ownerNotes}
+                    <div class="info-section">
+                        <span class="label">Messaggio del proprietario:</span>
+                        <div style="white-space: pre-wrap;">{ownerNotes}</div>
+                    </div>
+                    {/if}
+
+                    {#if days}
+                    <div class="info-section">
+                        <span class="label">Giorni disponibili per lo scambio:</span>
+                        <div>{days}</div>
+                    </div>
+                    {/if}
+
+                    {#if slots}
+                    <div class="info-section">
+                        <span class="label">Fasce orarie:</span>
+                        <div>{slots}</div>
+                    </div>
+                    {/if}
+
+                    <p style="margin-top: 20px;">Controlla la tua dashboard per confermare la ricezione del libro quando avverrà lo scambio.</p>
+                {#else}
+                    <div class="status-box rejected">LA TUA RICHIESTA È STATA RIFIUTATA</div>
+                    <p>Ci dispiace, ma il proprietario non può prestare questo libro al momento.</p>
                 {/if}
 
-                {#if days}
-                <div class="info-section">
-                    <span class="label">giorni disponibili</span>
-                    <div>{days}</div>
-                </div>
-                {/if}
+                <p style="margin-top: 25px;">A presto,<br>Il team di Bibliomap</p>
+            </div>
 
-                {#if slots}
-                <div class="info-section">
-                    <span class="label">fasce orarie</span>
-                    <div>{slots}</div>
-                </div>
-                {/if}
-
-                <p>controlla la tua dashboard per confermare la ricezione del libro.</p>
-            {#else}
-                <div class="status-box rejected">LA TUA RICHIESTA E STATA RIFIUTATA</div>
-                <p>ci dispiace, ma il proprietario non può prestare questo libro al momento.</p>
-            {/if}
-
-            <p>a presto,<br>il team di bibliomap</p>
-        </div>
-
-        <div class="footer">
-            notifica automatica, non rispondere a questa email.
+            <div class="footer">
+                Notifica automatica relativa al patrimonio librario. Non rispondere a questa email.
+            </div>
         </div>
     </div>
 </body>

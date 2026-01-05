@@ -2,19 +2,110 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: sans-serif; color: #333; }
-        .warning { color: #c0392b; font-weight: bold; }
-        .footer { font-size: 0.8em; margin-top: 20px; border-top: 1px solid #ccc; }
+        body {
+            background-color: #ffffff;
+            color: #495d63;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .page-wrapper {
+            background-color: #f9fafb;
+            padding: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #d7bcc8;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            padding: 32px 24px 16px 24px;
+            border-bottom: 1px solid #d7bcc8;
+        }
+        .header h1 {
+            color: #629677;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .content {
+            padding: 24px;
+            font-size: 14px;
+        }
+        .warning-box {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-left: 4px solid #fac8cd;
+            border-radius: 4px;
+            margin: 20px 0;
+            color: #495d63;
+        }
+        .highlight-text {
+            color: #495d63;
+            font-weight: bold;
+        }
+        .btn-dashboard {
+            display: inline-block;
+            background-color: #495d63;
+            color: #ffffff !important;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 16px 24px;
+            border-top: 1px solid #d7bcc8;
+            font-size: 11px;
+            color: #98b6b1;
+            text-align: center;
+        }
+        .brand {
+            font-weight: bold;
+            color: #495d63;
+        }
     </style>
 </head>
 <body>
-    <h3>Ciao {recipientName},</h3>
-    <p>Ti ricordiamo che il termine per la restituzione del libro <strong class="warning">{bookTitle}</strong> era fissato per il <strong>{dueDate}</strong>.</p>
-    <p>Ti chiediamo gentilmente di metterti in contatto con il proprietario per organizzare la restituzione il prima possibile.</p>
-    <p><a href="{dashboardUrl}">Accedi alla tua dashboard</a> per i dettagli del contatto.</p>
-    <div class="footer">
-        <p>Grazie per la collaborazione,<br>Team Bibliomap</p>
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Sollecito Restituzione</h1>
+            </div>
+            <div class="content">
+                <p>Ciao {recipientName},</p>
+                
+                <div class="warning-box">
+                    Ti ricordiamo che il termine per la restituzione del libro <span class="highlight-text">{bookTitle}</span> era fissato per il <strong>{dueDate}</strong>.
+                </div>
+                
+                <p>Ti chiediamo gentilmente di metterti in contatto con il proprietario per organizzare la restituzione il prima possibile e mantenere affidabile la nostra community.</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{dashboardUrl}" class="btn-dashboard">
+                        Accedi alla tua dashboard
+                    </a>
+                </div>
+
+                <p style="font-size: 12px; opacity: 0.8; margin-top: 20px;">
+                    Dalla dashboard puoi consultare i dettagli del contatto e metterti d'accordo con il proprietario del libro per effettuare la restituzione.
+                </p>
+            </div>
+            <div class="footer">
+                Grazie per la collaborazione,<br>
+                Il team di <span class="brand">Bibliomap</span>
+            </div>
+        </div>
     </div>
 </body>
 </html>

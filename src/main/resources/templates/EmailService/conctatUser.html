@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* stile allineato ai colori e componenti del sito bibliomap */
+        body {
+            background-color: #ffffff;
+            color: #495d63;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .page-wrapper {
+            background-color: #f9fafb;
+            padding: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #d7bcc8;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            padding: 32px 24px 16px 24px;
+            border-bottom: 1px solid #d7bcc8;
+        }
+        .header h1 {
+            color: #629677;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .content {
+            padding: 24px;
+            font-size: 14px;
+        }
+        /* box richiesta basato su ash-gray alpha per distinguere il corpo del messaggio */
+        .message-box {
+            background-color: #f9fafb;
+            border: 1px solid #d7bcc8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #98b6b1;
+            display: block;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+        .info-value {
+            margin-bottom: 15px;
+            color: #495d63;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 16px 24px;
+            border-top: 1px solid #d7bcc8;
+            font-size: 11px;
+            color: #98b6b1;
+            text-align: center;
+        }
+        .brand {
+            font-weight: bold;
+            color: #495d63;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>Richiesta di Contatto</h1>
+            </div>
+            <div class="content">
+                <p>Ciao <strong>{ownerName}</strong>,</p>
+                <p>hai ricevuto un messaggio da <strong>{recipientName}</strong> per il libro <i>"{title}"</i>.</p>
+                
+                <div class="message-box">
+                    <span class="section-label">messaggio dell'utente</span>
+                    <div class="info-value" style="white-space: pre-wrap;">{notes}</div>
+                    
+                    {#if selectedDays}
+                        <span class="section-label">giorni proposti per lo scambio</span>
+                        <div class="info-value">{selectedDays}</div>
+                    {/if}
+                    
+                    {#if selectedSlots}
+                        <span class="section-label">fasce orarie preferite</span>
+                        <div class="info-value">{selectedSlots}</div>
+                    {/if}
+                </div>
+
+                
+            </div>
+            <div class="footer">
+                notifica inviata automaticamente dal sistema di condivisione bibliomap.
+                <br>
+                Il team di <span class="brand">Bibliomap</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
