@@ -30,10 +30,10 @@ public class GoogleBooksService {
 	ObjectMapper objectMapper;
 
 
-	@ConfigProperty(name = "quarkus.book-api.key")
+	@ConfigProperty(name = "book-api.key")
 	String apiKey;
 
-	@ConfigProperty(name = "quarkus.book-api.url")
+	@ConfigProperty(name = "book-api.url")
 	String url;
 
 	HttpClient client = HttpClient.newHttpClient();

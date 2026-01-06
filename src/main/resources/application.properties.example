@@ -1,10 +1,10 @@
 # CORS Configuration
-quarkus.http.cors=true
-quarkus.http.cors.origins=url
-quarkus.http.cors.methods=GET,POST,PUT,DELETE,OPTIONS
-quarkus.http.cors.headers=Content-Type,Authorization,X-Session-Id,Accept
-quarkus.http.cors.access-control-allow-credentials=true
-quarkus.http.cors.exposed-headers=Content-Type,X-Session-Id
+http.cors=true
+http.cors.origins=url
+http.cors.methods=GET,POST,PUT,DELETE,OPTIONS
+http.cors.headers=Content-Type,Authorization,X-Session-Id,Accept
+http.cors.access-control-allow-credentials=true
+http.cors.exposed-headers=Content-Type,X-Session-Id
 
 # Logging
 quarkus.log.level=INFO
@@ -18,23 +18,23 @@ quarkus.mongodb.database=bibliomap
 quarkus.redis.hosts= 
 
 # Auth OTP
-quarkus.auth.otp.duration-minutes=5
+auth.otp.duration-minutes=5
 
 # Email service
-quarkus.email.debug-mode=false
+email.debug-mode=false
 #TODO
-quarkus.email.base-url= 
+email.base-url= 
 
 # LOAN
-quarkus.loan.duration= 30 
-quarkus.loan.scheduler= 0 0 9 * * ?
+loan.duration= 30 
+loan.scheduler= 0 0 9 * * ?
 
 # Book API
-quarkus.book-api.url= 
-quarkus.book-api.key= 
+book-api.url= 
+book-api.key= 
 
 # Sessione
-quarkus.session.duration-minutes=120
+session.duration-minutes=120
 
 # Mailer
 quarkus.mailer.host=smtp.gmail.com

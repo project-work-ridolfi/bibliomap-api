@@ -64,15 +64,15 @@ public class EmailService {
 	Template conctactUserTemplate;
 	
 	@Inject
-	@ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
+	@ConfigProperty(name = "email.debug-mode", defaultValue = "false")
 	boolean debugEmail;
 
 	@Inject
-	@ConfigProperty(name = "quarkus.auth.otp.duration-minutes", defaultValue = "5")
+	@ConfigProperty(name = "auth.otp.duration-minutes", defaultValue = "5")
 	long otpDurationMinutes;
 
 	@Inject
-	@ConfigProperty(name = "quarkus.email.base-url", defaultValue = "http://localhost:5173/")
+	@ConfigProperty(name = "email.base-url", defaultValue = "http://localhost:5173/")
 	String baseUrl;
 
 	@Inject

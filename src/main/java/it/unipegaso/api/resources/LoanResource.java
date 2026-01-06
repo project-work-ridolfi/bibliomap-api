@@ -70,7 +70,7 @@ public class LoanResource {
 	@Inject
 	LoansRepository loansRepository;
 
-	@ConfigProperty(name = "quarkus.loan.duration", defaultValue = "30")
+	@ConfigProperty(name = "loan.duration", defaultValue = "30")
 	int loanDuration;
 
 

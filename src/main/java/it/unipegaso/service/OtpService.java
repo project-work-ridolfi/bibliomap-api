@@ -41,13 +41,13 @@ public class OtpService {
     @Inject
     EmailService emailService;
 
-    @ConfigProperty(name = "quarkus.auth.otp.duration-minutes", defaultValue = "5")
+    @ConfigProperty(name = "auth.otp.duration-minutes", defaultValue = "5")
     long otpDurationMinutes;
     
     @ConfigProperty(name = "quarkus.auth.otp.max-retries", defaultValue = "3")
     long maxRetriesConfig; 
 
-    @ConfigProperty(name = "quarkus.email.debug-mode", defaultValue = "false")
+    @ConfigProperty(name = "email.debug-mode", defaultValue = "false")
     boolean otpDebugMode;
 
 
