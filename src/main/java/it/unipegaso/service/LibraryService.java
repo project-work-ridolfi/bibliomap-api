@@ -163,7 +163,12 @@ public class LibraryService {
 		}
 
 		Library lib = opLib.get();
-		boolean isOwner = lib.getOwnerId().equals(currentUserId);
+		String ownerId = lib.getOwnerId();
+		boolean isOwner = ownerId.equals(currentUserId);
+		
+		LOG.debug("owner id: " + ownerId );
+		LOG.debug("current user id: " + currentUserId);
+		LOG.debug("is owner: " + isOwner);
 
 		librariesRepository.addView(libraryId);
 

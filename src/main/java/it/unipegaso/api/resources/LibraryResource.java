@@ -115,7 +115,7 @@ public class LibraryResource {
 	public Response getLibrary(@PathParam("id") String libraryId, @Context HttpHeaders headers) {
 
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-		String currentUserId = null;
+		String currentUserId = "";
 
 		try {
 			User currentUser = userService.getUserFromSession(sessionId);
@@ -152,7 +152,7 @@ public class LibraryResource {
 
 		if(opOwner.isPresent()) {
 			User owner = opOwner.get();
-			if(!owner.getVisibility().equals("private")) {
+			if(!owner.getVisibility().equals("private") || owner.getId().equals(currentUserId)) {
 				response.put("ownerName", owner.getUsername());
 				response.put("ownerId", owner.getId());
 			}
