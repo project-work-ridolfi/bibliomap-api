@@ -87,21 +87,21 @@ Il progetto fa uso delle seguenti estensioni e tecnologie:
 
 Spiegazione dei collegamenti:
 
-    USER & LOCATION: Ogni utente ha un locationId che punta alle coordinate geografiche della propria zona/casa.
+  USER & LOCATION: Ogni utente ha un locationId che punta alle coordinate geografiche della propria zona/casa.
 
-    LIBRARY & USER: Una libreria appartiene a un utente (ownerId). Un utente può avere più librerie (relazione 1 a molti).
+  LIBRARY & USER: Una libreria appartiene a un utente (ownerId). Un utente può avere più librerie (relazione 1 a molti).
+  
+  LIBRARY & LOCATION: Ogni libreria ha il proprio locationId (che può essere diverso da quello dell'utente).
 
-    LIBRARY & LOCATION: Ogni libreria ha il proprio locationId (che può essere diverso da quello dell'utente).
+  COPY & BOOK: La COPY (Copia Fisica) è l'istanza reale di un BOOK (Titolo/ISBN). Molte copie diverse possono fare riferimento allo stesso ISBN.
 
-    COPY & BOOK: La COPY (Copia Fisica) è l'istanza reale di un BOOK (Titolo/ISBN). Molte copie diverse possono fare riferimento allo stesso ISBN.
+  COPY & LIBRARY: Ogni copia fisica è depositata all'interno di una specifica libreria (libraryId).
 
-    COPY & LIBRARY: Ogni copia fisica è depositata all'interno di una specifica libreria (libraryId).
+  LOAN (Prestito): È l'oggetto "centrale" che mette in relazione:
 
-    LOAN (Prestito): È l'oggetto "centrale" che mette in relazione:
-
-      - La copia fisica specifica che viene scambiata (copy_id).
-      - L'utente che presta il libro (owner_id).
-      - L'utente che chiede il libro (requester_id).
+    - La copia fisica specifica che viene scambiata (copy_id).
+    - L'utente che presta il libro (owner_id).
+    - L'utente che chiede il libro (requester_id).
 
 ### ESEMPIO UTENTE
 ```json
@@ -316,3 +316,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [ ] documentazione
 - [x] crea email gmail apposita con foto profilo bibliomap da usare al posto di quella universitaria
 - [ ] script mongo
+- [ ] url reali ovunque
+  - [ ] controlla conf email
+  - [ ] controlla swagger
+  - [ ] fronend
