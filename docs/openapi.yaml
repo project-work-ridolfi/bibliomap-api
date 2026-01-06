@@ -977,6 +977,3 @@ paths:
       summary: Update Username
       tags:
       - User Resource
-info:
-  title: bibliomap-api API
-  version: 1.0.0-SNAPSHOT
