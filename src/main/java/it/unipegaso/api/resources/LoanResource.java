@@ -119,8 +119,6 @@ public class LoanResource {
 
 			String ownerId = lib.getOwnerId();
 
-
-
 			Optional<User> opOwner = userRepository.get(ownerId);
 
 			if(opOwner.isEmpty()) {

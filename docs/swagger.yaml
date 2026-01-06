@@ -1,0 +1,972 @@
+---
+openapi: 3.1.0
+components:
+  schemas:
+    BookDetailDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        isbn:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+        coverUrl:
+          type: string
+        customCover:
+          type: string
+        publicationYear:
+          type: integer
+          format: int32
+        language:
+          type: string
+        coverType:
+          type: string
+        publisher:
+          type: string
+        libraryName:
+          type: string
+        libraryId:
+          type: string
+        ownerId:
+          type: string
+        ownerName:
+          type: string
+        condition:
+          type: string
+        status:
+          type: string
+        ownerNotes:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        views:
+          type: integer
+          format: int64
+        distance:
+          type: number
+          format: double
+    BookMultipartBody:
+      type: object
+      properties:
+        book:
+          $ref: "#/components/schemas/BookDetailDTO"
+        coverFile:
+          type: string
+          format: binary
+    LibraryDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        locationType:
+          type: string
+        visibility:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        blurRadius:
+          type: integer
+          format: int32
+    LoginDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    RegistrationDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        acceptTerms:
+          type: boolean
+        acceptPrivacy:
+          type: boolean
+    SetLocationDTO:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        blurRadius:
+          type: integer
+          format: int32
+        visibility:
+          type: string
+    VerificationDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+paths:
+  /api/auth/login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Login
+      tags:
+      - Auth Resource
+  /api/auth/logout:
+    post:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Logout
+      tags:
+      - Auth Resource
+  /api/auth/password-reset-complete:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Password Reset Complete
+      tags:
+      - Auth Resource
+  /api/auth/password-reset-init:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Password Reset Init
+      tags:
+      - Auth Resource
+  /api/auth/password-reset-verify:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Password Reset Verify
+      tags:
+      - Auth Resource
+  /api/auth/register:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Register
+      tags:
+      - Auth Resource
+  /api/auth/register-init:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Register Init
+      tags:
+      - Auth Resource
+  /api/auth/register-verify:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerificationDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Register Verify
+      tags:
+      - Auth Resource
+  /api/books/external/lookup-metadata:
+    get:
+      parameters:
+      - name: isbn
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Lookup Book Metadata
+      tags:
+      - Book Resource
+  /api/books/external/search-isbn:
+    get:
+      parameters:
+      - name: author
+        in: query
+        schema:
+          type: string
+      - name: language
+        in: query
+        schema:
+          type: string
+      - name: publisher
+        in: query
+        schema:
+          type: string
+      - name: title
+        in: query
+        schema:
+          type: string
+      - name: year
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Lookup ISBN
+      tags:
+      - Book Resource
+  /api/books/nearby:
+    get:
+      parameters:
+      - name: exclude_user
+        in: query
+        schema:
+          type: string
+      - name: lat
+        in: query
+        schema:
+          type: number
+          format: double
+      - name: lng
+        in: query
+        schema:
+          type: number
+          format: double
+      - name: radius
+        in: query
+        schema:
+          type: number
+          format: double
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: visibility
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Nearby Books
+      tags:
+      - Book Resource
+  /api/books/save:
+    post:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/BookMultipartBody"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Save
+      tags:
+      - Book Resource
+  /api/books/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Book
+      tags:
+      - Book Resource
+  /api/books/{id}/similar:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Similar Book
+      tags:
+      - Book Resource
+  /api/copies/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                condition:
+                  type: string
+                ownerNotes:
+                  type: string
+                tags:
+                  type: string
+                useDefaultCover:
+                  type: boolean
+                coverFile:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Update Copy
+      tags:
+      - Copy Resource
+    delete:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Delete Copy
+      tags:
+      - Copy Resource
+  /api/copies/{id}/move:
+    patch:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Move Copy
+      tags:
+      - Copy Resource
+  /api/libraries:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LibraryDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Create Library
+      tags:
+      - Library Resource
+  /api/libraries/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LibraryDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Update Library
+      tags:
+      - Library Resource
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Library
+      tags:
+      - Library Resource
+    delete:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Delete Library
+      tags:
+      - Library Resource
+  /api/loan/active:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Active Loans
+      tags:
+      - Loan Resource
+  /api/loan/all:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get All Loans
+      tags:
+      - Loan Resource
+  /api/loan/requests/incoming:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Incoming Requests
+      tags:
+      - Loan Resource
+  /api/loan/{id}:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Create Loan Request
+      tags:
+      - Loan Resource
+  /api/loan/{id}/contact:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Notify Owner
+      tags:
+      - Loan Resource
+  /api/loan/{id}/extend:
+    patch:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: integer
+                format: int32
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Extend Loan
+      tags:
+      - Loan Resource
+  /api/loan/{id}/return:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Close Loan
+      tags:
+      - Loan Resource
+  /api/loan/{id}/start:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Start Loan
+      tags:
+      - Loan Resource
+  /api/loan/{id}/status:
+    patch:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Manage Request
+      tags:
+      - Loan Resource
+  /api/stats/global/counters:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Global Counters
+      tags:
+      - Stats Resource
+  /api/stats/global/full:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get Global Stats Full
+      tags:
+      - Stats Resource
+  /api/stats/user/{id}/counters:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get User Counters
+      tags:
+      - Stats Resource
+  /api/stats/user/{id}/full:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get User Stats Full
+      tags:
+      - Stats Resource
+  /api/users/check-exists/{username}:
+    get:
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Check Username Exists
+      tags:
+      - User Resource
+  /api/users/export:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Export User Data
+      tags:
+      - User Resource
+  /api/users/me:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get User Me
+      tags:
+      - User Resource
+    delete:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Delete Account
+      tags:
+      - User Resource
+  /api/users/me/libraries:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get User Libraries
+      tags:
+      - User Resource
+  /api/users/set-location:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetLocationDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Set Location
+      tags:
+      - User Resource
+  /api/users/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Get User Profile
+      tags:
+      - User Resource
+  /api/users/{id}/password:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Change Password
+      tags:
+      - User Resource
+  /api/users/{id}/privacy:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Update Privacy Settings
+      tags:
+      - User Resource
+  /api/users/{id}/username:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Update Username
+      tags:
+      - User Resource
+info:
+  title: bibliomap-api API
+  version: 1.0.0-SNAPSHOT
