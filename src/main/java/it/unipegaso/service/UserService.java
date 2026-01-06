@@ -116,8 +116,8 @@ public class UserService {
 		List<String> libraryIds = librariesRepository.getUserLibIds(userId, isOwner, logged);
 		Map<String,Long> topTags = copiesRepository.getTags(libraryIds);
 
-		if(visibility.equals(VisibilityOptions.PRIVATE.toDbValue())|| (visibility.equals(VisibilityOptions.LOGGED_IN.toDbValue()) && !logged)) {
-			userName = "utente anonimo";
+		if((!isOwner && visibility.equals(VisibilityOptions.PRIVATE.toDbValue()))|| (visibility.equals(VisibilityOptions.LOGGED_IN.toDbValue()) && !logged)) {
+			userName = "utente con profilo privato";
 		}else if (user.getLocationId() != null) {
 			coords = locationService.getLocationMap(user.getLocationId());
 		}

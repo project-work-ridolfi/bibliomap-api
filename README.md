@@ -246,6 +246,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [x] per le cover usiamo anche google books, da togliere com'è ora nel fe
 - [ ] definisci flusso di ricerca
 - [ ] definisci flusso di prestito
+- [ ] per i prestiti se ce ne sono più pending per la stessa cosa gli altri vengono automaticamente rimandati?
 - [ ] pagina aggiunta libro (da finire e testare), deve avere:
  - [x] controllo su google books
  - [x] inserimento isbn

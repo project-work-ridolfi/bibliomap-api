@@ -2,6 +2,7 @@ package it.unipegaso.api.resources;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import it.unipegaso.api.util.SessionIDProvider;
 import it.unipegaso.database.BooksRepository;
@@ -55,11 +56,12 @@ public class StatsResource {
 
 		try {
 			User user = userService.getUserFromSession(sessionId);
-			
+
 			boolean isProfileOwner = user.getId().equals(userId);
 
-			if (!isProfileOwner && user.getVisibility().equals(VisibilityOptions.PRIVATE.toDbValue())) {
-				return Response.status(Response.Status.FORBIDDEN).build();
+			//carichiamo utente se non e' lo stesso e controlliamo visibilita' del profilo
+			if(!isProfileOwner && !canSeeProfile(userId)) {
+				return Response.status(Response.Status.NOT_FOUND).build();
 			}
 
 			Map<String, Long> counts = new HashMap<>();
@@ -67,7 +69,7 @@ public class StatsResource {
 			counts.put("totalLoansOut", loansRepository.count(userId, true));
 			counts.put("totalLoansIn", loansRepository.count(userId, false));
 			return Response.ok(counts).build();
-		
+
 		} catch (Exception e) { 
 			return Response.status(Response.Status.UNAUTHORIZED).build(); 
 		}
@@ -78,17 +80,18 @@ public class StatsResource {
 	public Response getUserStatsFull(@PathParam("id") String userId, @Context HttpHeaders headers) {
 
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-		
+
 		try {
 			User user = userService.getUserFromSession(sessionId);
 			boolean isProfileOwner = user.getId().equals(userId);
 
-			if (!isProfileOwner && user.getVisibility().equals(VisibilityOptions.PRIVATE.toDbValue())) {
-				return Response.status(Response.Status.FORBIDDEN).build();
+			//carichiamo utente se non e' lo stesso e controlliamo visibilita' del profilo
+			if(!isProfileOwner && !canSeeProfile(userId)) {
+				return Response.status(Response.Status.NOT_FOUND).build();
 			}
 
 			return Response.ok(statsService.getAllUserStats(userId, true, isProfileOwner)).build();
-		
+
 		} catch (Exception e) { 
 			return Response.status(Response.Status.UNAUTHORIZED).build(); 
 		}
@@ -97,19 +100,19 @@ public class StatsResource {
 	@GET
 	@Path("/global/counters")
 	public Response getGlobalCounters() {
-		
+
 		Map<String, Long> response = new HashMap<>();
 		response.put("books", bookRepository.count());
 		response.put("copies", libraryService.countCopies(null, false));
 		response.put("loans", loansRepository.count());
 		return Response.ok(response).build();
-	
+
 	}
 
 	@GET
 	@Path("/global/full")
 	public Response getGlobalStatsFull(@Context HttpHeaders headers) {
-		
+
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
 		String userId = null;
 		boolean logged = false;
@@ -122,5 +125,18 @@ public class StatsResource {
 			// utente non loggato, procediamo come guest (currentUserId resta null)
 		}
 		return Response.ok(statsService.getGlobalStats(logged, userId)).build(); 
+	}
+
+
+	private boolean canSeeProfile(String userId) {
+
+		Optional<User> opProfileUser = usersRepository.get(userId);
+
+		//anche se e' privato ritorno un not found per proteggere privacy (altro confermerebbe l'esistenza)
+		if(opProfileUser.isEmpty() || opProfileUser.get().getVisibility().equals(VisibilityOptions.PRIVATE.toDbValue())) {
+			return false;
+		}
+
+		return true;
 	}
 }

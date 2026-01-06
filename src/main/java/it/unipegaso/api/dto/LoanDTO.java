@@ -13,5 +13,6 @@ public record LoanDTO(
 	Date expectedReturnDate,
 	String ownerNotes, 
 	String ownerUsername, 
-	String requesterUsername) {
+	String requesterUsername,
+	Date updatedAt) {
 }

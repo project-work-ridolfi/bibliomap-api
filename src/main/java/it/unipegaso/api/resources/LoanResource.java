@@ -366,7 +366,7 @@ public class LoanResource {
 
 			User requester = opRequester.get();
 			String title = loan.getTitle();
-			String selectedDays = request.getOrDefault("days", "");   // es: "lun, mer"
+			String selectedDays = request.getOrDefault("days", "");   // es: "lunedì, mercoledì"
 			String selectedSlots = request.getOrDefault("slots", ""); // es: "pomeriggio, sera"
 
 			success = emailService.sendRequestResponseEmail(requester.getEmail(), requester.getUsername(), title, action, notes, selectedDays, selectedSlots);
@@ -673,7 +673,8 @@ public class LoanResource {
 				loan.getExpectedReturnDate(),
 				loan.getOwnerNotes(), 
 				ownerUsername, 
-				requesterUsername);
+				requesterUsername,
+				loan.getUpdatedAt());
 		return dto;
 	}
 
