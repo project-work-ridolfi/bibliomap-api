@@ -10,7 +10,7 @@ Questo progetto contiene il backend dell'applicazione Bibliomap. Il codice è sv
 
 ## Documentazione API
 
-La specifica tecnica delle API è disponibile visualizzando il file [swagger.yaml](./docs/swagger.yaml).
+La specifica tecnica delle API è disponibile visualizzando il file [openapi.yaml](./docs/openapi.yaml).
 
 ## Sviluppo con Quarkus
 
