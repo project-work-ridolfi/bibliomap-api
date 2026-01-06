@@ -44,6 +44,8 @@ public class LoansRepository implements IRepository<Loan> {
 
 	private static final String REQUESTER_ID = "requester_id";
 	private static final String OWNER_ID = "owner_id";
+	private static final String COPY_ID = "copy_id";
+	private static final String STATUS = "status";
 
 
 	@Inject
@@ -121,11 +123,18 @@ public class LoansRepository implements IRepository<Loan> {
 		return loans.find(filter).into(new ArrayList<>());
 	}
 
+	public List<Loan> findPendingByCopyId(String copyId){
+
+		Bson filter = Filters.and(Filters.eq(COPY_ID, copyId), Filters.eq(STATUS, LoanStatus.PENDING.toString()));
+
+		return loans.find(filter).into(new ArrayList<>());
+	}
+
 	public List<Loan> findIncomingByOwner(String id) {
 		// filtro per richieste pendenti ricevute dal proprietario
 		Bson filter = Filters.and(
 				Filters.eq(OWNER_ID, id), 
-				Filters.eq("status", LoanStatus.PENDING.toString())
+				Filters.eq(STATUS, LoanStatus.PENDING.toString())
 				);
 
 		return loans.find(filter).into(new ArrayList<>());
@@ -134,7 +143,7 @@ public class LoansRepository implements IRepository<Loan> {
 	public List<Loan> findOverdue(Date date) {
 		// stato ON_LOAN e data di ritorno prevista minore di adesso
 		Bson filter = Filters.and(
-				Filters.eq("status", LoanStatus.ON_LOAN.toString()),
+				Filters.eq(STATUS, LoanStatus.ON_LOAN.toString()),
 				Filters.lt("expected_return_date", date)
 				);
 
@@ -173,30 +182,30 @@ public class LoansRepository implements IRepository<Loan> {
 	}
 
 	public Map<String, Long> getTitlesRanking(String userId) {
-	    List<Bson> pipeline = new ArrayList<>();
+		List<Bson> pipeline = new ArrayList<>();
 
-	    //null per conteggi globali
-	    if (userId != null) {
-	        pipeline.add(match(eq(OWNER_ID, userId)));
-	    }
+		//null per conteggi globali
+		if (userId != null) {
+			pipeline.add(match(eq(OWNER_ID, userId)));
+		}
 
-	    pipeline.add(group(
-	        new Document("$concat", Arrays.asList("$copy_id", "_", "$title")), 
-	        sum("count", 1)
-	    ));
+		pipeline.add(group(
+				new Document("$concat", Arrays.asList("$copy_id", "_", "$title")), 
+				sum("count", 1)
+				));
 
-	    pipeline.add(sort(descending("count")));
-	    pipeline.add(limit(5));
+		pipeline.add(sort(descending("count")));
+		pipeline.add(limit(5));
 
-	    Map<String, Long> ranking = new LinkedHashMap<>();
+		Map<String, Long> ranking = new LinkedHashMap<>();
 
-	    loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(doc -> {
-	        String combinedKey = doc.getString("_id");
-	        Number count = doc.get("count", Number.class);
-	        ranking.put(combinedKey, count.longValue());
-	    });
+		loans.withDocumentClass(Document.class).aggregate(pipeline).forEach(doc -> {
+			String combinedKey = doc.getString("_id");
+			Number count = doc.get("count", Number.class);
+			ranking.put(combinedKey, count.longValue());
+		});
 
-	    return ranking;
+		return ranking;
 	}
 
 
@@ -220,16 +229,16 @@ public class LoansRepository implements IRepository<Loan> {
 
 	// Trova l'utente con cui l'utente ha scambiato più libri
 	public String findTopPartnerId(String userId) {
-	    List<Bson> pipeline = Arrays.asList(
-	        match(Filters.eq(OWNER_ID, userId)),
-	        group("$requester_id", sum("count", 1)),
-	        sort(descending("count")),
-	        limit(1)
-	    );
-	    Document res = loans.withDocumentClass(Document.class).aggregate(pipeline).first();
-	    
-	    // Ritorna l'ID (che è dentro _id dopo il group) o null
-	    return res != null ? res.getString("_id") : null;
+		List<Bson> pipeline = Arrays.asList(
+				match(Filters.eq(OWNER_ID, userId)),
+				group("$requester_id", sum("count", 1)),
+				sort(descending("count")),
+				limit(1)
+				);
+		Document res = loans.withDocumentClass(Document.class).aggregate(pipeline).first();
+
+		// Ritorna l'ID (che è dentro _id dopo il group) o null
+		return res != null ? res.getString("_id") : null;
 	}
 
 	// prende tutti i prestiti completati dall'utente
@@ -275,52 +284,67 @@ public class LoansRepository implements IRepository<Loan> {
 		.forEach(doc -> {
 			Document id = doc.get("_id", Document.class);
 			if (id.getInteger("month") != null && id.getInteger("year") != null) {
-                String label = id.getInteger("month") + "/" + id.getInteger("year");
-                trend.put(label, doc.getInteger("count").longValue());
-                LOG.debug("label: " +  label + " - count " + doc.getInteger("count").longValue());
-            }
+				String label = id.getInteger("month") + "/" + id.getInteger("year");
+				trend.put(label, doc.getInteger("count").longValue());
+				LOG.debug("label: " +  label + " - count " + doc.getInteger("count").longValue());
+			}
 		});
 
 		return trend;
 	}
 
 	public Map<String, Long> getWeeklyRequests() {
-	    List<Bson> pipeline = new ArrayList<>();
+		List<Bson> pipeline = new ArrayList<>();
 
-	    Document dateTrunc = new Document("$dateTrunc", 
-	        new Document("date", "$created_at")
-	            .append("unit", "week")
-	            .append("startOfWeek", "monday"));
-	    
-	    pipeline.add(group(dateTrunc, sum("count", 1)));
+		Document dateTrunc = new Document("$dateTrunc", 
+				new Document("date", "$created_at")
+				.append("unit", "week")
+				.append("startOfWeek", "monday"));
 
-	    pipeline.add(sort(descending("_id")));
-	    pipeline.add(limit(4));
+		pipeline.add(group(dateTrunc, sum("count", 1)));
 
-	    List<Document> results = loans.withDocumentClass(Document.class)
-	                                  .aggregate(pipeline)
-	                                  .into(new ArrayList<>());
-	    
-	    Map<String, Long> weekly = new LinkedHashMap<>();
-	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
+		pipeline.add(sort(descending("_id")));
+		pipeline.add(limit(4));
 
-	    for (int i = results.size() - 1; i >= 0; i--) {
-	        Document doc = results.get(i);
-	        Date monday = doc.getDate("_id");
-	        
-	        if (monday != null) {
-	            Calendar cal = Calendar.getInstance();
-	            cal.setTime(monday);
-	            String start = sdf.format(cal.getTime());
-	            cal.add(Calendar.DAY_OF_YEAR, 6);
-	            String end = sdf.format(cal.getTime());
-	            
-	            String label = start + " - " + end;
-	            Long val = ((Number) doc.get("count")).longValue();
-	            weekly.put(label, val);
-	        }
-	    }
-	    return weekly;
+		List<Document> results = loans.withDocumentClass(Document.class)
+				.aggregate(pipeline)
+				.into(new ArrayList<>());
+
+		Map<String, Long> weekly = new LinkedHashMap<>();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
+
+		for (int i = results.size() - 1; i >= 0; i--) {
+			Document doc = results.get(i);
+			Date monday = doc.getDate("_id");
+
+			if (monday != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(monday);
+				String start = sdf.format(cal.getTime());
+				cal.add(Calendar.DAY_OF_YEAR, 6);
+				String end = sdf.format(cal.getTime());
+
+				String label = start + " - " + end;
+				Long val = ((Number) doc.get("count")).longValue();
+				weekly.put(label, val);
+			}
+		}
+		return weekly;
+	}
+
+	public boolean checkExists(Loan loan) {
+
+		//cerchiamo se lo stesso utente ha la stessa richiesta per lo stesso libro 
+
+		Bson filter = Filters.and(
+				Filters.eq(STATUS, loan.getStatus()),
+				Filters.eq(COPY_ID, loan.getCopyId()),
+				Filters.eq(REQUESTER_ID, loan.getRequesterId()));
+
+		ArrayList<Loan> result = loans.find(filter).into(new ArrayList<>());
+
+
+		return result.size() > 0;
 	}
 
 

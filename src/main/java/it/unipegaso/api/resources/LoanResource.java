@@ -136,6 +136,9 @@ public class LoanResource {
 
 			Book book = opBook.get();
 			String title = book.getTitle();
+			
+			
+			
 
 			//crea richiesta
 			Loan loanRequest = new Loan();
@@ -148,6 +151,13 @@ public class LoanResource {
 
 			Date now = new Date();
 			loanRequest.setCreatedAt(now);
+			
+			boolean requestExistsAlready = loansRepository.checkExists(loanRequest);
+			
+			if (requestExistsAlready) {
+				LOG.info("user already requested this book");
+				return Response.status(Response.Status.CONFLICT).build();
+			}
 
 			//se e' andato tutto bene lo salvo
 			String loanId = loansRepository.create(loanRequest);
@@ -349,7 +359,31 @@ public class LoanResource {
 
 			boolean success = loansRepository.update(loan);
 			if(!success) {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+
+			// si rifiutano automaticamente le altre richieste per la stessa copia
+			if ("ACCEPT".equalsIgnoreCase(action)) {
+
+				List<Loan> otherRequests = loansRepository.findPendingByCopyId(loan.getCopyId());
+			    for (Loan other : otherRequests) {
+			        if (!other.getId().equals(loanId)) { // non rifiuta quella appena accettata
+			            other.setStatus(LoanStatus.REJECTED.toString());
+			            other.setOwnerNotes("Copia non più disponibile (richiesta di un altro utente accettata).");
+			            loansRepository.update(other);
+			            
+			            //invia email di notifica automatica agli "sfortunati"
+			            Optional<User> opOtherReq = userRepository.get(other.getRequesterId());
+			            if(opOtherReq.isPresent()) {
+			                emailService.sendRequestResponseEmail(
+			                    opOtherReq.get().getEmail(), 
+			                    opOtherReq.get().getUsername(), 
+			                    other.getTitle(), 
+			                    "REJECT", 
+			                    other.getOwnerNotes(), "", "");
+			            }
+			        }
+			    }
 			}
 
 			// Recupero dati per email
