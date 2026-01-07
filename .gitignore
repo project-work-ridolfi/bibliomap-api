@@ -29,4 +29,4 @@ replay_pid*
 .project
 /.settings
 .DS_Store
-src/main/resources/application.properties
+run.sh
