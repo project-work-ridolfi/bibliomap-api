@@ -52,34 +52,34 @@ Se si desidera costruire un über-jar (un singolo file contenente tutto) eseguir
 L'applicazione sarà avviabile con `java -jar target/*-runner.jar`.
 
 
-## Dipendenze e Guide correlate
+## Dipendenze
 
-Il progetto fa uso delle seguenti estensioni e tecnologie:
+Il progetto è basato sul framework **Quarkus** e utilizza le seguenti estensioni e tecnologie per garantire scalabilità, sicurezza e documentazione automatica:
 
-* **REST**
-  Implementazione Jakarta REST con elaborazione a tempo di compilazione basata su Vert.x.
-* **MongoDB client**
-  Connettore per database MongoDB in stile imperativo o reattivo.
-* **Micrometer Registry Prometheus**
-  Abilita il supporto Prometheus per la raccolta metriche con Micrometer.
-* **Hibernate Validator**
-  Validazione delle proprietà degli oggetti e dei parametri dei metodi.
-* **SmallRye OpenAPI**
-  Documentazione delle API REST (include Swagger UI).
-* **SmallRye Fault Tolerance**
-  Libreria per la gestione della tolleranza ai guasti nei servizi di rete.
-* **RESTEasy Classic Multipart**
-  Supporto per le richieste Multipart.
-* **YAML Configuration**
-  Permette l'uso di file YAML per la configurazione dell'applicazione.
-* **SmallRye JWT**
-  Sicurezza delle applicazioni tramite JSON Web Token.
-* **SmallRye Health**
-  Monitoraggio dello stato di salute del servizio.
-* **SmallRye Metrics**
-  Esposizione delle metriche di servizio.
-* **SmallRye JWT Build**
-  API per la creazione e firma di token JWT.
+* **[Quarkus REST (Jackson)](https://quarkus.io/guides/resteasy-reactive)**
+    Implementazione Jakarta REST (precedentemente RESTEasy Reactive) per la gestione degli endpoint API.
+* **[MongoDB with Panache](https://quarkus.io/guides/mongodb-panache)**
+    Strumento di astrazione per MongoDB che semplifica l'accesso ai dati tramite il pattern Repository/Active Record.
+* **[Redis Client](https://quarkus.io/guides/redis)**
+    Client per l'integrazione con Redis, utilizzato per la gestione delle sessioni utente.
+* **[Mailer](https://quarkus.io/guides/mailer)**
+    Servizio per l'invio di email tramite protocollo SMTP.
+* **[Qute Templating](https://quarkus.io/guides/qute)**
+    Motore di templating type-safe utilizzato per generare dinamicamente il contenuto delle email.
+* **[Hibernate Validator](https://quarkus.io/guides/validation)**
+    Implementazione di Jakarta Bean Validation per validare automaticamente i dati in ingresso e garantire l'integrità dei parametri dei metodi.
+* **[SmallRye OpenAPI](https://quarkus.io/guides/openapi-swaggerui)**
+    Generazione automatica della specifica OpenAPI 3 e integrazione di **Swagger UI** per testare visivamente gli endpoint.
+* **[SmallRye JWT Build](https://quarkus.io/guides/signed-jwt)**
+    Libreria utilizzata per la creazione, firma e gestione dei JWT.
+* **[SmallRye Fault Tolerance](https://quarkus.io/guides/fault-tolerance)**
+    Fornisce pattern di resilienza come Timeout, Retry e Circuit Breaker per gestire in sicurezza le chiamate a servizi esterni (es. Google Books API).
+* **[Scheduler](https://quarkus.io/guides/scheduler)**
+    Servizio per la pianificazione di task automatici, utilizzato per gestire i promemoria dei prestiti in scadenza.
+* **[Elytron Security](https://quarkus.io/guides/security-properties)**
+    Infrastruttura di sicurezza per la gestione di identità e permessi basata su file di configurazione e standard Jakarta Security.
+* **[OpenPDF](https://github.com/LibrePDF/OpenPDF)** (Libreria esterna)
+    Libreria Java per la creazione e manipolazione di file PDF.
 
 ## MONGO DB
 
