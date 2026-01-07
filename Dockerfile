@@ -1,5 +1,5 @@
 # compilazione con Maven
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN mvn package -DskipTests -Dquarkus.package.type=fast-jar
