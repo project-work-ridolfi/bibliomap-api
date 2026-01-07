@@ -35,13 +35,13 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
         final String path = requestContext.getUriInfo().getPath();
         final int status = responseContext.getStatus();
         
-        responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:5173"); //TODO
-        responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
-        responseContext.getHeaders().add("Access-Control-Allow-Headers", 
-            "Content-Type, Authorization, X-Session-Id, Accept");
-        responseContext.getHeaders().add("Access-Control-Allow-Methods", 
-            "GET, POST, PUT, DELETE, OPTIONS");
-        responseContext.getHeaders().add("Access-Control-Max-Age", "3600");
+//        responseContext.getHeaders().add("Access-Control-Allow-Origin", "http://localhost:5173"); //TODO
+//        responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
+//        responseContext.getHeaders().add("Access-Control-Allow-Headers", 
+//            "Content-Type, Authorization, X-Session-Id, Accept");
+//        responseContext.getHeaders().add("Access-Control-Allow-Methods", 
+//            "GET, POST, PUT, DELETE, OPTIONS");
+//        responseContext.getHeaders().add("Access-Control-Max-Age", "3600");
         
         LOG.infof("<<< OUTGOING RESPONSE: %s %s -> Status %d", method, path, status);
         
