@@ -72,7 +72,8 @@ public class UserService {
 		String username = sessionDataService.get(sessionId, "username").orElse(null);
 
 		if(username == null) {
-			LOG.warnf("Dati username mancanti in sessione per ID: %s", sessionId);
+			Map<String, String> allData = sessionDataService.getAll(sessionId);
+   		 	LOG.warnf("Dati mancanti per ID: %s. Contenuto Redis attuale: %s", sessionId, allData);
 			// 401 Unauthorized 
 			throw new NotAuthorizedException(
 					"SESSION_DATA_MISSING: Dati username mancanti nella sessione.",
