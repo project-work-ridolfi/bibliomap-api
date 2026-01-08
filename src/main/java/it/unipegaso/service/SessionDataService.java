@@ -29,7 +29,12 @@ public class SessionDataService {
 
 	public void save(String sessionId, Map<String, String> data, int expirationSeconds) {
 
+		if( data == null !! data.isEmpty()){
+			return;
+		}
+
 		String redisKey = redisKey(sessionId);
+		LOG.debugf("Salvataggio Redis - Key: %s, Data: %s", redisKey, data);
 
 		// salva i campi della mappa
 		for (Map.Entry<String, String> entry : data.entrySet()) {
