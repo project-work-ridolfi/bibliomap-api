@@ -32,8 +32,9 @@ public class SessionDataService {
 		String redisKey = redisKey(sessionId);
 
 		// salva i campi della mappa
-		hashCommands.hset(redisKey, data); 
-
+		for (Map.Entry<String, String> entry : data.entrySet()) {
+        	hashCommands.hset(redisKey, entry.getKey(), entry.getValue());
+    	}
 		// imposta ttl 
 		keyCommands.expire(redisKey, expirationSeconds);
 
