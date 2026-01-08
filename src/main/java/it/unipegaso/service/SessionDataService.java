@@ -2,6 +2,7 @@ package it.unipegaso.service;
 
 import java.util.Map;
 import java.util.Optional;
+import org.jboss.logging.Logger;
 
 import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.hash.HashCommands;
