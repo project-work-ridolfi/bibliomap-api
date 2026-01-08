@@ -22,6 +22,8 @@ import it.unipegaso.database.model.Loan;
 import it.unipegaso.database.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.Base64;
+import it.unipegaso.api.dto.BrevoAttachment; 
 
 @ApplicationScoped
 public class EmailService {
@@ -281,37 +283,42 @@ public class EmailService {
 	}
 	
 	public boolean sendExportEmail(String recipientEmail, String recipientName, byte[] pdfBytes) {
-	    String htmlBody = "<p>Ciao " + recipientName + ",</p><p>In allegato trovi il documento PDF con tutti i tuoi dati registrati su Bibliomap.</p>";
-	    String subject = "Export Dati Bibliomap";
+    String htmlBody = "<p>Ciao " + recipientName + ",</p><p>In allegato trovi il documento PDF con tutti i tuoi dati registrati su Bibliomap.</p>";
+    String subject = "Export Dati Bibliomap";
 
-	    if (debugEmail) {
-	        LOG.info("--------------------------------------------------");
-	        LOG.infof("DEBUG EMAIL [Export Dati] to: %s", recipientEmail);
-	        LOG.info("Body: " + htmlBody);
-	        LOG.infof("Allegato: bibliomap_export.pdf (%d bytes)", pdfBytes.length);
-	        try {
-	            Path path = Paths.get("target", "export_" + recipientName + "_" + System.currentTimeMillis() + ".pdf");
-	            
-	            Files.write(path, pdfBytes);
-	            
-	            LOG.infof("FILE DI DEBUG CREATO: %s", path.toAbsolutePath().toString());
-	        } catch (java.io.IOException e) {
-	            LOG.error("Errore durante la creazione del file PDF di debug", e);
-	        }	        LOG.info("--------------------------------------------------");
-	        return true;
-	    }
+    if (debugEmail) {
+        LOG.info("--------------------------------------------------");
+        LOG.infof("DEBUG EMAIL [Export Dati] to: %s", recipientEmail);
+        LOG.info("Body: " + htmlBody);
+        LOG.infof("Allegato: bibliomap_export.pdf (%d bytes)", pdfBytes.length);
+        LOG.info("--------------------------------------------------");
+        return true;
+    }
 
-	    try {
-	        mailer.send(Mail.withHtml(recipientEmail, subject, htmlBody)
-	                .setFrom("Bibliomap <noreply.bibliomap@gmail.com>")
-	                .addAttachment("bibliomap_export.pdf", pdfBytes, "application/pdf"));
-	        LOG.infof("Email [Export Dati] inviata con successo a %s", recipientEmail);
-	        return true;
-	    } catch (Exception e) {
-	        LOG.errorf(e, "ERRORE SMTP invio [Export Dati] a %s", recipientEmail);
-	        return false;
-	    }
-	}
+    try {
+        // conversione pdf in base64 per api brevo
+        String base64Content = Base64.getEncoder().encodeToString(pdfBytes);
+        
+        BrevoContact sender = new BrevoContact("Bibliomap", "adrianaridolfi91@gmail.com");
+        BrevoContact recipient = new BrevoContact("", recipientEmail);
+        BrevoAttachment attachment = new BrevoAttachment(base64Content, "bibliomap_export.pdf");
+        
+        BrevoRequest request = new BrevoRequest(
+            sender, 
+            List.of(recipient), 
+            subject, 
+            htmlBody, 
+            List.of(attachment)
+        );
+
+        brevoClient.sendEmail(brevoApiKey, request);
+        LOG.infof("email [Export Dati] inviata con successo a %s", recipientEmail);
+        return true;
+    } catch (Exception e) {
+        LOG.errorf(e, "errore api invio [Export Dati] a %s", recipientEmail);
+        return false;
+    }
+}
 
 	private boolean sendEmail(String to, String subject, String body, String logType) {
 		if (debugEmail) {
@@ -326,9 +333,9 @@ public class EmailService {
 	
 		try {
 	        // mittente autorizzato tramite verifica individuale
-	        var sender = new BrevoContact("Bibliomap", "adrianaridolfi91@gmail.com");
-	        var recipient = new BrevoContact("", to);
-	        var request = new BrevoRequest(sender, List.of(recipient), subject, body);
+	        BrevoContact sender = new BrevoContact("Bibliomap", "adrianaridolfi91@gmail.com");
+	        BrevoContact recipient = new BrevoContact("", to);
+	        BrevoRequest request = new BrevoRequest(sender, List.of(recipient), subject, body);
 	
 	        // invio tramite porta 443 (standard http)
 	        brevoClient.sendEmail(brevoApiKey, request);
