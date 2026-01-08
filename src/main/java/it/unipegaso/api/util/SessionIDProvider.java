@@ -47,7 +47,7 @@ public final class SessionIDProvider {
 				.path("/")
 				.maxAge(maxAgeSeconds)
 				.expiry(Date.from(expiryInstant)) 
-				.secure(isSecure) 
+				.secure(true) 
 				.httpOnly(true)
 				.sameSite(NewCookie.SameSite.NONE)
 				.build();
