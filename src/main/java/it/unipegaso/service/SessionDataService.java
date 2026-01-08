@@ -12,6 +12,8 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class SessionDataService {
 
+	private static final Logger LOG = Logger.getLogger(SessionDataService.class);
+
 	@Inject
 	RedisDataSource ds; 
 
