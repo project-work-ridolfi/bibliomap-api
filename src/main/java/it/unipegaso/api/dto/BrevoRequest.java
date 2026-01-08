@@ -1,7 +1,7 @@
 package it.unipegaso.api.dto
 
-import java.util.List
-import com.fasterxml.jackson.annotation.JsonProperty
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record BrevoRequest(
     @JsonProperty("sender") BrevoContact sender,
