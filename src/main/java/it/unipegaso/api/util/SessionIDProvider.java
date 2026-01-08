@@ -49,7 +49,7 @@ public final class SessionIDProvider {
 				.expiry(Date.from(expiryInstant)) 
 				.secure(isSecure) 
 				.httpOnly(true)
-				.sameSite(NewCookie.SameSite.LAX)
+				.sameSite(NewCookie.SameSite.NONE)
 				.build();
 
 	}
