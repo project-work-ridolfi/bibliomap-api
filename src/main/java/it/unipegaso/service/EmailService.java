@@ -335,7 +335,7 @@ public class EmailService {
 	        // mittente autorizzato tramite verifica individuale
 	        BrevoContact sender = new BrevoContact("Bibliomap", "adrianaridolfi91@gmail.com");
 	        BrevoContact recipient = new BrevoContact("", to);
-	        BrevoRequest request = new BrevoRequest(sender, List.of(recipient), subject, body);
+	        BrevoRequest request = new BrevoRequest(sender, List.of(recipient), subject, body, null);
 	
 	        // invio tramite porta 443 (standard http)
 	        brevoClient.sendEmail(brevoApiKey, request);
