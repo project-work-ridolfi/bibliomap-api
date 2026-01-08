@@ -329,9 +329,8 @@ public class AuthResource {
 	@POST
 	@Path("/logout")
 	public Response logout(@Context HttpHeaders headers) {
-		LOG.info("Tentativo di logout utente.");
-
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+    	LOG.infof("Tentativo di logout per sessione: %s", sessionId);
 
 		if (sessionId != null) {
 			// cancella lo stato di autenticazione da Redis (se l'utente era loggato)
