@@ -12,8 +12,10 @@ import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.Mailer;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import it.unipegaso.service.client.BrevoClient;
+import it.unipegaso.api.dto.BrevoRequest;
+import it.unipegaso.api.dto.BrevoContact;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import it.unipegaso.database.model.Loan;
@@ -76,7 +78,12 @@ public class EmailService {
 	String baseUrl;
 
 	@Inject
-	Mailer mailer;
+	@ConfigProperty(name = "brevo.api.key")
+	String brevoApiKey;
+
+	@Inject
+	@RestClient
+	BrevoClient brevoClient;
 
 	// Invia notifica di esito (accettazione/rifiuto) al richiedente.
 	public boolean sendRequestResponseEmail(String recipientEmail, String recipientName, String bookTitle, String action, String ownerNotes, String days, String slots) {
@@ -316,17 +323,21 @@ public class EmailService {
 			LOG.info("--------------------------------------------------");
 			return true;
 		}
-
+	
 		try {
-			mailer.send(Mail.withHtml(to, subject, body)
-					.setFrom("Bibliomap <noreply.bibliomap@gmail.com>")
-					.setReplyTo("noreply@invalid.local"));
-			LOG.infof("Email [%s] inviata con successo a %s", logType, to);
-			return true;
-		} catch (Exception e) {
-			LOG.errorf(e, "ERRORE SMTP invio [%s] a %s. Controllare configurazione.", logType, to);
-			return false;
-		}
+	        // mittente autorizzato tramite verifica individuale
+	        var sender = new BrevoContact("Bibliomap", "adrianaridolfi91@gmail.com");
+	        var recipient = new BrevoContact("", to);
+	        var request = new BrevoRequest(sender, List.of(recipient), subject, body);
+	
+	        // invio tramite porta 443 (standard http)
+	        brevoClient.sendEmail(brevoApiKey, request);
+	        LOG.infof("email [%s] inviata via api a %s", logType, to);
+	        return true;
+	    } catch (Exception e) {
+	        LOG.errorf(e, "errore invio brevo per %s", to);
+	        return false;
+	    }
 	}
 
 
