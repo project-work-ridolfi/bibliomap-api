@@ -1,4 +1,4 @@
-package it.unipegaso.api.dto
+package it.unipegaso.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
