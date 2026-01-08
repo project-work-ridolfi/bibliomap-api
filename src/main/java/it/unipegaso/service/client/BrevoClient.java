@@ -1,6 +1,6 @@
 package it.unipegaso.service.client;
 
-import it.unipegaso.database.dto.BrevoRequest;
+import it.unipegaso.api.dto.BrevoRequest;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
