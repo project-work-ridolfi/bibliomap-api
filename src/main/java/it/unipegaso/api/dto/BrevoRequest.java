@@ -7,5 +7,6 @@ public record BrevoRequest(
     @JsonProperty("sender") BrevoContact sender,
     @JsonProperty("to") List<BrevoContact> to,
     @JsonProperty("subject") String subject,
-    @JsonProperty("htmlContent") String htmlContent
+    @JsonProperty("htmlContent") String htmlContent,
+    @JsonProperty("attachment") List<BrevoAttachment> attachment
 ) {}
