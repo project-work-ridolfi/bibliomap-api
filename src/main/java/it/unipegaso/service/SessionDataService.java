@@ -29,7 +29,7 @@ public class SessionDataService {
 
 	public void save(String sessionId, Map<String, String> data, int expirationSeconds) {
 
-		if( data == null !! data.isEmpty()){
+		if( data == null || data.isEmpty()) {
 			return;
 		}
 
