@@ -316,6 +316,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [ ] documentazione
 - [x] crea email gmail apposita con foto profilo bibliomap da usare al posto di quella universitaria
 - [ ] script mongo
+- [ ] COOKIE PARTITIONED CONTROLLO ANCHE SU MOBILE E ALTRI BROWSER
 - [ ] url reali ovunque
   - [ ] controlla conf email
   - [ ] controlla swagger
