@@ -266,7 +266,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [x] per le cover usiamo anche google books, da togliere com'è ora nel fe
 - [ ] definisci flusso di ricerca
 - [ ] definisci flusso di prestito
-- [ ] per i prestiti se ce ne sono più pending per la stessa cosa gli altri vengono automaticamente rimandati?
+- [x] per i prestiti se ce ne sono più pending per la stessa cosa gli altri vengono automaticamente rifiutati
 - [ ] pagina aggiunta libro (da finire e testare), deve avere:
  - [x] controllo su google books
  - [x] inserimento isbn
@@ -284,7 +284,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [x] pagina libro per utente che la vede, bottone per richiedere il prestito -> manda email
 - [x] libreria da aggiungere la gestione di una location sua
 - [x] libreria va messa la possibilità di una visibilità diversa da quella dell'utente
-- [ ] fuzzy level (da ricontrollare se è vero)
+- [x] fuzzy location
 - [x] Creare Enum `LoanStatus`: `PENDING`, `ACCEPTED`, `ON_LOAN`, `RETURNED`, `REJECTED`, `CANCELLED`
 - [x] Creare Entity `Loan` nella collection `loans`:
 - [x] Creare `LoanRepository`:
@@ -312,12 +312,13 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [x] Creare Scheduler `@Scheduled(cron = "0 0 9 * * ?")` (ogni giorno alle 9):
     - [x] Cerca prestiti scaduti (`ON_LOAN` && `expectedReturnDate` passata)
     - [x] Per ogni prestito, invia Email di sollecito al `requesterId`
-- [ ] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
+- [x] scarica swagger yaml (http://localhost:8080/q/openapi) per inserirlo nella doc
 - [ ] documentazione
-- [x] crea email gmail apposita con foto profilo bibliomap da usare al posto di quella universitaria
+- [ ] readme
+- [ ] docker image 
 - [ ] script mongo
 - [ ] COOKIE PARTITIONED CONTROLLO ANCHE SU MOBILE E ALTRI BROWSER
 - [ ] url reali ovunque
   - [ ] controlla conf email
   - [ ] controlla swagger
-  - [ ] fronend
+  - [ ] frontend
