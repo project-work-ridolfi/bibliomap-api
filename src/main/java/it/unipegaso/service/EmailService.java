@@ -300,9 +300,11 @@ public class EmailService {
         String base64Content = Base64.getEncoder().encodeToString(pdfBytes);
         
         BrevoContact sender = new BrevoContact("Bibliomap", "adrianaridolfi91@gmail.com");
-        BrevoContact recipient = new BrevoContact("", recipientEmail);
+        BrevoContact recipient = new BrevoContact(recipientEmail, recipientEmail);
         BrevoAttachment attachment = new BrevoAttachment(base64Content, "bibliomap_export.pdf");
         
+        LOG.infof("PDF size bytes: %d", pdfBytes.length);
+
         BrevoRequest request = new BrevoRequest(
             sender, 
             List.of(recipient), 
