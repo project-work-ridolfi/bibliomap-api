@@ -4,6 +4,7 @@ Questo progetto contiene il backend dell'applicazione Bibliomap. Il codice è sv
 
 ## INDEX
  - [Documentazione API](#documentazione-api)
+ - [Diagrammi e Documentazione visuale](#diagrammi-e-documentazione-visuale)
  - [Quarkus](#sviluppo-con-quarkus)
  - [Dipendenze](#dipendenze-e-tecnologie)
  - [TODO](#todo)
@@ -11,6 +12,32 @@ Questo progetto contiene il backend dell'applicazione Bibliomap. Il codice è sv
 ## Documentazione API
 
 La specifica tecnica delle API è disponibile visualizzando il file [openapi.yaml](./docs/openapi.yaml).
+
+Le API sono organizzate in diverse risorse logiche:
+
+- **Auth Resource**: gestione autenticazione (registrazione, login, reset password, verifica OTP)
+- **User Resource**: profilo utente, impostazioni privacy, esportazione dati GDPR
+- **Library Resource**: CRUD delle librerie personali con gestione location e visibilità
+- **Book/Copy Resource**: catalogazione libri, ricerca geografica, gestione copie fisiche
+- **Loan Resource**: ciclo completo dei prestiti (richiesta, approvazione, consegna, restituzione, estensione)
+- **Stats Resource**: statistiche globali e per utente sull'utilizzo della piattaforma
+
+Gli endpoint principali includono la ricerca di libri nelle vicinanze (`/api/books/nearby`), la gestione dello stato dei prestiti (`/api/loan/{id}/status`), e l'integrazione con Google Books API per il recupero automatico dei metadati (`/api/books/external/lookup-metadata`).
+
+
+## Diagrammi e Documentazione Visuale
+
+Per una comprensione più approfondita dell'architettura e dei flussi applicativi, è disponibile una raccolta di diagrammi in formato draw.io al percorso [docs/bibliomap.drawio](./docs/bibliomap.drawio). 
+
+La documentazione include:
+- **ERD** dello schema database MongoDB
+- **Diagramma di deployment** dell'infrastruttura
+- **Diagramma di sequenza** per l'integrazione con Google Books API
+- **Flussi applicativi** di registrazione utente e gestione prestiti
+- **Macchina a stati** del ciclo di vita dei prestiti
+
+Questi diagrammi facilitano la comprensione delle relazioni tra le entità, dei flussi operativi e delle interazioni tra i componenti del sistema.
+
 
 ## Sviluppo con Quarkus
 
@@ -264,14 +291,13 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [x] usa error message sempre nei casi di errore (no mappa)
 - [x] crea oggetti model per Books, Copies, Locations e Libraries
 - [x] per le cover usiamo anche google books, da togliere com'è ora nel fe
-- [ ] definisci flusso di ricerca
-- [ ] definisci flusso di prestito
+- [x] definisci flusso di prestito
 - [x] per i prestiti se ce ne sono più pending per la stessa cosa gli altri vengono automaticamente rifiutati
-- [ ] pagina aggiunta libro (da finire e testare), deve avere:
+- [x] pagina aggiunta libro (da finire e testare), deve avere:
  - [x] controllo su google books
  - [x] inserimento isbn
  - [x] sblocco camera per isbn
- - [ ] condizione ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
+ - [x] condizione ma scelta fissa (da definire nuovo/ottima/discreta/usato/pessima)
  - [x] caricamento copertina (drag or choose, cerca su google, camera??, scegli icona)
  - [x] lista di tag (si può scegliere da una lista fissa, alcuni suggeriti dal libro stesso, oppure inserire un tag nuovo)
  - [x] da definire bene logica tag e copertina
@@ -316,9 +342,11 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [ ] documentazione
 - [ ] readme
 - [ ] docker image 
+  - [ ] doc img docker
 - [ ] script mongo
 - [ ] COOKIE PARTITIONED CONTROLLO ANCHE SU MOBILE E ALTRI BROWSER
 - [ ] url reali ovunque
   - [ ] controlla conf email
   - [ ] controlla swagger
   - [ ] frontend
+
