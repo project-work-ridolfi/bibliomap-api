@@ -173,91 +173,93 @@ public class AuthResource {
 		}
 	}
 
-
 	@POST
 	@Path("/register")
 	public Response register(RegistrationDTO request) {
 
 		// CONTROLLO DI SICUREZZA: tutti i valori devono essere presenti
 		if (request.password() == null || request.password().isEmpty() || !request.acceptTerms() || !request.acceptPrivacy()) {
-
 			return Response.status(Response.Status.BAD_REQUEST)
 					.entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Password e accettazione termini sono obbligatori per la registrazione finale."))
 					.build();
 		}
 
-
 		// HASHING DELLA PASSWORD
 		String hashedPassword = BcryptUtil.bcryptHash(request.password());
 
 		User newUser = new User();
-
-		// Campi obbligatori e di sicurezza
 		newUser.setUsername(request.username());
 		newUser.setEmail(request.email());
 		newUser.setHashedPassword(hashedPassword);
 		newUser.setAcceptedTerms(request.acceptTerms());
-		Response response;
 
 		try {
 			// SALVATAGGIO UTENTE nel DB
-
 			String id = userRepository.create(newUser);
 			boolean success = id != null;
 
 			if (success) {
-
 				// genera ID di sessione a lunga durata 
 				String authenticatedSessionId = UUID.randomUUID().toString(); 
 
-				// salva lo stato autenticato in Redis (userId e username)
-				registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, newUser.getId(), newUser.getUsername(), sessionDurationMinutes * 60); 
+				// salva lo stato autenticato in Redis
+				int durationSeconds = sessionDurationMinutes * 60;
+				registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, newUser.getId(), newUser.getUsername(), durationSeconds); 
 
 				// determina se il flag 'Secure' deve essere TRUE
 				boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
-
-				// crea e imposta il cookie SESSION_ID a LUNGO TERMINE 
-				NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
-						authenticatedSessionId, 
-						isSecure, 
-						sessionDurationMinutes * 60 // MaxAge in secondi
-						); 
 
 				Map<String, String> responseBody = Map.of(
 						"message", "User created and authenticated.",
 						"userId", newUser.getId() 
 						);
 
-				// ritorna la risposta con il nuovo Cookie SESSION_ID 
-				return Response.status(Response.Status.CREATED)
-						.entity(responseBody)
-						.cookie(authCookie) 
-						.build();
+				// usa partitioned
+				if (isSecure) {
+					// usa l'header Set-Cookie personalizzato con Partitioned
+					String setCookieHeader = SessionIDProvider.buildSetCookieHeader(
+							authenticatedSessionId, 
+							durationSeconds, 
+							true, 
+							true // partitioned
+							);
+
+					return Response.status(Response.Status.CREATED)
+							.entity(responseBody)
+							.header("Set-Cookie", setCookieHeader)
+							.build();
+				} else {
+					NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
+							authenticatedSessionId, 
+							false, 
+							durationSeconds
+							);
+
+					return Response.status(Response.Status.CREATED)
+							.entity(responseBody)
+							.cookie(authCookie)
+							.build();
+				}
 
 			} else {
-				// fallimento logico non coperto
 				LOG.errorf("Salvataggio utente fallito silenziosamente per %s. (Motivo non specificato).", request.email());
-				response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity(new ErrorResponse("DB_FAILURE_SILENT", "Creazione utente fallita senza eccezione specifica."))
 						.build();
 			}
 
 		} catch (IllegalArgumentException e) {
-			// Cattura chiavi uniche duplicate (username/email)
 			LOG.warnf("Tentativo di inserimento utente duplicato fallito: %s", e.getMessage());
-			response = Response.status(Response.Status.CONFLICT)
+			return Response.status(Response.Status.CONFLICT)
 					.entity(new ErrorResponse("ALREADY_EXISTS", "L'username o l'email esistono già nel database."))
 					.build();
 
 		} catch (RuntimeException e) {
-			// Cattura tutti gli altri errori di DB/runtime
 			LOG.errorf(e, "Errore generico durante il salvataggio dell'utente %s.", request.email());
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity(new ErrorResponse("DB_SAVE_FAILURE", "Impossibile completare la registrazione a causa di un errore interno."))
 					.build();
 		}
-
-		return response;
 	}
 
 
@@ -267,7 +269,6 @@ public class AuthResource {
 
 		if (credentials.email() == null || credentials.email().isEmpty() ||
 				credentials.password() == null || credentials.password().isEmpty()) {
-
 			return Response.status(Response.Status.BAD_REQUEST)
 					.entity(new ErrorResponse("REQUIRED_FIELDS_MISSING", "Identificatore (username/email) e password sono obbligatori."))
 					.build();
@@ -275,19 +276,14 @@ public class AuthResource {
 
 		LOG.debugf("Tentativo di login per: %s", credentials.email());
 
-		// cerca l'utente 
 		Optional<User> userOptional = userRepository.findByEmail(credentials.email());
-
 		if (userOptional.isEmpty()) {
-			// senza specificare se l'utente esiste o no 
 			return Response.status(Response.Status.UNAUTHORIZED) 
 					.entity(new ErrorResponse("INVALID_CREDENTIALS", "Credenziali non valide."))
 					.build();
 		}
 
 		User user = userOptional.get();
-
-		// verifica la password
 		boolean isPasswordValid = BcryptUtil.matches(credentials.password(), user.getHashedPassword());
 
 		if (!isPasswordValid) {
@@ -296,157 +292,165 @@ public class AuthResource {
 					.build();
 		}
 
-
 		// session id a lunga durata
 		String authenticatedSessionId = UUID.randomUUID().toString(); 
+		int durationSeconds = sessionDurationMinutes * 60;
 
-		int durationSeconds =  sessionDurationMinutes * 60;
-		// salva lo stato autenticato in Redis
 		registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, user.getId(), user.getUsername(), durationSeconds); 
 
-		// determina se il flag 'Secure' deve essere TRUE
 		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
 
-		// crea e imposta il cookie SESSION_ID a LUNGO TERMINE
-		NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
-				authenticatedSessionId, 
-				isSecure, 
-				durationSeconds
-				); 
-
-		// risposta di successo
 		Map<String, String> responseBody = Map.of(
 				"message", "Accesso effettuato con successo.",
 				"userId", user.getId() 
 				);
 
-		return Response.ok(responseBody) // 200 OK
-				.cookie(authCookie) // Imposta il SESSION_ID
-				.build();
+		// usa Partitioned
+		if (isSecure) {
+			String setCookieHeader = SessionIDProvider.buildSetCookieHeader(
+					authenticatedSessionId, 
+					durationSeconds, 
+					true, 
+					true // partitioned
+					);
+
+			return Response.ok(responseBody)
+					.header("Set-Cookie", setCookieHeader)
+					.build();
+		} else {
+			NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
+					authenticatedSessionId, 
+					false, 
+					durationSeconds
+					);
+
+			return Response.ok(responseBody)
+					.cookie(authCookie)
+					.build();
+		}
 	}
 
-	
+
 	@POST
 	@Path("/logout")
 	public Response logout(@Context HttpHeaders headers) {
 		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
-    	LOG.infof("Tentativo di logout per sessione: %s", sessionId);
+		LOG.infof("Tentativo di logout per sessione: %s", sessionId);
 
 		if (sessionId != null) {
-			// cancella lo stato di autenticazione da Redis (se l'utente era loggato)
-			registrationFlowService.deleteSession(sessionId); 
+			registrationFlowService.deleteSession(sessionId);
 		}
 
-		// cancella il cookie nel browser (Max-Age=0)
-		NewCookie expiredCookie = SessionIDProvider.createExpiredSessionCookie(sessionId); 
+		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+		NewCookie expiredCookie = SessionIDProvider.createExpiredSessionCookie(isSecure);
 
-		return Response.noContent() 
+		return Response.noContent()
 				.cookie(expiredCookie)
 				.build();
 	}
-	
+
 	@POST
-    @Path("/password-reset-init")
-    public Response passwordResetInit(Map<String, String> request, @Context HttpHeaders headers) {
-        String email = request.get("email");
-        if (email == null || email.isBlank()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ErrorResponse("EMAIL_REQUIRED", "L'email è obbligatoria per il recupero password."))
-                    .build();
-        }
+	@Path("/password-reset-init")
+	public Response passwordResetInit(Map<String, String> request, @Context HttpHeaders headers) {
+		String email = request.get("email");
+		if (email == null || email.isBlank()) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ErrorResponse("EMAIL_REQUIRED", "L'email è obbligatoria per il recupero password."))
+					.build();
+		}
 
-        //  Verifica se l'utente esiste (Security best practice: non dire se esiste o no, 
-        // ma noi qui seguiamo il flusso OTP esistente che necessita dell'utente)
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            LOG.warnf("Richiesta recupero password per email inesistente: %s", email);
-            // Ritorniamo comunque successo per evitare enumeration
-            return Response.ok(Map.of("message", "Se l'email è registrata, riceverai un codice OTP.")).build();
-        }
+		//  Verifica se l'utente esiste (Security best practice: non dire se esiste o no, 
+		// ma noi qui seguiamo il flusso OTP esistente che necessita dell'utente)
+		Optional<User> userOpt = userRepository.findByEmail(email);
+		if (userOpt.isEmpty()) {
+			LOG.warnf("Richiesta recupero password per email inesistente: %s", email);
+			// Ritorniamo comunque successo per evitare enumeration
+			return Response.ok(Map.of("message", "Se l'email è registrata, riceverai un codice OTP.")).build();
+		}
 
-        User user = userOpt.get();
-        
-        // recupera sid dal Cookie o ne genera uno nuovo
-        String sessionId = SessionIDProvider.getSessionId(headers).orElse(UUID.randomUUID().toString());
+		User user = userOpt.get();
 
-        // genera e invia OTP con OtpService
-        String mockOtp = otpService.generateAndSendOtp(email, sessionId, user.getUsername(), true);
+		// recupera sid dal Cookie o ne genera uno nuovo
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(UUID.randomUUID().toString());
 
-        if (mockOtp == null && !otpDebugMode) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ErrorResponse("SMTP_FAILURE", "Impossibile inviare l'email di recupero."))
-                    .build();
-        }
+		// genera e invia OTP con OtpService
+		String mockOtp = otpService.generateAndSendOtp(email, sessionId, user.getUsername(), true);
 
-        // Risposta
-        Map<String, String> responseData = otpDebugMode 
-            ? Map.of("message", "OTP inviato (Debug).", "mockOtp", mockOtp)
-            : Map.of("message", "Codice di verifica inviato.");
+		if (mockOtp == null && !otpDebugMode) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(new ErrorResponse("SMTP_FAILURE", "Impossibile inviare l'email di recupero."))
+					.build();
+		}
 
-        boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
-        NewCookie sessionCookie = SessionIDProvider.createSessionCookie(sessionId, isSecure);
+		// Risposta
+		Map<String, String> responseData = otpDebugMode 
+				? Map.of("message", "OTP inviato (Debug).", "mockOtp", mockOtp)
+						: Map.of("message", "Codice di verifica inviato.");
 
-        return Response.ok(responseData).cookie(sessionCookie).build();
-    }
+		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+		NewCookie sessionCookie = SessionIDProvider.createSessionCookie(sessionId, isSecure);
 
-    @POST
-    @Path("/password-reset-verify")
-    public Response passwordResetVerify(Map<String, String> request, @Context HttpHeaders headers) {
-        String email = request.get("email");
-        String otp = request.get("otp");
-        String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
+		return Response.ok(responseData).cookie(sessionCookie).build();
+	}
 
-        if (sessionId == null || email == null || otp == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ErrorResponse("MISSING_DATA", "Dati mancanti o sessione scaduta."))
-                    .build();
-        }
+	@POST
+	@Path("/password-reset-verify")
+	public Response passwordResetVerify(Map<String, String> request, @Context HttpHeaders headers) {
+		String email = request.get("email");
+		String otp = request.get("otp");
+		String sessionId = SessionIDProvider.getSessionId(headers).orElse(null);
 
-        // Riutilizzo della logica di verifica esistente (inclusi retry su Redis)
-        Map<String, Object> result = otpService.verifyOtp(email, otp, sessionId);
-        boolean isValid = (boolean) result.getOrDefault("valid", false);
+		if (sessionId == null || email == null || otp == null) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ErrorResponse("MISSING_DATA", "Dati mancanti o sessione scaduta."))
+					.build();
+		}
 
-        if (isValid) {
-            return Response.noContent().build(); // 204
-        } else {
-            return Response.status(Response.Status.FORBIDDEN).entity(result).build();
-        }
-    }
+		// Riutilizzo della logica di verifica esistente (inclusi retry su Redis)
+		Map<String, Object> result = otpService.verifyOtp(email, otp, sessionId);
+		boolean isValid = (boolean) result.getOrDefault("valid", false);
 
-    @PUT
-    @Path("/password-reset-complete")
-    public Response passwordResetComplete(Map<String, Object> request) {
-        String email = (String) request.get("email");
-        String newPassword = (String) request.get("new");
-        Boolean fromOtp = (Boolean) request.get("fromOtp");
+		if (isValid) {
+			return Response.noContent().build(); // 204
+		} else {
+			return Response.status(Response.Status.FORBIDDEN).entity(result).build();
+		}
+	}
 
-        if (email == null || newPassword == null || fromOtp == null || !fromOtp) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ErrorResponse("INVALID_REQUEST", "Richiesta non valida.")).build();
-        }
+	@PUT
+	@Path("/password-reset-complete")
+	public Response passwordResetComplete(Map<String, Object> request) {
+		String email = (String) request.get("email");
+		String newPassword = (String) request.get("new");
+		Boolean fromOtp = (Boolean) request.get("fromOtp");
 
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+		if (email == null || newPassword == null || fromOtp == null || !fromOtp) {
+			return Response.status(Response.Status.BAD_REQUEST)
+					.entity(new ErrorResponse("INVALID_REQUEST", "Richiesta non valida.")).build();
+		}
 
-        User user = userOpt.get();
-        
-        // Hashing della nuova password
-        String hashedPassword = BcryptUtil.bcryptHash(newPassword);
-        user.setHashedPassword(hashedPassword);
-        
-        // Aggiunta alla history
-        Map<String, Object> historyEntry = Map.of(
-            "action", "PASSWORD_RESET_VIA_OTP",
-            "changedOn", new java.util.Date()
-        );
-        user.addToHistory(historyEntry);
+		Optional<User> userOpt = userRepository.findByEmail(email);
+		if (userOpt.isEmpty()) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
 
-        // Salvataggio nel DB
-        userRepository.update(user);
+		User user = userOpt.get();
 
-        return Response.ok(Map.of("message", "Password aggiornata con successo.")).build();
-    }
+		// Hashing della nuova password
+		String hashedPassword = BcryptUtil.bcryptHash(newPassword);
+		user.setHashedPassword(hashedPassword);
+
+		// Aggiunta alla history
+		Map<String, Object> historyEntry = Map.of(
+				"action", "PASSWORD_RESET_VIA_OTP",
+				"changedOn", new java.util.Date()
+				);
+		user.addToHistory(historyEntry);
+
+		// Salvataggio nel DB
+		userRepository.update(user);
+
+		return Response.ok(Map.of("message", "Password aggiornata con successo.")).build();
+	}
 
 }
