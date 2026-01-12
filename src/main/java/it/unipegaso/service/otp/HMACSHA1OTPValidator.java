@@ -24,24 +24,7 @@ public class HMACSHA1OTPValidator {
         baseStringEncoding = aBaseStringEncoding;
     }
 
-    /**
-     * Validates an HMAC-SHA1 OTP generated password using the OATH standard.
-     * This method assumes an 8 digit OTP, without checksum and dynamic truncation.
-     * 
-     * @param password     the one time password
-     * @param secret       device secret key, in hexadecimal notation
-     * @param movingFactor the counter, time, or other value that
-     *                     changes on a per use basis.
-     * @throws NoSuchAlgorithmException if no provider makes
-     *                                  either HmacSHA1 or HMAC-SHA-1
-     *                                  digest algorithms available.
-     * @throws InvalidKeyException      The secret provided was not
-     *                                  a valid HMAC-SHA-1 key.
-     * 
-     * @return true if the password is valid for the given secret and
-     *         movingFactor, false otherwise
-     * @throws DecodingException
-     */
+     // Valida una password OTP HMAC-SHA1 secondo lo standard OATH.
     public boolean validatePassword(String password, String secret, long movingFactor)
             throws InvalidKeyException, NoSuchAlgorithmException, DecodingException {
 
@@ -50,23 +33,7 @@ public class HMACSHA1OTPValidator {
 
     }
 
-    /**
-     * Generates an HMAC-SHA1 OTP using the OATH standard.
-     * This method assumes an 8 digit OTP, without checksum and dynamic truncation.
-     * 
-     * @param secret       device secret key, in hexadecimal notation
-     * @param movingFactor the counter, time, or other value that
-     *                     changes on a per use basis.
-     * @throws NoSuchAlgorithmException if no provider makes
-     *                                  either HmacSHA1 or HMAC-SHA-1
-     *                                  digest algorithms available.
-     * @throws InvalidKeyException      The secret provided was not
-     *                                  a valid HMAC-SHA-1 key.
-     * 
-     * @return true if the password is valid for the given secret and
-     *         movingFactor, false otherwise
-     * @throws DecodingException
-     */
+     // Genera una password OTP HMAC-SHA1 secondo lo standard OATH.
     public String generatePassword(String secret, long movingFactor)
             throws InvalidKeyException, NoSuchAlgorithmException, DecodingException {
 
@@ -74,34 +41,8 @@ public class HMACSHA1OTPValidator {
                 DEFAULT_TRUNCATION_OFFSET);
     }
 
-    /**
-     * Validates an HMAC-SHA1 OTP generated password using the OATH standard.
-     * 
-     * @param password         the one time password
-     * @param secret           device secret key, in hexadecimal notation
-     * @param movingFactor     the counter, time, or other value that
-     *                         changes on a per use basis.
-     * @param codeDigits       the number of digits in the OTP, not
-     *                         including the checksum, if any.
-     * @param addChecksum      a flag that indicates if a checksum digit
-     *                         should be appended to the OTP.
-     * @param truncationOffset the offset into the MAC result to
-     *                         begin truncation. If this value is out of
-     *                         the range of 0 ... 15, then dynamic
-     *                         truncation will be used.
-     *                         Dynamic truncation is when the last 4
-     *                         bits of the last byte of the MAC are
-     *                         used to determine the start offset.
-     * @throws NoSuchAlgorithmException if no provider makes
-     *                                  either HmacSHA1 or HMAC-SHA-1
-     *                                  digest algorithms available.
-     * @throws InvalidKeyException      The secret provided was not
-     *                                  a valid HMAC-SHA-1 key.
-     * 
-     * @return true if the password is valid for the given secret and
-     *         movingFactor, false otherwise
-     * @throws DecodingException
-     */
+
+     // Valida una password OTP HMAC-SHA1 con parametri personalizzati.
     public boolean validatePassword(String password, String secret, long movingFactor, int codeDigits,
             boolean addChecksum, int truncationOffset)
             throws InvalidKeyException, NoSuchAlgorithmException, DecodingException {
@@ -119,33 +60,8 @@ public class HMACSHA1OTPValidator {
         return result;
     }
 
-    /**
-     * Generates an HMAC-SHA1 OTP using the OATH standard.
-     * 
-     * @param secret           device secret key, in hexadecimal notation
-     * @param movingFactor     the counter, time, or other value that
-     *                         changes on a per use basis.
-     * @param codeDigits       the number of digits in the OTP, not
-     *                         including the checksum, if any.
-     * @param addChecksum      a flag that indicates if a checksum digit
-     *                         should be appended to the OTP.
-     * @param truncationOffset the offset into the MAC result to
-     *                         begin truncation. If this value is out of
-     *                         the range of 0 ... 15, then dynamic
-     *                         truncation will be used.
-     *                         Dynamic truncation is when the last 4
-     *                         bits of the last byte of the MAC are
-     *                         used to determine the start offset.
-     * @throws NoSuchAlgorithmException if no provider makes
-     *                                  either HmacSHA1 or HMAC-SHA-1
-     *                                  digest algorithms available.
-     * @throws InvalidKeyException      The secret provided was not
-     *                                  a valid HMAC-SHA-1 key.
-     * 
-     * @return true if the password is valid for the given secret and
-     *         movingFactor, false otherwise
-     * @throws DecodingException
-     */
+
+     // Genera una password OTP HMAC-SHA1 con parametri personalizzati.
     public String generatePassword(String secret, long movingFactor, int codeDigits, boolean addChecksum,
             int truncationOffset)
             throws InvalidKeyException, NoSuchAlgorithmException, DecodingException {
@@ -160,17 +76,7 @@ public class HMACSHA1OTPValidator {
 
     }
 
-    /**
-     * Calculates the checksum using the credit card algorithm.
-     * This algorithm has the advantage that it detects any single
-     * mistyped digit and any single transposition of
-     * adjacent digits.
-     *
-     * @param num    the number to calculate the checksum for
-     * @param digits number of significant places in the number
-     *
-     * @return the checksum of num
-     */
+    // Calcola il checksum usando l'algoritmo delle carte di credito.
     private int calcChecksum(long num, int digits) {
         boolean doubleDigit = true;
         int total = 0;
@@ -189,23 +95,8 @@ public class HMACSHA1OTPValidator {
         }
         return result;
     }
-
-    /**
-     * This method uses the JCE to provide the HMAC-SHA-1
-     * algorithm.
-     * HMAC computes a Hashed Message Authentication Code and
-     * in this case SHA1 is the hash algorithm used.
-     *
-     * @param keyBytes the bytes to use for the HMAC-SHA-1 key
-     * @param text     the message or text to be authenticated.
-     *
-     * @throws NoSuchAlgorithmException if no provider makes
-     *                                  either HmacSHA1 or HMAC-SHA-1
-     *                                  digest algorithms available.
-     * @throws InvalidKeyException      The secret provided was not a valid
-     *                                  HMAC-SHA-1 key.
-     *
-     */
+    
+    // Calcola l'HMAC-SHA-1 utilizzando JCE.
     private byte[] hmacSha1(byte[] keyBytes, byte[] text)
             throws NoSuchAlgorithmException, InvalidKeyException {
         Mac hmacSha1;
@@ -219,34 +110,8 @@ public class HMACSHA1OTPValidator {
         return hmacSha1.doFinal(text);
     }
 
-    /**
-     * This method generates an OTP value for the given
-     * set of parameters.
-     *
-     * @param secret           the shared secret
-     * @param movingFactor     the counter, time, or other value that
-     *                         changes on a per use basis.
-     * @param codeDigits       the number of digits in the OTP, not
-     *                         including the checksum, if any.
-     * @param addChecksum      a flag that indicates if a checksum digit
-     *                         should be appended to the OTP.
-     * @param truncationOffset the offset into the MAC result to
-     *                         begin truncation. If this value is out of
-     *                         the range of 0 ... 15, then dynamic
-     *                         truncation will be used.
-     *                         Dynamic truncation is when the last 4
-     *                         bits of the last byte of the MAC are
-     *                         used to determine the start offset.
-     * @throws NoSuchAlgorithmException if no provider makes
-     *                                  either HmacSHA1 or HMAC-SHA-1
-     *                                  digest algorithms available.
-     * @throws InvalidKeyException      The secret provided was not
-     *                                  a valid HMAC-SHA-1 key.
-     *
-     * @return A numeric String in base 10 that includes
-     *         {@link codeDigits} digits plus the optional checksum
-     *         digit if requested.
-     */
+    
+    // Genera un valore OTP per i parametri specificati.
     private String generateOTP(byte[] secret,
             long movingFactor,
             int codeDigits,
@@ -254,7 +119,6 @@ public class HMACSHA1OTPValidator {
             int truncationOffset)
             throws NoSuchAlgorithmException, InvalidKeyException {
 
-        // put movingFactor value into text byte array
         StringBuilder result = null;
         int digits = addChecksum ? (codeDigits + 1) : codeDigits;
         byte[] text = new byte[8];
@@ -262,9 +126,7 @@ public class HMACSHA1OTPValidator {
             text[i] = (byte) (movingFactor & 0xff);
             movingFactor >>= 8;
         }
-        // compute hmac hash
         byte[] hash = hmacSha1(secret, text);
-        // put selected bytes into result int
         int offset = hash[hash.length - 1] & 0xf;
         if ((0 <= truncationOffset) &&
                 (truncationOffset < (hash.length - 4))) {
