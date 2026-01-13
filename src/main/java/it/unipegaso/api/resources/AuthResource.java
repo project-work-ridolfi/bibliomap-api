@@ -199,47 +199,32 @@ public class AuthResource {
 			boolean success = id != null;
 
 			if (success) {
-				// genera ID di sessione a lunga durata 
 				String authenticatedSessionId = UUID.randomUUID().toString(); 
-
-				// salva lo stato autenticato in Redis
 				int durationSeconds = sessionDurationMinutes * 60;
-				registrationFlowService.saveAuthenticatedUser(authenticatedSessionId, newUser.getId(), newUser.getUsername(), durationSeconds); 
+				registrationFlowService.saveAuthenticatedUser(
+						authenticatedSessionId, 
+						newUser.getId(), 
+						newUser.getUsername(), 
+						durationSeconds
+						); 
 
-				// determina se il flag 'Secure' deve essere TRUE
 				boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+
+				NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
+						authenticatedSessionId, 
+						isSecure, 
+						durationSeconds
+						);
 
 				Map<String, String> responseBody = Map.of(
 						"message", "User created and authenticated.",
 						"userId", newUser.getId() 
 						);
 
-				// usa partitioned
-				if (isSecure) {
-					// usa l'header Set-Cookie personalizzato con Partitioned
-					String setCookieHeader = SessionIDProvider.buildSetCookieHeader(
-							authenticatedSessionId, 
-							durationSeconds, 
-							true, 
-							true // partitioned
-							);
-
-					return Response.status(Response.Status.CREATED)
-							.entity(responseBody)
-							.header("Set-Cookie", setCookieHeader)
-							.build();
-				} else {
-					NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
-							authenticatedSessionId, 
-							false, 
-							durationSeconds
-							);
-
-					return Response.status(Response.Status.CREATED)
-							.entity(responseBody)
-							.cookie(authCookie)
-							.build();
-				}
+				return Response.status(Response.Status.CREATED)
+						.entity(responseBody)
+						.cookie(authCookie)  
+						.build();
 
 			} else {
 				LOG.errorf("Salvataggio utente fallito silenziosamente per %s. (Motivo non specificato).", request.email());

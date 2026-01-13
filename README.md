@@ -190,7 +190,7 @@ Spiegazione dei collegamenti:
 
 ### ricerca punto vicino
 
-```json
+```code
 db.locations.aggregate([
   {
     $geoNear: {
@@ -344,7 +344,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [ ] docker image 
   - [ ] doc img docker
 - [ ] script mongo
-- [ ] COOKIE PARTITIONED CONTROLLO ANCHE SU MOBILE E ALTRI BROWSER
+- [x] COOKIE PARTITIONED CONTROLLO ANCHE SU MOBILE E ALTRI BROWSER
 - [ ] url reali ovunque
   - [ ] controlla conf email
   - [ ] controlla swagger
