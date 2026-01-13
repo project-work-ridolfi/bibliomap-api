@@ -290,29 +290,16 @@ public class AuthResource {
 				"userId", user.getId() 
 				);
 
-		// usa Partitioned
-		if (isSecure) {
-			String setCookieHeader = SessionIDProvider.buildSetCookieHeader(
-					authenticatedSessionId, 
-					durationSeconds, 
-					true, 
-					true // partitioned
-					);
+		String setCookieHeader = SessionIDProvider.buildSetCookieHeader(
+		        authenticatedSessionId, 
+		        durationSeconds, 
+		        isSecure, 
+		        true // Partitioned
+		);
 
-			return Response.ok(responseBody)
-					.header("Set-Cookie", setCookieHeader)
-					.build();
-		} else {
-			NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
-					authenticatedSessionId, 
-					false, 
-					durationSeconds
-					);
-
-			return Response.ok(responseBody)
-					.cookie(authCookie)
-					.build();
-		}
+		return Response.ok(responseBody)
+		        .header("Set-Cookie", setCookieHeader)
+		        .build();
 	}
 
 

@@ -50,18 +50,17 @@ public final class SessionIDProvider {
 
 	// Metodo privato per costruire il cookie con logica condizionale
 	private static NewCookie buildCookie(String value, int maxAgeSeconds, boolean isSecure) {
-		Instant expiryInstant = Instant.now().plusSeconds(maxAgeSeconds);
+	    Instant expiryInstant = Instant.now().plusSeconds(maxAgeSeconds);
 
-		NewCookie.Builder builder = new NewCookie.Builder(SESSION_COOKIE_NAME)
-				.value(value)
-				.path("/")
-				.maxAge(maxAgeSeconds)
-				.expiry(Date.from(expiryInstant))
-				.httpOnly(true)
-				.secure(isSecure)
-				.sameSite(isSecure ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX);
-
-		return builder.build();
+	    return new NewCookie.Builder(SESSION_COOKIE_NAME)
+	            .value(value)
+	            .path("/")
+	            .maxAge(maxAgeSeconds)
+	            .expiry(Date.from(expiryInstant))
+	            .httpOnly(true)
+	            .secure(isSecure)
+	            .sameSite(isSecure ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX)
+	            .build();
 	}
 	
 	/**
