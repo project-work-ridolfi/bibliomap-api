@@ -343,7 +343,7 @@ Il risultato e' un elenco di libri disponibili in librerie vicine con informazio
 - [ ] readme
 - [ ] docker image 
   - [ ] doc img docker
-- [ ] script mongo
+- [x] script mongo
 - [x] COOKIE PARTITIONED CONTROLLO ANCHE SU MOBILE E ALTRI BROWSER
 - [ ] url reali ovunque
   - [ ] controlla conf email
