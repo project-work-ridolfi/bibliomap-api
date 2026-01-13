@@ -5,15 +5,15 @@
  *
  * DESCRIZIONE:
  * Questo script gestisce il popolamento massivo delle collection MongoDB importando
- * dataset strutturati da file JSON esterni. La procedura è progettata per garantire
+ * dataset strutturati da file JSON esterni. La procedura e' progettata per garantire
  * il caricamento consistente dei dati di test, rispettando i vincoli di schema
- * e l'integrità referenziale logica definita nel modello dati.
+ * e l'integrita' referenziale logica definita nel modello dati.
  *
  * DIPENDENZE E PREREQUISITI:
- * 1. Inizializzazione Schema: L'esecuzione di questo script è subordinata al
+ * 1. Inizializzazione Schema: L'esecuzione di questo script e' subordinata al
  * precedente lancio di 'bibliomap-db-init.js'. La pre-esistenza degli indici
  * (in particolare l'indice spaziale '2dsphere' sulla collection 'locations')
- * è condizione necessaria per la corretta persistenza dei dati GeoJSON.
+ * e' condizione necessaria per la corretta persistenza dei dati GeoJSON.
  *
  * 2. Dataset di Riferimento: I file JSON contenenti i dati strutturati necessari
  * per il popolamento sono allocati nella directory relativa './json', fornita
@@ -72,9 +72,12 @@ function importCollection(collectionName, fileName) {
         if (Array.isArray(data) && data.length > 0) {
             const col = database.getCollection(collectionName);
             const result = col.insertMany(data);
-            print(" [OK] " + collectionName.padEnd(12) + ": Inseriti " + result.insertedIds.length + " documenti.");
+
+            const count = Object.keys(result.insertedIds).length;
+            
+            print(" [OK] " + collectionName.padEnd(12) + ": Inseriti " + count + " documenti.");
         } else {
-            print(" [INFO] " + fileName + " è vuoto -> Nessun dato inserito.");
+            print(" [INFO] " + fileName + " e' vuoto -> Nessun dato inserito.");
         }
 
     } catch (error) {

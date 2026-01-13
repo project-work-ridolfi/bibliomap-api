@@ -8,11 +8,11 @@
  *
  * Lo script crea esplicitamente tutte le collection e applica:
  *  - identificatori (_id) basati su stringhe
- *  - vincoli di non nullabilità tramite JSON Schema validation
- *  - vincoli di unicità dove necessario
+ *  - vincoli di non nullabilita' tramite JSON Schema validation
+ *  - vincoli di unicita' dove necessario
  *  - indicizzazione geospaziale per le query basate sulla posizione
  *
- * È pensato per ambienti in cui non si utilizza MongoDB Atlas
+ * E' pensato per ambienti in cui non si utilizza MongoDB Atlas
  * e si preferisce un'istanza MongoDB locale.
  *
  * Ambiente di esecuzione: mongosh
@@ -21,7 +21,7 @@
 
 /**
  * Selezione del database applicativo.
- * Se il database non esiste, verrà creato implicitamente
+ * Se il database non esiste, verra' creato implicitamente
  * alla creazione della prima collection.
  */
 const dbName = "bibliomap";
@@ -34,7 +34,7 @@ const database = db.getSiblingDB(dbName);
  * ============================================================
  *
  * Contiene i metadati dei libri.
- * L'identificatore _id corrisponde all'ISBN ed è memorizzato
+ * L'identificatore _id corrisponde all'ISBN ed e' memorizzato
  * come stringa.
  * Vengono resi obbligatori solo i campi identificativi principali.
  */
@@ -196,8 +196,8 @@ database.createCollection("users", {
 });
 
 /**
- * Indici di unicità per garantire la consistenza
- * dell'identità degli utenti.
+ * Indici di unicita' per garantire la consistenza
+ * dell'identita' degli utenti.
  */
 database.users.createIndex({ email: 1 }, { unique: true });
 database.users.createIndex({ username: 1 }, { unique: true });
@@ -212,10 +212,10 @@ database.users.createIndex({ username: 1 }, { unique: true });
  *
  * Il campo geolocation segue lo standard GeoJSON:
  *  - type deve essere "Point"
- *  - coordinates è un array [longitudine, latitudine]
+ *  - coordinates e' un array [longitudine, latitudine]
  *
  * La presenza di un indice 2dsphere consente:
- *  - ricerche di prossimità
+ *  - ricerche di prossimita'
  *  - query basate su raggio
  *  - utilizzo delle operazioni geospaziali di MongoDB
  */

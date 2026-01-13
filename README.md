@@ -7,6 +7,7 @@ Questo progetto contiene il backend dell'applicazione Bibliomap. Il codice è sv
  - [Diagrammi e Documentazione visuale](#diagrammi-e-documentazione-visuale)
  - [Quarkus](#sviluppo-con-quarkus)
  - [Dipendenze](#dipendenze-e-tecnologie)
+ - [MongoDB](#mongo-db)
  - [TODO](#todo)
 
 ## Documentazione API
@@ -278,7 +279,54 @@ In sintesi la pipeline:
 8. Ordina il risultato finale per distanza crescente dalla posizione di partenza
 
 Il risultato e' un elenco di libri disponibili in librerie vicine con informazioni complete su location libreria proprietario e libro ordinate per prossimita' geografica.
-  
+
+
+### Inizializzazione e Setup Locale
+
+Sebbene l'applicazione sia configurata per connettersi a un cluster MongoDB Atlas remoto, vengono forniti gli script necessari per replicare l'intera struttura del database e i dati di test in un ambiente locale.
+
+Gli script di manutenzione si trovano nel percorso docs/scripts.
+
+Struttura della directory:
+
+```bash
+.
+├── bibliomap.drawio
+├── imgs
+│   └── db_schema.jpg
+├── openapi.yaml
+└── scripts
+    ├── bibliomap-db-init.js       # Script di definizione schema e indici
+    ├── bibliomap-db-populate.js   # Script di importazione dati
+    └── json                       # Dataset in formato JSON
+        ├── bibliomap.books.json
+        ├── bibliomap.copies.json
+        ├── bibliomap.libraries.json
+        ├── bibliomap.loans.json
+        ├── bibliomap.locations.json
+        └── bibliomap.users.json
+```
+### Logica e Ordine di Esecuzione
+
+Per garantire la corretta inizializzazione degli indici geospaziali (necessari per le query $geoNear) e l'integrità referenziale dei dati, è fondamentale rispettare l'ordine di esecuzione degli script.
+
+1. bibliomap-db-init.js: Questo script si occupa della definizione strutturale. Crea le collection, applica le regole di validazione (JSON Schema Validator) e, soprattutto, costruisce l'indice 2dsphere sulla collection locations.
+
+2. bibliomap-db-populate.js: Questo script legge i dataset presenti nella sottocartella /json e popola il database.
+
+Procedura di avvio (tramite mongosh):
+```bash
+# 1. Spostarsi nella directory degli script
+cd docs/scripts
+
+# 2. Inizializzare lo schema e gli indici 
+mongosh bibliomap-db-init.js
+
+# 3. Popolare il database con i dati di test
+mongosh bibliomap-db-populate.js
+```
+
+
 ## TODO
  - [x] controllo su click multiplo per get otp
  - [x] accedi
