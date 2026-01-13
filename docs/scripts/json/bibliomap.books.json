@@ -1,370 +1,363 @@
-[{
-  "_id": "9780671664961",
-  "author": "Douglas Adams",
-  "cover": "https://books.google.com/books/content?id=SQkU8EnJUtAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 1981,
-  "title": "The Hitchhiker's Guide to the Galaxy"
-},
-{
-  "_id": "9781535200080",
-  "author": "Douglas Adams",
-  "cover": "https://books.google.com/books/content?id=R-LwvQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2016,
-  "title": "The Restaurant at the End of the Universe"
-},
-{
-  "_id": "9780330513142",
-  "author": "Douglas Adams",
-  "cover": "https://books.google.com/books/content?id=8QCRffdz99oC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2009,
-  "publisher": "Pan Macmillan",
-  "title": "Life, the Universe and Everything"
-},
-{
-  "_id": "9781439557617",
-  "author": "Douglas Adams",
-  "language": "Inglese",
-  "publication_year": 2008,
-  "publisher": "Paw Prints",
-  "title": "So Long, and Thanks for All the Fish"
-},
-{
-  "_id": "9780330513203",
-  "author": "Douglas Adams",
-  "cover": "https://books.google.com/books/content?id=eBd08nr5J8wC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2009,
-  "publisher": "Pan Macmillan",
-  "title": "Mostly Harmless"
-},
-{
-  "_id": "9788804633358",
-  "author": "Douglas Adams",
-  "language": "Italiano",
-  "publication_year": 2013,
-  "title": "Shada. Doctor Who"
-},
-{
-  "_id": "9788822705624",
-  "author": "H.G. Wells",
-  "cover": "https://books.google.com/books/content?id=Y60XDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2017,
-  "publisher": "Newton Compton Editori",
-  "title": "La macchina del tempo • L’uomo invisibile • La guerra dei mondi • L’isola del dottor Moreau"
-},
-{
-  "_id": "9788817079754",
-  "author": "Stephen William Hawking",
-  "language": "Italiano",
-  "publication_year": 2015,
-  "publisher": "Scienza",
-  "title": "Dal big bang ai buchi neri. Breve storia del tempo"
-},
-{
-  "_id": "9780142437247",
-  "author": "Herman Melville",
-  "language": "Inglese",
-  "publication_year": 0,
-  "publisher": "National Geographic Books",
-  "title": "Moby-Dick"
-},
-{
-  "_id": "9788811130246",
-  "author": "Joseph Conrad",
-  "cover": "https://books.google.com/books/content?id=AYg28HDpFcMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2010,
-  "publisher": "Garzanti Classici",
-  "title": "Cuore di tenebra"
-},
-{
-  "_id": "9798730367241",
-  "author": "Jane Austen",
-  "cover": "https://books.google.com/books/content?id=ad9dzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2021,
-  "publisher": "",
-  "title": "Orgoglio e Pregiudizio"
-},
-{
-  "_id": "9781539648000",
-  "author": "Jane Austen",
-  "cover": "https://books.google.com/books/content?id=bUY3vgAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2016,
-  "publisher": "",
-  "title": "Persuasion"
-},
-{
-  "_id": "9788831812108",
-  "author": "Licia Troisi",
-  "cover": "https://books.google.com/books/content?id=TLbDEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2023,
-  "publisher": "Rizzoli",
-  "title": "Astrofisica per ansiosi"
-},
-{
-  "_id": "9781877527937",
-  "author": "Louisa May Alcott",
-  "cover": "https://books.google.com/books/content?id=WMjHdhYI8F4C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2009,
-  "publisher": "The Floating Press",
-  "title": "Little Women"
-},
-{
-  "_id": "9798643298694",
-  "author": "Nathaniel Hawthorne",
-  "cover": "https://books.google.com/books/content?id=IlaEzQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2020,
-  "publisher": "",
-  "title": "The Scarlet Letter By Nathaniel Hawthorne (Romantic Novel) \"The New Annotated Version\""
-},
-{
-  "_id": "9783849673574",
-  "author": "Herman Melville",
-  "cover": "https://books.google.com/books/content?id=xiFIDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 1899,
-  "publisher": "Jazzybee Verlag",
-  "title": "Typee: A Romance of the South Seas"
-},
-{
-  "_id": "9781501137365",
-  "author": "Jane Austen",
-  "cover": "https://books.google.com/books/content?id=TsGDCgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2016,
-  "publisher": "Simon and Schuster",
-  "title": "Emma"
-},
-{
-  "_id": "9788811148067",
-  "author": "Jane Austen",
-  "cover": "https://books.google.com/books/content?id=EW4sDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2017,
-  "publisher": "Garzanti Classici",
-  "title": "L'abbazia di Northanger"
-},
-{
-  "_id": "9788830119000",
-  "author": "John R. R. Tolkien",
-  "cover": "https://books.google.com/books/content?id=7YqhzwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2023,
-  "publisher": "",
-  "title": "Il signore degli anelli"
-},
-{
-  "_id": "9788845290060",
-  "author": "John Ronald Reuel Tolkien",
-  "cover": "https://books.google.com/books/content?id=QOiKuQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2000,
-  "publisher": "",
-  "title": "Il Silmarillion"
-},
-{
-  "_id": "9788858796412",
-  "author": "J.R.R. Tolkien",
-  "cover": "https://books.google.com/books/content?id=3X0pEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2024,
-  "publisher": "Bompiani",
-  "title": "Lo Hobbit. Illustrato dall'autore"
-},
-{
-  "_id": "9788854125599",
-  "author": "James G. Frazer",
-  "cover": "https://books.google.com/books/content?id=3L7MWYs6awMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2012,
-  "publisher": "Newton Compton Editori",
-  "title": "Il ramo d'oro"
-},
-{
-  "_id": "9788829706969",
-  "author": "Madeline Miller",
-  "cover": "https://books.google.com/books/content?id=qKIPEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2021,
-  "publisher": "Marsilio Editori spa",
-  "title": "Circe (ed.italiana)"
-},
-{
-  "_id": "9788835715405",
-  "author": "Ursula K. Le Guin",
-  "cover": "https://books.google.com/books/content?id=Hm5YEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2022,
-  "publisher": "Edizioni Mondadori",
-  "title": "La mano sinistra del buio"
-},
-{
-  "_id": "9780545387200",
-  "author": "Suzanne Collins",
-  "cover": "https://books.google.com/books/content?id=zM-vZ-JiSFYC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2011,
-  "publisher": "Scholastic Inc.",
-  "title": "The Hunger Games Trilogy"
-},
-{
-  "_id": "9788807015649",
-  "author": "Doris Lessing",
-  "cover": "https://books.google.com/books/content?id=hokn0Ujq4DUC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 1999,
-  "publisher": "Feltrinelli Editore",
-  "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)"
-},
-{
-  "_id": "9780486406626",
-  "author": "Margaret Fuller",
-  "cover": "https://books.google.com/books/content?id=xtwpoD0Vc9EC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 1999,
-  "publisher": "Courier Corporation",
-  "title": "Woman in the Nineteenth Century"
-},
-{
-  "_id": "9780191605970",
-  "author": "George Sand",
-  "cover": "https://books.google.com/books/content?id=rfeU_YK-nXcC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2000,
-  "publisher": "OUP Oxford",
-  "title": "Indiana"
-},
-{
-  "_id": "9783985513338",
-  "author": "Mary Shelley",
-  "cover": "https://books.google.com/books/content?id=ktQsEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2021,
-  "publisher": "Leonardo Lumbreras",
-  "title": "Frankenstein - Mary Shelley"
-},
-{
-  "_id": "9781407139982",
-  "author": "Suzanne Collins",
-  "cover": "https://books.google.com/books/content?id=c9RGBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2013,
-  "publisher": "Scholastic UK",
-  "title": "The Hunger Games Complete Trilogy"
-},
-{
-  "_id": "9791280639028",
-  "author": "George Orwell",
-  "cover": "https://books.google.com/books/content?id=67xIEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2021,
-  "publisher": "Urban Apnea Edizioni",
-  "title": "1984"
-},
-{
-  "_id": "9788833310497",
-  "author": "Margaret Atwood",
-  "cover": "https://books.google.com/books/content?id=1mZODwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2018,
-  "publisher": "Ponte alle Grazie",
-  "title": "Il racconto dell'Ancella"
-},
-{
-  "_id": "9780006530404",
-  "author": "Naomi Klein",
-  "cover": "https://books.google.com/books/content?id=AqjX3Z0puyQC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2001,
-  "publisher": "HarperCollins UK",
-  "title": "No Logo"
-},
-{
-  "_id": "9788869984006",
-  "author": "Octavia E. Butler",
-  "cover": "https://books.google.com/books/content?id=iSfN0AEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2024,
-  "publisher": "",
-  "title": "La parabola del seminatore"
-},
-{
-  "_id": "9788858400654",
-  "author": "Cormac McCarthy",
-  "cover": "https://books.google.com/books/content?id=1K4PbNfMxWEC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2010,
-  "publisher": "Giulio Einaudi Editore",
-  "title": "La strada"
-},
-{
-  "_id": "9788884909053",
-  "author": "Barry Lopez",
-  "cover": "https://books.google.com/books/content?id=4ek_PQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2006,
-  "publisher": "",
-  "title": "Sogni artici"
-},
-{
-  "_id": "9781857151374",
-  "author": "Simone de Beauvoir",
-  "cover": "https://books.google.com/books/content?id=rnGeQgAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Francese",
-  "publication_year": 1993,
-  "publisher": "Vintage",
-  "title": "Le Deuxième Sexe"
-},
-{
-  "_id": "9788831811903",
-  "author": "Louisa May Alcott",
-  "cover": "https://books.google.com/books/content?id=qnfAEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2023,
-  "publisher": "Rizzoli",
-  "title": "Piccole donne - I quattro romanzi"
-},
-{
-  "_id": "9786050414820",
-  "author": "Louisa May Alcott",
-  "cover": "https://books.google.com/books/content?id=l6uMDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2019,
-  "publisher": "Vento dell'Est",
-  "title": "Gli otto cugini"
-},
-{
-  "_id": "9788892547698",
-  "author": "Louisa May Alcott",
-  "cover": "https://books.google.com/books/content?id=q6uMDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  "language": "Italiano",
-  "publication_year": 2019,
-  "publisher": "Vento dell'Est",
-  "title": "Jack e Jill"
-},
-{
-  "_id": "9780356511474",
-  "author": "Rena Rossner",
-  "language": "Inglese",
-  "publication_year": 2021,
-  "publisher": "Orbit Books",
-  "title": "The Light of the Midnight Stars"
-},
-{
-  "_id": "9780571334667",
-  "author": "Sally Rooney",
-  "cover": "https://books.google.com/books/content?id=x3tgDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-  "language": "Inglese",
-  "publication_year": 2018,
-  "publisher": "Faber & Faber",
-  "title": "Normal People"
-}]
+[
+  {
+    "_id": "9780671664961",
+    "author": "Douglas Adams",
+    "cover": "https://books.google.com/books/content?id=SQkU8EnJUtAC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 1981,
+    "title": "The Hitchhiker's Guide to the Galaxy"
+  },
+  {
+    "_id": "9781535200080",
+    "author": "Douglas Adams",
+    "cover": "https://books.google.com/books/content?id=R-LwvQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2016,
+    "title": "The Restaurant at the End of the Universe"
+  },
+  {
+    "_id": "9780330513142",
+    "author": "Douglas Adams",
+    "cover": "https://books.google.com/books/content?id=8QCRffdz99oC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2009,
+    "publisher": "Pan Macmillan",
+    "title": "Life, the Universe and Everything"
+  },
+  {
+    "_id": "9781439557617",
+    "author": "Douglas Adams",
+    "language": "Inglese",
+    "publication_year": 2008,
+    "publisher": "Paw Prints",
+    "title": "So Long, and Thanks for All the Fish"
+  },
+  {
+    "_id": "9780330513203",
+    "author": "Douglas Adams",
+    "cover": "https://books.google.com/books/content?id=eBd08nr5J8wC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2009,
+    "publisher": "Pan Macmillan",
+    "title": "Mostly Harmless"
+  },
+  {
+    "_id": "9788804633358",
+    "author": "Douglas Adams",
+    "language": "Italiano",
+    "publication_year": 2013,
+    "title": "Shada. Doctor Who"
+  },
+  {
+    "_id": "9788822705624",
+    "author": "H.G. Wells",
+    "cover": "https://books.google.com/books/content?id=Y60XDgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2017,
+    "publisher": "Newton Compton Editori",
+    "title": "La macchina del tempo • L’uomo invisibile • La guerra dei mondi • L’isola del dottor Moreau"
+  },
+  {
+    "_id": "9788817079754",
+    "author": "Stephen William Hawking",
+    "language": "Italiano",
+    "publication_year": 2015,
+    "publisher": "Scienza",
+    "title": "Dal big bang ai buchi neri. Breve storia del tempo"
+  },
+  {
+    "_id": "9780142437247",
+    "author": "Herman Melville",
+    "language": "Inglese",
+    "publication_year": 0,
+    "publisher": "National Geographic Books",
+    "title": "Moby-Dick"
+  },
+  {
+    "_id": "9788811130246",
+    "author": "Joseph Conrad",
+    "cover": "https://books.google.com/books/content?id=AYg28HDpFcMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2010,
+    "publisher": "Garzanti Classici",
+    "title": "Cuore di tenebra"
+  },
+  {
+    "_id": "9798730367241",
+    "author": "Jane Austen",
+    "cover": "https://books.google.com/books/content?id=ad9dzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2021,
+    "publisher": "",
+    "title": "Orgoglio e Pregiudizio"
+  },
+  {
+    "_id": "9781539648000",
+    "author": "Jane Austen",
+    "cover": "https://books.google.com/books/content?id=bUY3vgAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2016,
+    "publisher": "",
+    "title": "Persuasion"
+  },
+  {
+    "_id": "9788831812108",
+    "author": "Licia Troisi",
+    "cover": "https://books.google.com/books/content?id=TLbDEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2023,
+    "publisher": "Rizzoli",
+    "title": "Astrofisica per ansiosi"
+  },
+  {
+    "_id": "9781877527937",
+    "author": "Louisa May Alcott",
+    "cover": "https://books.google.com/books/content?id=WMjHdhYI8F4C&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2009,
+    "publisher": "The Floating Press",
+    "title": "Little Women"
+  },
+  {
+    "_id": "9798643298694",
+    "author": "Nathaniel Hawthorne",
+    "cover": "https://books.google.com/books/content?id=IlaEzQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2020,
+    "publisher": "",
+    "title": "The Scarlet Letter By Nathaniel Hawthorne (Romantic Novel) \"The New Annotated Version\""
+  },
+  {
+    "_id": "9783849673574",
+    "author": "Herman Melville",
+    "cover": "https://books.google.com/books/content?id=xiFIDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 1899,
+    "publisher": "Jazzybee Verlag",
+    "title": "Typee: A Romance of the South Seas"
+  },
+  {
+    "_id": "9781501137365",
+    "author": "Jane Austen",
+    "cover": "https://books.google.com/books/content?id=TsGDCgAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2016,
+    "publisher": "Simon and Schuster",
+    "title": "Emma"
+  },
+  {
+    "_id": "9788811148067",
+    "author": "Jane Austen",
+    "cover": "https://books.google.com/books/content?id=EW4sDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2017,
+    "publisher": "Garzanti Classici",
+    "title": "L'abbazia di Northanger"
+  },
+  {
+    "_id": "9788830119000",
+    "author": "John R. R. Tolkien",
+    "cover": "https://books.google.com/books/content?id=7YqhzwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2023,
+    "publisher": "",
+    "title": "Il signore degli anelli"
+  },
+  {
+    "_id": "9788845290060",
+    "author": "John Ronald Reuel Tolkien",
+    "cover": "https://books.google.com/books/content?id=QOiKuQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2000,
+    "publisher": "",
+    "title": "Il Silmarillion"
+  },
+  {
+    "_id": "9788858796412",
+    "author": "J.R.R. Tolkien",
+    "cover": "https://books.google.com/books/content?id=3X0pEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2024,
+    "publisher": "Bompiani",
+    "title": "Lo Hobbit. Illustrato dall'autore"
+  },
+  {
+    "_id": "9788854125599",
+    "author": "James G. Frazer",
+    "cover": "https://books.google.com/books/content?id=3L7MWYs6awMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2012,
+    "publisher": "Newton Compton Editori",
+    "title": "Il ramo d'oro"
+  },
+  {
+    "_id": "9788829706969",
+    "author": "Madeline Miller",
+    "cover": "https://books.google.com/books/content?id=qKIPEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2021,
+    "publisher": "Marsilio Editori spa",
+    "title": "Circe (ed.italiana)"
+  },
+  {
+    "_id": "9788835715405",
+    "author": "Ursula K. Le Guin",
+    "cover": "https://books.google.com/books/content?id=Hm5YEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2022,
+    "publisher": "Edizioni Mondadori",
+    "title": "La mano sinistra del buio"
+  },
+  {
+    "_id": "9788807015649",
+    "author": "Doris Lessing",
+    "cover": "https://books.google.com/books/content?id=hokn0Ujq4DUC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 1999,
+    "publisher": "Feltrinelli Editore",
+    "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)"
+  },
+  {
+    "_id": "9780486406626",
+    "author": "Margaret Fuller",
+    "cover": "https://books.google.com/books/content?id=xtwpoD0Vc9EC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 1999,
+    "publisher": "Courier Corporation",
+    "title": "Woman in the Nineteenth Century"
+  },
+  {
+    "_id": "9780191605970",
+    "author": "George Sand",
+    "cover": "https://books.google.com/books/content?id=rfeU_YK-nXcC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2000,
+    "publisher": "OUP Oxford",
+    "title": "Indiana"
+  },
+  {
+    "_id": "9783985513338",
+    "author": "Mary Shelley",
+    "cover": "https://books.google.com/books/content?id=ktQsEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2021,
+    "publisher": "Leonardo Lumbreras",
+    "title": "Frankenstein - Mary Shelley"
+  },
+  {
+    "_id": "9781407139982",
+    "author": "Suzanne Collins",
+    "cover": "https://books.google.com/books/content?id=c9RGBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2013,
+    "publisher": "Scholastic UK",
+    "title": "The Hunger Games Complete Trilogy"
+  },
+  {
+    "_id": "9791280639028",
+    "author": "George Orwell",
+    "cover": "https://books.google.com/books/content?id=67xIEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2021,
+    "publisher": "Urban Apnea Edizioni",
+    "title": "1984"
+  },
+  {
+    "_id": "9788833310497",
+    "author": "Margaret Atwood",
+    "cover": "https://books.google.com/books/content?id=1mZODwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2018,
+    "publisher": "Ponte alle Grazie",
+    "title": "Il racconto dell'Ancella"
+  },
+  {
+    "_id": "9780006530404",
+    "author": "Naomi Klein",
+    "cover": "https://books.google.com/books/content?id=AqjX3Z0puyQC&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2001,
+    "publisher": "HarperCollins UK",
+    "title": "No Logo"
+  },
+  {
+    "_id": "9788869984006",
+    "author": "Octavia E. Butler",
+    "cover": "https://books.google.com/books/content?id=iSfN0AEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2024,
+    "publisher": "",
+    "title": "La parabola del seminatore"
+  },
+  {
+    "_id": "9788858400654",
+    "author": "Cormac McCarthy",
+    "cover": "https://books.google.com/books/content?id=1K4PbNfMxWEC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2010,
+    "publisher": "Giulio Einaudi Editore",
+    "title": "La strada"
+  },
+  {
+    "_id": "9788884909053",
+    "author": "Barry Lopez",
+    "cover": "https://books.google.com/books/content?id=4ek_PQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2006,
+    "publisher": "",
+    "title": "Sogni artici"
+  },
+  {
+    "_id": "9781857151374",
+    "author": "Simone de Beauvoir",
+    "cover": "https://books.google.com/books/content?id=rnGeQgAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Francese",
+    "publication_year": 1993,
+    "publisher": "Vintage",
+    "title": "Le Deuxième Sexe"
+  },
+  {
+    "_id": "9788831811903",
+    "author": "Louisa May Alcott",
+    "cover": "https://books.google.com/books/content?id=qnfAEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2023,
+    "publisher": "Rizzoli",
+    "title": "Piccole donne - I quattro romanzi"
+  },
+  {
+    "_id": "9786050414820",
+    "author": "Louisa May Alcott",
+    "cover": "https://books.google.com/books/content?id=l6uMDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2019,
+    "publisher": "Vento dell'Est",
+    "title": "Gli otto cugini"
+  },
+  {
+    "_id": "9788892547698",
+    "author": "Louisa May Alcott",
+    "cover": "https://books.google.com/books/content?id=q6uMDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+    "language": "Italiano",
+    "publication_year": 2019,
+    "publisher": "Vento dell'Est",
+    "title": "Jack e Jill"
+  },
+  {
+    "_id": "9780356511474",
+    "author": "Rena Rossner",
+    "language": "Inglese",
+    "publication_year": 2021,
+    "publisher": "Orbit Books",
+    "title": "The Light of the Midnight Stars"
+  },
+  {
+    "_id": "9780571334667",
+    "author": "Sally Rooney",
+    "cover": "https://books.google.com/books/content?id=x3tgDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "language": "Inglese",
+    "publication_year": 2018,
+    "publisher": "Faber & Faber",
+    "title": "Normal People"
+  }
+]

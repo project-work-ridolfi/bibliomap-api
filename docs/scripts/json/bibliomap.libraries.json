@@ -1,238 +1,240 @@
-[{
-  "_id": "9a64eeb3-e75e-43f8-8c6d-392072bf43fe",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-29T18:16:51.245Z"
+[
+  {
+    "_id": "9a64eeb3-e75e-43f8-8c6d-392072bf43fe",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-29T18:16:51.245Z"
+    },
+    "locationId": "28836ceb-0c11-4d7e-99e5-4f4b4327512a",
+    "modifiedAt": {
+      "$date": "2026-01-05T15:25:49.625Z"
+    },
+    "name": "Don't panic",
+    "ownerId": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "viewsCounter": {
+      "$numberLong": "20"
+    },
+    "visibility": "all"
   },
-  "locationId": "28836ceb-0c11-4d7e-99e5-4f4b4327512a",
-  "modifiedAt": {
-    "$date": "2026-01-05T15:25:49.625Z"
+  {
+    "_id": "032a257e-c244-49d0-9e66-2a8b8139ffbc",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-29T18:31:11.101Z"
+    },
+    "locationId": "ae714033-eb3f-4c84-bc71-8c86f6710c70",
+    "modifiedAt": {
+      "$date": "2025-12-29T18:31:11.101Z"
+    },
+    "name": "Tardis",
+    "ownerId": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "visibility": "all",
+    "viewsCounter": {
+      "$numberLong": "38"
+    }
   },
-  "name": "Don't panic",
-  "ownerId": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "viewsCounter": {
-    "$numberLong": "20"
+  {
+    "_id": "ee491e7f-158e-457e-a837-7c8ab134aa84",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-29T18:42:18.447Z"
+    },
+    "locationId": "ae714033-eb3f-4c84-bc71-8c86f6710c70",
+    "modifiedAt": {
+      "$date": "2025-12-29T18:42:18.447Z"
+    },
+    "name": "Gallifrey",
+    "ownerId": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "visibility": "all",
+    "viewsCounter": {
+      "$numberLong": "40"
+    }
   },
-  "visibility": "all"
-},
-{
-  "_id": "032a257e-c244-49d0-9e66-2a8b8139ffbc",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-29T18:31:11.101Z"
+  {
+    "_id": "c9d398a4-c988-4039-8414-dff2ee590862",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-30T10:15:21.791Z"
+    },
+    "locationId": "55cf60f4-3643-4434-91b0-a8437562bf7f",
+    "modifiedAt": {
+      "$date": "2025-12-30T10:15:21.791Z"
+    },
+    "name": "oceano",
+    "ownerId": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "visibility": "all",
+    "viewsCounter": {
+      "$numberLong": "7"
+    }
   },
-  "locationId": "ae714033-eb3f-4c84-bc71-8c86f6710c70",
-  "modifiedAt": {
-    "$date": "2025-12-29T18:31:11.101Z"
+  {
+    "_id": "b9904d82-d9aa-487e-9d8c-60bb0d4faa6c",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-30T10:33:27.926Z"
+    },
+    "locationId": "f355af26-0106-4ad3-ae78-c111a684e858",
+    "modifiedAt": {
+      "$date": "2025-12-30T10:33:27.926Z"
+    },
+    "name": "ossessione",
+    "ownerId": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "visibility": "logged_in",
+    "viewsCounter": {
+      "$numberLong": "4"
+    }
   },
-  "name": "Tardis",
-  "ownerId": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "visibility": "all",
-  "viewsCounter": {
-    "$numberLong": "38"
+  {
+    "_id": "a4f96a32-d286-4e5d-91e1-9c4e370530a6",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-30T10:37:59.319Z"
+    },
+    "locationId": "68e87a6a-9622-4219-a480-9bfc2e813d47",
+    "modifiedAt": {
+      "$date": "2025-12-30T10:37:59.319Z"
+    },
+    "name": "Sentimenti",
+    "ownerId": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "visibility": "all",
+    "viewsCounter": {
+      "$numberLong": "28"
+    }
+  },
+  {
+    "_id": "bced977e-9e89-4a2a-9125-3d4aa70086b3",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-30T11:15:36.231Z"
+    },
+    "locationId": "a1a94c44-3297-4adb-b453-b065d4fda2d1",
+    "modifiedAt": {
+      "$date": "2025-12-30T11:15:36.231Z"
+    },
+    "name": "La libreria delle sorelle March",
+    "ownerId": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "visibility": "logged_in",
+    "viewsCounter": {
+      "$numberLong": "14"
+    }
+  },
+  {
+    "_id": "7725b9d7-1381-4a54-9c1d-da7d00df3b04",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-30T20:49:18.619Z"
+    },
+    "locationId": "68e87a6a-9622-4219-a480-9bfc2e813d47",
+    "modifiedAt": {
+      "$date": "2025-12-30T20:49:18.619Z"
+    },
+    "name": "Tea Time",
+    "ownerId": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "visibility": "all",
+    "viewsCounter": {
+      "$numberLong": "16"
+    }
+  },
+  {
+    "_id": "66badeda-7162-4b8a-aee7-bfc982c524d0",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2025-12-30T20:54:30.833Z"
+    },
+    "locationId": "a01707d3-b03b-4bca-8f08-e7f91fbeb09b",
+    "modifiedAt": {
+      "$date": "2026-01-02T13:00:32.139Z"
+    },
+    "name": "La Tana di Amon",
+    "ownerId": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "viewsCounter": {
+      "$numberLong": "33"
+    },
+    "visibility": "all"
+  },
+  {
+    "_id": "4a92d26e-f05d-41ec-a55e-72d5930f9e99",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2026-01-03T17:51:24.236Z"
+    },
+    "locationId": "ba6d666b-3a38-46d6-95f9-4fa6ffc382b6",
+    "modifiedAt": {
+      "$date": "2026-01-05T15:05:11.595Z"
+    },
+    "name": "42",
+    "ownerId": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "viewsCounter": {
+      "$numberLong": "21"
+    },
+    "visibility": "all"
+  },
+  {
+    "_id": "d68d7034-ab86-4f89-92c4-0e3b7e46eaa6",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2026-01-03T17:56:55.369Z"
+    },
+    "locationId": "ee5aff1d-7a6c-47e2-a5fa-7e4c573166aa",
+    "modifiedAt": {
+      "$date": "2026-01-03T17:56:55.369Z"
+    },
+    "name": "The second shelf",
+    "ownerId": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "viewsCounter": {
+      "$numberLong": "7"
+    },
+    "visibility": "all"
+  },
+  {
+    "_id": "1a1312c8-78b2-40c1-b241-b66ee6f9580b",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2026-01-03T18:15:04.513Z"
+    },
+    "locationId": "f7d5290b-c3bc-4d6b-9b27-4f25b21c8986",
+    "modifiedAt": {
+      "$date": "2026-01-03T18:15:04.513Z"
+    },
+    "name": "Libri contra Panem et Circenses",
+    "ownerId": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "viewsCounter": {
+      "$numberLong": "34"
+    },
+    "visibility": "all"
+  },
+  {
+    "_id": "4281d9fc-9f69-4bc0-832a-ac64b1e5d381",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2026-01-03T18:20:33.499Z"
+    },
+    "locationId": "f7d5290b-c3bc-4d6b-9b27-4f25b21c8986",
+    "modifiedAt": {
+      "$date": "2026-01-03T18:20:33.499Z"
+    },
+    "name": "Nella foresta",
+    "ownerId": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "viewsCounter": {
+      "$numberLong": "20"
+    },
+    "visibility": "all"
+  },
+  {
+    "_id": "3369bb55-9bb7-4d58-b1d0-a8602567970c",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2026-01-08T11:23:54.185Z"
+    },
+    "locationId": "45838a82-3947-4cf2-bbd9-e7e49647901c",
+    "modifiedAt": {
+      "$date": "2026-01-08T11:23:54.185Z"
+    },
+    "name": "la libreria di poste",
+    "ownerId": "9f7fb6cd-03db-493e-baec-c0086a6b9a79",
+    "viewsCounter": {
+      "$numberLong": "6"
+    },
+    "visibility": "all"
   }
-},
-{
-  "_id": "ee491e7f-158e-457e-a837-7c8ab134aa84",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-29T18:42:18.447Z"
-  },
-  "locationId": "ae714033-eb3f-4c84-bc71-8c86f6710c70",
-  "modifiedAt": {
-    "$date": "2025-12-29T18:42:18.447Z"
-  },
-  "name": "Gallifrey",
-  "ownerId": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "visibility": "all",
-  "viewsCounter": {
-    "$numberLong": "40"
-  }
-},
-{
-  "_id": "c9d398a4-c988-4039-8414-dff2ee590862",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-30T10:15:21.791Z"
-  },
-  "locationId": "55cf60f4-3643-4434-91b0-a8437562bf7f",
-  "modifiedAt": {
-    "$date": "2025-12-30T10:15:21.791Z"
-  },
-  "name": "oceano",
-  "ownerId": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "visibility": "all",
-  "viewsCounter": {
-    "$numberLong": "7"
-  }
-},
-{
-  "_id": "b9904d82-d9aa-487e-9d8c-60bb0d4faa6c",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-30T10:33:27.926Z"
-  },
-  "locationId": "f355af26-0106-4ad3-ae78-c111a684e858",
-  "modifiedAt": {
-    "$date": "2025-12-30T10:33:27.926Z"
-  },
-  "name": "ossessione",
-  "ownerId": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "visibility": "logged_in",
-  "viewsCounter": {
-    "$numberLong": "4"
-  }
-},
-{
-  "_id": "a4f96a32-d286-4e5d-91e1-9c4e370530a6",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-30T10:37:59.319Z"
-  },
-  "locationId": "68e87a6a-9622-4219-a480-9bfc2e813d47",
-  "modifiedAt": {
-    "$date": "2025-12-30T10:37:59.319Z"
-  },
-  "name": "Sentimenti",
-  "ownerId": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "visibility": "all",
-  "viewsCounter": {
-    "$numberLong": "28"
-  }
-},
-{
-  "_id": "bced977e-9e89-4a2a-9125-3d4aa70086b3",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-30T11:15:36.231Z"
-  },
-  "locationId": "a1a94c44-3297-4adb-b453-b065d4fda2d1",
-  "modifiedAt": {
-    "$date": "2025-12-30T11:15:36.231Z"
-  },
-  "name": "La libreria delle sorelle March",
-  "ownerId": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "visibility": "logged_in",
-  "viewsCounter": {
-    "$numberLong": "14"
-  }
-},
-{
-  "_id": "7725b9d7-1381-4a54-9c1d-da7d00df3b04",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-30T20:49:18.619Z"
-  },
-  "locationId": "68e87a6a-9622-4219-a480-9bfc2e813d47",
-  "modifiedAt": {
-    "$date": "2025-12-30T20:49:18.619Z"
-  },
-  "name": "Tea Time",
-  "ownerId": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "visibility": "all",
-  "viewsCounter": {
-    "$numberLong": "16"
-  }
-},
-{
-  "_id": "66badeda-7162-4b8a-aee7-bfc982c524d0",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2025-12-30T20:54:30.833Z"
-  },
-  "locationId": "a01707d3-b03b-4bca-8f08-e7f91fbeb09b",
-  "modifiedAt": {
-    "$date": "2026-01-02T13:00:32.139Z"
-  },
-  "name": "La Tana di Amon",
-  "ownerId": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "viewsCounter": {
-    "$numberLong": "33"
-  },
-  "visibility": "all"
-},
-{
-  "_id": "4a92d26e-f05d-41ec-a55e-72d5930f9e99",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2026-01-03T17:51:24.236Z"
-  },
-  "locationId": "ba6d666b-3a38-46d6-95f9-4fa6ffc382b6",
-  "modifiedAt": {
-    "$date": "2026-01-05T15:05:11.595Z"
-  },
-  "name": "42",
-  "ownerId": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "viewsCounter": {
-    "$numberLong": "21"
-  },
-  "visibility": "all"
-},
-{
-  "_id": "d68d7034-ab86-4f89-92c4-0e3b7e46eaa6",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2026-01-03T17:56:55.369Z"
-  },
-  "locationId": "ee5aff1d-7a6c-47e2-a5fa-7e4c573166aa",
-  "modifiedAt": {
-    "$date": "2026-01-03T17:56:55.369Z"
-  },
-  "name": "The second shelf",
-  "ownerId": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "viewsCounter": {
-    "$numberLong": "7"
-  },
-  "visibility": "all"
-},
-{
-  "_id": "1a1312c8-78b2-40c1-b241-b66ee6f9580b",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2026-01-03T18:15:04.513Z"
-  },
-  "locationId": "f7d5290b-c3bc-4d6b-9b27-4f25b21c8986",
-  "modifiedAt": {
-    "$date": "2026-01-03T18:15:04.513Z"
-  },
-  "name": "Libri contra Panem et Circenses",
-  "ownerId": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "viewsCounter": {
-    "$numberLong": "34"
-  },
-  "visibility": "all"
-},
-{
-  "_id": "4281d9fc-9f69-4bc0-832a-ac64b1e5d381",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2026-01-03T18:20:33.499Z"
-  },
-  "locationId": "f7d5290b-c3bc-4d6b-9b27-4f25b21c8986",
-  "modifiedAt": {
-    "$date": "2026-01-03T18:20:33.499Z"
-  },
-  "name": "Nella foresta",
-  "ownerId": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "viewsCounter": {
-    "$numberLong": "20"
-  },
-  "visibility": "all"
-},
-{
-  "_id": "3369bb55-9bb7-4d58-b1d0-a8602567970c",
-  "blurRadius": 0,
-  "createdAt": {
-    "$date": "2026-01-08T11:23:54.185Z"
-  },
-  "locationId": "45838a82-3947-4cf2-bbd9-e7e49647901c",
-  "modifiedAt": {
-    "$date": "2026-01-08T11:23:54.185Z"
-  },
-  "name": "la libreria di poste",
-  "ownerId": "9f7fb6cd-03db-493e-baec-c0086a6b9a79",
-  "viewsCounter": {
-    "$numberLong": "6"
-  },
-  "visibility": "all"
-}]
+]

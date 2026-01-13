@@ -1,942 +1,897 @@
-[{
-  "_id": "1117fde4-2a8b-4cfa-a221-c5869bea4256",
-  "actual_return_date": {
-    "$date": "2025-10-19T18:40:53.633Z"
+[
+  {
+    "_id": "1117fde4-2a8b-4cfa-a221-c5869bea4256",
+    "actual_return_date": {
+      "$date": "2025-10-19T18:40:53.633Z"
+    },
+    "copy_id": "c646f5b1-f138-400f-a9f8-01e7523ca3f6",
+    "created_at": {
+      "$date": "2025-10-19T18:24:31.712Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-28T18:40:33.349Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-10-29T18:40:33.349Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "RETURNED",
+    "title": "The Hitchhiker's Guide to the Galaxy",
+    "updated_at": {
+      "$date": "2025-12-29T18:40:53.633Z"
+    }
   },
-  "copy_id": "c646f5b1-f138-400f-a9f8-01e7523ca3f6",
-  "created_at": {
-    "$date": "2025-10-19T18:24:31.712Z"
+  {
+    "_id": "2f5c46e2-c68b-4a35-b081-0b12373174c8",
+    "actual_return_date": {
+      "$date": "2025-12-30T18:31:56.146Z"
+    },
+    "copy_id": "f5ce1df2-71d3-4d08-8e89-c84b607cf831",
+    "created_at": {
+      "$date": "2025-12-30T09:30:53.647Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-01T11:54:06.075Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-12-30T11:54:06.075Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "status": "RETURNED",
+    "title": "So Long, and Thanks for All the Fish",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:56.146Z"
+    }
   },
-  "expected_return_date": {
-    "$date": "2026-01-28T18:40:33.349Z"
+  {
+    "_id": "0557ae3a-d700-4f1c-a342-b0d490afe77d",
+    "actual_return_date": {
+      "$date": "2025-12-25T18:30:48.665Z"
+    },
+    "copy_id": "90d35042-ca5f-43f4-8ea6-d39404fda73f",
+    "created_at": {
+      "$date": "2025-12-25T10:17:06.296Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-25T10:17:43.571Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-12-25T10:17:43.571Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "status": "RETURNED",
+    "title": "Orgoglio e Pregiudizio",
+    "updated_at": {
+      "$date": "2025-12-30T18:30:48.665Z"
+    }
   },
-  "loan_start_date": {
-    "$date": "2025-10-29T18:40:33.349Z"
+  {
+    "_id": "8dc47ea8-3c49-4a3a-8997-ad206f387f39",
+    "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
+    "created_at": {
+      "$date": "2025-12-30T11:52:11.272Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "owner_notes": "scusami sono nel 2050",
+    "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "status": "REJECTED",
+    "title": "Dal big bang ai buchi neri. Breve storia del tempo",
+    "updated_at": {
+      "$date": "2025-12-30T11:52:57.954Z"
+    }
   },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "RETURNED",
-  "title": "The Hitchhiker's Guide to the Galaxy",
-  "updated_at": {
-    "$date": "2025-12-29T18:40:53.633Z"
+  {
+    "_id": "d38ef03c-2336-40be-a242-39cc77ae8b96",
+    "actual_return_date": {
+      "$date": "2025-12-10T18:31:57.898Z"
+    },
+    "copy_id": "fafae596-df4c-44a7-b458-9c7cec911472",
+    "created_at": {
+      "$date": "2025-12-10T11:53:29.981Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-10T11:54:07.338Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-12-10T11:54:07.338Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "RETURNED",
+    "title": "Life, the Universe and Everything",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:57.898Z"
+    }
+  },
+  {
+    "_id": "1b681cb9-5eeb-4498-97cc-e9dfefa54d53",
+    "actual_return_date": {
+      "$date": "2025-12-30T18:31:59.481Z"
+    },
+    "copy_id": "edd7a63d-36e5-4239-a7f0-6dfe174acd55",
+    "created_at": {
+      "$date": "2025-12-30T11:53:34.178Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T11:54:09.200Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-12-30T11:54:09.200Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "RETURNED",
+    "title": "The Restaurant at the End of the Universe",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:59.481Z"
+    }
+  },
+  {
+    "_id": "1b250751-1c0e-4306-97d9-879de806cf9b",
+    "actual_return_date": {
+      "$date": "2025-10-10T18:31:15.238Z"
+    },
+    "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
+    "created_at": {
+      "$date": "2025-10-10T11:53:39.992Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T18:31:09.619Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-10-10T18:31:09.619Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "RETURNED",
+    "title": "Astrofisica per ansiosi",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:15.238Z"
+    }
+  },
+  {
+    "_id": "669311db-4ce3-498f-9202-8e195753247e",
+    "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
+    "created_at": {
+      "$date": "2025-12-30T11:58:26.207Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "REJECTED",
+    "title": "Persuasion",
+    "updated_at": {
+      "$date": "2025-12-30T18:30:59.046Z"
+    }
+  },
+  {
+    "_id": "e4690b19-f5be-475c-ad35-b22ea9a6943d",
+    "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
+    "created_at": {
+      "$date": "2025-12-30T16:15:20.740Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "REJECTED",
+    "title": "Persuasion",
+    "updated_at": {
+      "$date": "2025-12-30T18:30:55.974Z"
+    }
+  },
+  {
+    "_id": "bb82c5cf-878a-468a-9554-14cfc3269aaa",
+    "actual_return_date": {
+      "$date": "2025-12-30T18:31:13.623Z"
+    },
+    "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
+    "created_at": {
+      "$date": "2025-12-30T16:19:44.376Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T18:31:11.233Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-12-30T18:31:11.233Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "RETURNED",
+    "title": "Persuasion",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:13.623Z"
+    }
+  },
+  {
+    "_id": "af11dce1-a4d1-4fc7-a35a-306ee4a24a86",
+    "actual_return_date": {
+      "$date": "2025-12-30T18:32:01.018Z"
+    },
+    "copy_id": "ee4a7ed3-c56e-44f2-aff7-82920cc7f21d",
+    "created_at": {
+      "$date": "2025-12-30T16:58:13.225Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T17:01:30.342Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-12-30T17:01:30.342Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "status": "RETURNED",
+    "title": "Mostly Harmless",
+    "updated_at": {
+      "$date": "2025-12-30T18:32:01.018Z"
+    }
+  },
+  {
+    "_id": "dc7769a5-4532-4683-b924-86a6d6be9d57",
+    "actual_return_date": {
+      "$date": "2025-12-30T18:31:42.824Z"
+    },
+    "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
+    "created_at": {
+      "$date": "2025-12-30T18:28:21.972Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T18:31:37.478Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-12-30T18:31:37.478Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "RETURNED",
+    "title": "Dal big bang ai buchi neri. Breve storia del tempo",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:42.824Z"
+    }
+  },
+  {
+    "_id": "eafe3e34-f367-4b1b-a789-4d924d20f407",
+    "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
+    "created_at": {
+      "$date": "2025-12-30T18:28:41.500Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "status": "REJECTED",
+    "title": "Persuasion",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:07.538Z"
+    }
+  },
+  {
+    "_id": "8d711ab2-0a0f-4704-8890-5da173efbe30",
+    "actual_return_date": {
+      "$date": "2025-11-30T18:30:15.179Z"
+    },
+    "copy_id": "d93e4265-d151-45a7-9a7a-b54915f318c2",
+    "created_at": {
+      "$date": "2025-11-30T18:29:19.650Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T18:30:09.490Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-11-30T18:30:09.490Z"
+    },
+    "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "requester_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "status": "RETURNED",
+    "title": "Typee: A Romance of the South Seas",
+    "updated_at": {
+      "$date": "2025-12-30T18:30:15.179Z"
+    }
+  },
+  {
+    "_id": "4aab8460-2ebf-4d81-a629-79925dd08ade",
+    "actual_return_date": {
+      "$date": "2025-11-30T18:30:13.733Z"
+    },
+    "copy_id": "acacc564-3041-4b00-bf63-434cd7327ce1",
+    "created_at": {
+      "$date": "2025-11-30T18:29:45.171Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T18:30:08.010Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-11-30T18:30:08.010Z"
+    },
+    "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "status": "RETURNED",
+    "title": "Moby-Dick",
+    "updated_at": {
+      "$date": "2025-12-30T18:30:13.733Z"
+    }
+  },
+  {
+    "_id": "5d4a07a4-5ee8-4948-a249-382924879bf0",
+    "actual_return_date": {
+      "$date": "2025-11-30T18:31:41.225Z"
+    },
+    "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
+    "created_at": {
+      "$date": "2025-11-30T18:30:35.706Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-29T18:31:38.856Z"
+    },
+    "loan_start_date": {
+      "$date": "2025-11-30T18:31:38.856Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "status": "RETURNED",
+    "title": "Dal big bang ai buchi neri. Breve storia del tempo",
+    "updated_at": {
+      "$date": "2025-12-30T18:31:41.225Z"
+    }
+  },
+  {
+    "_id": "2669ebdf-33eb-45b2-9ed7-26fd9dd4e8ae",
+    "copy_id": "e5d907b7-9f93-4552-b42a-2c5466c85858",
+    "created_at": {
+      "$date": "2025-12-30T19:07:16.522Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-01-04T17:57:27.113Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-05T17:57:27.113Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "ON_LOAN",
+    "title": "Shada. Doctor Who",
+    "updated_at": {
+      "$date": "2026-01-05T17:57:27.113Z"
+    }
+  },
+  {
+    "_id": "add384aa-528c-4588-9e70-47cda0ec2415",
+    "copy_id": "d93e4265-d151-45a7-9a7a-b54915f318c2",
+    "created_at": {
+      "$date": "2025-12-30T19:12:01.366Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-05T17:54:41.505Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-06T17:54:41.505Z"
+    },
+    "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "status": "ON_LOAN",
+    "title": "Typee: A Romance of the South Seas",
+    "updated_at": {
+      "$date": "2026-01-06T17:54:41.505Z"
+    }
+  },
+  {
+    "_id": "c1066d08-7707-44aa-8343-d102d30d96e2",
+    "actual_return_date": {
+      "$date": "2026-01-05T17:53:26.967Z"
+    },
+    "copy_id": "4f172836-3a97-44a2-becb-ca9db67a4d8d",
+    "created_at": {
+      "$date": "2026-01-02T10:28:22.079Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-01T17:58:38.660Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-02T17:58:38.660Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "RETURNED",
+    "title": "La macchina del tempo • L’uomo invisibile • La guerra dei mondi • L’isola del dottor Moreau",
+    "updated_at": {
+      "$date": "2026-01-05T17:53:26.967Z"
+    }
+  },
+  {
+    "_id": "c20532ba-aedf-4b29-90d2-e4203431c626",
+    "copy_id": "c646f5b1-f138-400f-a9f8-01e7523ca3f6",
+    "created_at": {
+      "$date": "2026-01-02T10:49:59.685Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-01T10:50:40.244Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-02T10:50:40.244Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "status": "ON_LOAN",
+    "title": "The Hitchhiker's Guide to the Galaxy",
+    "updated_at": {
+      "$date": "2026-01-02T10:50:40.244Z"
+    }
+  },
+  {
+    "_id": "a4bffdac-7487-4c1a-a284-3e9d83db0ee7",
+    "actual_return_date": {
+      "$date": "2026-01-02T11:08:03.890Z"
+    },
+    "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
+    "created_at": {
+      "$date": "2026-01-02T11:05:08.270Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-01T11:07:57.256Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-02T11:07:57.256Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "RETURNED",
+    "title": "Astrofisica per ansiosi",
+    "updated_at": {
+      "$date": "2026-01-02T11:08:03.890Z"
+    }
+  },
+  {
+    "_id": "167baaf8-2288-450b-9e56-1de8acf8d5f6",
+    "copy_id": "2e8dbb45-efef-4b8f-b5f3-151c679bfa47",
+    "created_at": {
+      "$date": "2026-01-02T12:01:35.591Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-01T12:12:18.973Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-02T12:12:18.973Z"
+    },
+    "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "ON_LOAN",
+    "title": "La mano sinistra del buio",
+    "updated_at": {
+      "$date": "2026-01-02T12:12:18.974Z"
+    }
+  },
+  {
+    "_id": "c94f0189-bc6b-4af5-8c94-01d9bd1d7745",
+    "copy_id": "fb3b79bb-f3aa-4433-be3a-79773715a6fe",
+    "created_at": {
+      "$date": "2026-01-02T12:01:39.607Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-04T12:04:52.509Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-05T12:04:52.509Z"
+    },
+    "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "ON_LOAN",
+    "title": "Il Silmarillion",
+    "updated_at": {
+      "$date": "2026-01-05T12:04:52.509Z"
+    }
+  },
+  {
+    "_id": "ad39d5ac-b676-4bb6-9be1-a6d4be6b19b9",
+    "actual_return_date": {
+      "$date": "2026-01-04T18:22:07.416Z"
+    },
+    "copy_id": "fafae596-df4c-44a7-b458-9c7cec911472",
+    "created_at": {
+      "$date": "2026-01-02T12:01:53.105Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-03T18:19:58.133Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-04T18:19:58.133Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "RETURNED",
+    "title": "Life, the Universe and Everything",
+    "updated_at": {
+      "$date": "2026-01-04T18:22:07.416Z"
+    }
+  },
+  {
+    "_id": "019905a4-c2e5-41c0-816b-920a1871cbf6",
+    "actual_return_date": {
+      "$date": "2026-01-02T12:13:08.144Z"
+    },
+    "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
+    "created_at": {
+      "$date": "2026-01-02T12:02:08.167Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-01T12:13:04.711Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-02T12:13:04.711Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "RETURNED",
+    "title": "Astrofisica per ansiosi",
+    "updated_at": {
+      "$date": "2026-01-02T12:13:08.144Z"
+    }
+  },
+  {
+    "_id": "86b7b78e-2296-4131-a658-a5918d0c70fd",
+    "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
+    "created_at": {
+      "$date": "2026-01-02T12:10:48.084Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-04T17:28:11.296Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-05T17:28:11.296Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "ON_LOAN",
+    "title": "Dal big bang ai buchi neri. Breve storia del tempo",
+    "updated_at": {
+      "$date": "2026-01-05T17:28:11.296Z"
+    }
+  },
+  {
+    "_id": "b9a44869-3848-4406-b1bd-51931c1356f5",
+    "copy_id": "a4965f1d-fb77-428a-8e35-007163106301",
+    "created_at": {
+      "$date": "2026-01-02T12:12:49.685Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-01T12:15:17.919Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-02T12:15:17.919Z"
+    },
+    "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "status": "ON_LOAN",
+    "title": "Il ramo d'oro",
+    "updated_at": {
+      "$date": "2026-01-02T12:15:17.919Z"
+    }
+  },
+  {
+    "_id": "557c0270-f8a3-4b4f-a112-6d4256f5f084",
+    "copy_id": "a4965f1d-fb77-428a-8e35-007163106301",
+    "created_at": {
+      "$date": "2026-01-02T12:13:55.962Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-02T17:58:06.607Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-03T17:58:06.607Z"
+    },
+    "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "status": "ON_LOAN",
+    "title": "Il ramo d'oro",
+    "updated_at": {
+      "$date": "2026-01-03T17:58:06.607Z"
+    }
+  },
+  {
+    "_id": "b4b439e8-3e5f-4b65-a442-1e8220895ce2",
+    "copy_id": "fafae596-df4c-44a7-b458-9c7cec911472",
+    "created_at": {
+      "$date": "2026-01-02T12:14:23.336Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-04T11:52:37.161Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-05T11:52:37.161Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "status": "ON_LOAN",
+    "title": "Life, the Universe and Everything",
+    "updated_at": {
+      "$date": "2026-01-05T11:52:37.161Z"
+    }
+  },
+  {
+    "_id": "4d7c8456-897a-473d-b6eb-734292fc278a",
+    "copy_id": "bb04ac8e-8733-43bf-ac72-2a6ebd6c1280",
+    "created_at": {
+      "$date": "2026-01-03T18:25:09.475Z"
+    },
+    "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "status": "ACCEPTED",
+    "title": "Circe (ed.italiana)"
+  },
+  {
+    "_id": "0538e4f7-0e72-47c7-9818-d9fed1ecfb7e",
+    "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
+    "created_at": {
+      "$date": "2026-01-04T12:31:21.615Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "status": "REJECTED",
+    "title": "Dal big bang ai buchi neri. Breve storia del tempo",
+    "updated_at": {
+      "$date": "2026-01-05T17:28:16.775Z"
+    }
+  },
+  {
+    "_id": "db85dd82-11db-4974-9191-e9f77112ac0d",
+    "copy_id": "7f6d5754-15e9-4651-a2d9-4b6d897b6680",
+    "created_at": {
+      "$date": "2026-01-04T13:45:41.902Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-05T18:06:03.267Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-06T18:06:03.267Z"
+    },
+    "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "ON_LOAN",
+    "title": "La parabola del seminatore",
+    "updated_at": {
+      "$date": "2026-01-06T18:06:03.267Z"
+    }
+  },
+  {
+    "_id": "d999e9b2-8c4f-46c7-a868-85d3530053ad",
+    "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
+    "created_at": {
+      "$date": "2026-01-04T14:14:39.231Z"
+    },
+    "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "status": "REJECTED",
+    "title": "Dal big bang ai buchi neri. Breve storia del tempo",
+    "updated_at": {
+      "$date": "2026-01-05T17:28:21.285Z"
+    }
+  },
+  {
+    "_id": "ce27056f-fee2-42ff-96fe-9b0ea217b9f7",
+    "copy_id": "70535937-b251-4110-bd38-3fb0b1dbc407",
+    "created_at": {
+      "$date": "2026-01-05T11:44:39.869Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-04T11:51:05.026Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-05T11:51:05.026Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "status": "ON_LOAN",
+    "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)",
+    "updated_at": {
+      "$date": "2026-01-05T11:51:05.026Z"
+    }
+  },
+  {
+    "_id": "2f834e46-0541-4bef-8fb4-24a547fa69c4",
+    "copy_id": "70535937-b251-4110-bd38-3fb0b1dbc407",
+    "created_at": {
+      "$date": "2026-01-05T11:45:12.538Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "status": "REJECTED",
+    "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)",
+    "updated_at": {
+      "$date": "2026-01-05T11:48:52.539Z"
+    }
+  },
+  {
+    "_id": "09043f99-7f8d-4694-abc3-32f562c02455",
+    "copy_id": "70535937-b251-4110-bd38-3fb0b1dbc407",
+    "created_at": {
+      "$date": "2026-01-05T11:47:53.079Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
+    "status": "REJECTED",
+    "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)",
+    "updated_at": {
+      "$date": "2026-01-05T11:48:59.085Z"
+    }
+  },
+  {
+    "_id": "96f73bfe-d461-4be1-b2e5-9120dd079120",
+    "actual_return_date": {
+      "$date": "2026-01-06T17:57:10.916Z"
+    },
+    "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
+    "created_at": {
+      "$date": "2026-01-05T17:54:30.431Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-05T17:56:30.069Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-06T17:56:30.069Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "RETURNED",
+    "title": "Persuasion",
+    "updated_at": {
+      "$date": "2026-01-06T17:57:10.916Z"
+    }
+  },
+  {
+    "_id": "3b44041f-d067-4f22-8ce4-e970afe46e7d",
+    "copy_id": "7266cddc-108c-4826-9d13-a8624850a021",
+    "created_at": {
+      "$date": "2026-01-05T17:54:33.125Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "owner_notes": "Copia non più disponibile (richiesta di un altro utente accettata).",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "REJECTED",
+    "title": "Emma",
+    "updated_at": {
+      "$date": "2026-01-06T17:52:09.605Z"
+    }
+  },
+  {
+    "_id": "a842dac8-63a4-4410-9a0f-8f949f636a9f",
+    "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
+    "created_at": {
+      "$date": "2026-01-05T17:54:38.599Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-05T17:52:52.202Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-06T17:52:52.202Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "ON_LOAN",
+    "title": "Astrofisica per ansiosi",
+    "updated_at": {
+      "$date": "2026-01-06T17:52:52.202Z"
+    }
+  },
+  {
+    "_id": "491c66b3-6d30-4ca7-95a3-5cc51be340be",
+    "copy_id": "acacc564-3041-4b00-bf63-434cd7327ce1",
+    "created_at": {
+      "$date": "2026-01-05T17:54:40.966Z"
+    },
+    "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "PENDING",
+    "title": "Moby-Dick"
+  },
+  {
+    "_id": "2a22c368-fa1a-4b43-91c7-4ee30c0c6d8e",
+    "copy_id": "d93e4265-d151-45a7-9a7a-b54915f318c2",
+    "created_at": {
+      "$date": "2026-01-05T17:54:44.146Z"
+    },
+    "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "PENDING",
+    "title": "Typee: A Romance of the South Seas"
+  },
+  {
+    "_id": "ba815cfe-a112-40fd-a6ff-341a8fffca55",
+    "copy_id": "38ff5066-aca7-47c8-87d0-4537f4773529",
+    "created_at": {
+      "$date": "2026-01-05T17:54:46.172Z"
+    },
+    "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "PENDING",
+    "title": "La strada"
+  },
+  {
+    "_id": "a3f935f9-9095-42e0-9a8e-c7ad46183e01",
+    "copy_id": "7f6d5754-15e9-4651-a2d9-4b6d897b6680",
+    "created_at": {
+      "$date": "2026-01-05T17:54:49.300Z"
+    },
+    "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "owner_notes": "Copia non più disponibile (richiesta di un altro utente accettata).",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "REJECTED",
+    "title": "La parabola del seminatore",
+    "updated_at": {
+      "$date": "2026-01-06T18:01:52.388Z"
+    }
+  },
+  {
+    "_id": "40898367-bc08-4603-943a-e609d43e5f99",
+    "copy_id": "af282aff-ad74-42a5-974f-04b479ba2e09",
+    "created_at": {
+      "$date": "2026-01-05T17:54:52.691Z"
+    },
+    "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "PENDING",
+    "title": "No Logo"
+  },
+  {
+    "_id": "d1fbbc4a-c9cf-4982-8226-0e20345d172c",
+    "copy_id": "f5ce1df2-71d3-4d08-8e89-c84b607cf831",
+    "created_at": {
+      "$date": "2026-01-05T17:54:55.916Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-04T17:57:34.260Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-05T17:57:34.260Z"
+    },
+    "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "ON_LOAN",
+    "title": "So Long, and Thanks for All the Fish",
+    "updated_at": {
+      "$date": "2026-01-05T17:57:34.261Z"
+    }
+  },
+  {
+    "_id": "e601a47a-6d25-44d2-aa20-4672157e5176",
+    "copy_id": "94de4955-9cc5-4c32-b3fb-5528f772794c",
+    "created_at": {
+      "$date": "2026-01-05T17:54:58.979Z"
+    },
+    "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
+    "status": "PENDING",
+    "title": "Il signore degli anelli"
+  },
+  {
+    "_id": "5c106f8e-8151-4fcc-b3f8-daa3da52996a",
+    "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
+    "created_at": {
+      "$date": "2026-01-06T17:40:54.414Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "owner_notes": "Copia non più disponibile (richiesta di un altro utente accettata).",
+    "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "status": "REJECTED",
+    "title": "Astrofisica per ansiosi",
+    "updated_at": {
+      "$date": "2026-01-06T17:41:33.054Z"
+    }
+  },
+  {
+    "_id": "58d4b018-c5e8-4378-acea-641e2467c148",
+    "copy_id": "7266cddc-108c-4826-9d13-a8624850a021",
+    "created_at": {
+      "$date": "2026-01-06T17:51:03.003Z"
+    },
+    "expected_return_date": {
+      "$date": "2026-02-12T17:52:18.684Z"
+    },
+    "loan_start_date": {
+      "$date": "2026-01-06T17:52:18.684Z"
+    },
+    "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
+    "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
+    "status": "ON_LOAN",
+    "title": "Emma",
+    "updated_at": {
+      "$date": "2026-01-06T17:57:36.457Z"
+    }
   }
-},
-{
-  "_id": "2f5c46e2-c68b-4a35-b081-0b12373174c8",
-  "actual_return_date": {
-    "$date": "2025-12-30T18:31:56.146Z"
-  },
-  "copy_id": "f5ce1df2-71d3-4d08-8e89-c84b607cf831",
-  "created_at": {
-    "$date": "2025-12-30T09:30:53.647Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-01T11:54:06.075Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-12-30T11:54:06.075Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "status": "RETURNED",
-  "title": "So Long, and Thanks for All the Fish",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:56.146Z"
-  }
-},
-{
-  "_id": "0557ae3a-d700-4f1c-a342-b0d490afe77d",
-  "actual_return_date": {
-    "$date": "2025-12-25T18:30:48.665Z"
-  },
-  "copy_id": "90d35042-ca5f-43f4-8ea6-d39404fda73f",
-  "created_at": {
-    "$date": "2025-12-25T10:17:06.296Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-25T10:17:43.571Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-12-25T10:17:43.571Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "status": "RETURNED",
-  "title": "Orgoglio e Pregiudizio",
-  "updated_at": {
-    "$date": "2025-12-30T18:30:48.665Z"
-  }
-},
-{
-  "_id": "8dc47ea8-3c49-4a3a-8997-ad206f387f39",
-  "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
-  "created_at": {
-    "$date": "2025-12-30T11:52:11.272Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "owner_notes": "scusami sono nel 2050",
-  "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "status": "REJECTED",
-  "title": "Dal big bang ai buchi neri. Breve storia del tempo",
-  "updated_at": {
-    "$date": "2025-12-30T11:52:57.954Z"
-  }
-},
-{
-  "_id": "d38ef03c-2336-40be-a242-39cc77ae8b96",
-  "actual_return_date": {
-    "$date": "2025-12-10T18:31:57.898Z"
-  },
-  "copy_id": "fafae596-df4c-44a7-b458-9c7cec911472",
-  "created_at": {
-    "$date": "2025-12-10T11:53:29.981Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-10T11:54:07.338Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-12-10T11:54:07.338Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "RETURNED",
-  "title": "Life, the Universe and Everything",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:57.898Z"
-  }
-},
-{
-  "_id": "1b681cb9-5eeb-4498-97cc-e9dfefa54d53",
-  "actual_return_date": {
-    "$date": "2025-12-30T18:31:59.481Z"
-  },
-  "copy_id": "edd7a63d-36e5-4239-a7f0-6dfe174acd55",
-  "created_at": {
-    "$date": "2025-12-30T11:53:34.178Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T11:54:09.200Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-12-30T11:54:09.200Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "RETURNED",
-  "title": "The Restaurant at the End of the Universe",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:59.481Z"
-  }
-},
-{
-  "_id": "1b250751-1c0e-4306-97d9-879de806cf9b",
-  "actual_return_date": {
-    "$date": "2025-10-10T18:31:15.238Z"
-  },
-  "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
-  "created_at": {
-    "$date": "2025-10-10T11:53:39.992Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T18:31:09.619Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-10-10T18:31:09.619Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "RETURNED",
-  "title": "Astrofisica per ansiosi",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:15.238Z"
-  }
-},
-{
-  "_id": "669311db-4ce3-498f-9202-8e195753247e",
-  "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
-  "created_at": {
-    "$date": "2025-12-30T11:58:26.207Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "REJECTED",
-  "title": "Persuasion",
-  "updated_at": {
-    "$date": "2025-12-30T18:30:59.046Z"
-  }
-},
-{
-  "_id": "e4690b19-f5be-475c-ad35-b22ea9a6943d",
-  "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
-  "created_at": {
-    "$date": "2025-12-30T16:15:20.740Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "REJECTED",
-  "title": "Persuasion",
-  "updated_at": {
-    "$date": "2025-12-30T18:30:55.974Z"
-  }
-},
-{
-  "_id": "bb82c5cf-878a-468a-9554-14cfc3269aaa",
-  "actual_return_date": {
-    "$date": "2025-12-30T18:31:13.623Z"
-  },
-  "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
-  "created_at": {
-    "$date": "2025-12-30T16:19:44.376Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T18:31:11.233Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-12-30T18:31:11.233Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "RETURNED",
-  "title": "Persuasion",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:13.623Z"
-  }
-},
-{
-  "_id": "af11dce1-a4d1-4fc7-a35a-306ee4a24a86",
-  "actual_return_date": {
-    "$date": "2025-12-30T18:32:01.018Z"
-  },
-  "copy_id": "ee4a7ed3-c56e-44f2-aff7-82920cc7f21d",
-  "created_at": {
-    "$date": "2025-12-30T16:58:13.225Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T17:01:30.342Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-12-30T17:01:30.342Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "status": "RETURNED",
-  "title": "Mostly Harmless",
-  "updated_at": {
-    "$date": "2025-12-30T18:32:01.018Z"
-  }
-},
-{
-  "_id": "dc7769a5-4532-4683-b924-86a6d6be9d57",
-  "actual_return_date": {
-    "$date": "2025-12-30T18:31:42.824Z"
-  },
-  "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
-  "created_at": {
-    "$date": "2025-12-30T18:28:21.972Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T18:31:37.478Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-12-30T18:31:37.478Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "RETURNED",
-  "title": "Dal big bang ai buchi neri. Breve storia del tempo",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:42.824Z"
-  }
-},
-{
-  "_id": "eafe3e34-f367-4b1b-a789-4d924d20f407",
-  "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
-  "created_at": {
-    "$date": "2025-12-30T18:28:41.500Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "status": "REJECTED",
-  "title": "Persuasion",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:07.538Z"
-  }
-},
-{
-  "_id": "8d711ab2-0a0f-4704-8890-5da173efbe30",
-  "actual_return_date": {
-    "$date": "2025-11-30T18:30:15.179Z"
-  },
-  "copy_id": "d93e4265-d151-45a7-9a7a-b54915f318c2",
-  "created_at": {
-    "$date": "2025-11-30T18:29:19.650Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T18:30:09.490Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-11-30T18:30:09.490Z"
-  },
-  "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "requester_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "status": "RETURNED",
-  "title": "Typee: A Romance of the South Seas",
-  "updated_at": {
-    "$date": "2025-12-30T18:30:15.179Z"
-  }
-},
-{
-  "_id": "4aab8460-2ebf-4d81-a629-79925dd08ade",
-  "actual_return_date": {
-    "$date": "2025-11-30T18:30:13.733Z"
-  },
-  "copy_id": "acacc564-3041-4b00-bf63-434cd7327ce1",
-  "created_at": {
-    "$date": "2025-11-30T18:29:45.171Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T18:30:08.010Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-11-30T18:30:08.010Z"
-  },
-  "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "status": "RETURNED",
-  "title": "Moby-Dick",
-  "updated_at": {
-    "$date": "2025-12-30T18:30:13.733Z"
-  }
-},
-{
-  "_id": "5d4a07a4-5ee8-4948-a249-382924879bf0",
-  "actual_return_date": {
-    "$date": "2025-11-30T18:31:41.225Z"
-  },
-  "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
-  "created_at": {
-    "$date": "2025-11-30T18:30:35.706Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-29T18:31:38.856Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-11-30T18:31:38.856Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "status": "RETURNED",
-  "title": "Dal big bang ai buchi neri. Breve storia del tempo",
-  "updated_at": {
-    "$date": "2025-12-30T18:31:41.225Z"
-  }
-},
-{
-  "_id": "2669ebdf-33eb-45b2-9ed7-26fd9dd4e8ae",
-  "copy_id": "e5d907b7-9f93-4552-b42a-2c5466c85858",
-  "created_at": {
-    "$date": "2025-12-30T19:07:16.522Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-01-04T17:57:27.113Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-05T17:57:27.113Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "ON_LOAN",
-  "title": "Shada. Doctor Who",
-  "updated_at": {
-    "$date": "2026-01-05T17:57:27.113Z"
-  }
-},
-{
-  "_id": "add384aa-528c-4588-9e70-47cda0ec2415",
-  "copy_id": "d93e4265-d151-45a7-9a7a-b54915f318c2",
-  "created_at": {
-    "$date": "2025-12-30T19:12:01.366Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-05T17:54:41.505Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-06T17:54:41.505Z"
-  },
-  "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "status": "ON_LOAN",
-  "title": "Typee: A Romance of the South Seas",
-  "updated_at": {
-    "$date": "2026-01-06T17:54:41.505Z"
-  }
-},
-{
-  "_id": "c1066d08-7707-44aa-8343-d102d30d96e2",
-  "actual_return_date": {
-    "$date": "2026-01-05T17:53:26.967Z"
-  },
-  "copy_id": "4f172836-3a97-44a2-becb-ca9db67a4d8d",
-  "created_at": {
-    "$date": "2026-01-02T10:28:22.079Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-01T17:58:38.660Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-02T17:58:38.660Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "RETURNED",
-  "title": "La macchina del tempo • L’uomo invisibile • La guerra dei mondi • L’isola del dottor Moreau",
-  "updated_at": {
-    "$date": "2026-01-05T17:53:26.967Z"
-  }
-},
-{
-  "_id": "c20532ba-aedf-4b29-90d2-e4203431c626",
-  "copy_id": "c646f5b1-f138-400f-a9f8-01e7523ca3f6",
-  "created_at": {
-    "$date": "2026-01-02T10:49:59.685Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-01T10:50:40.244Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-02T10:50:40.244Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "status": "ON_LOAN",
-  "title": "The Hitchhiker's Guide to the Galaxy",
-  "updated_at": {
-    "$date": "2026-01-02T10:50:40.244Z"
-  }
-},
-{
-  "_id": "a4bffdac-7487-4c1a-a284-3e9d83db0ee7",
-  "actual_return_date": {
-    "$date": "2026-01-02T11:08:03.890Z"
-  },
-  "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
-  "created_at": {
-    "$date": "2026-01-02T11:05:08.270Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-01T11:07:57.256Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-02T11:07:57.256Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "RETURNED",
-  "title": "Astrofisica per ansiosi",
-  "updated_at": {
-    "$date": "2026-01-02T11:08:03.890Z"
-  }
-},
-{
-  "_id": "167baaf8-2288-450b-9e56-1de8acf8d5f6",
-  "copy_id": "2e8dbb45-efef-4b8f-b5f3-151c679bfa47",
-  "created_at": {
-    "$date": "2026-01-02T12:01:35.591Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-01T12:12:18.973Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-02T12:12:18.973Z"
-  },
-  "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "ON_LOAN",
-  "title": "La mano sinistra del buio",
-  "updated_at": {
-    "$date": "2026-01-02T12:12:18.974Z"
-  }
-},
-{
-  "_id": "c94f0189-bc6b-4af5-8c94-01d9bd1d7745",
-  "copy_id": "fb3b79bb-f3aa-4433-be3a-79773715a6fe",
-  "created_at": {
-    "$date": "2026-01-02T12:01:39.607Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-04T12:04:52.509Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-05T12:04:52.509Z"
-  },
-  "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "ON_LOAN",
-  "title": "Il Silmarillion",
-  "updated_at": {
-    "$date": "2026-01-05T12:04:52.509Z"
-  }
-},
-{
-  "_id": "ad39d5ac-b676-4bb6-9be1-a6d4be6b19b9",
-  "actual_return_date": {
-    "$date": "2026-01-04T18:22:07.416Z"
-  },
-  "copy_id": "fafae596-df4c-44a7-b458-9c7cec911472",
-  "created_at": {
-    "$date": "2026-01-02T12:01:53.105Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-03T18:19:58.133Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-04T18:19:58.133Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "RETURNED",
-  "title": "Life, the Universe and Everything",
-  "updated_at": {
-    "$date": "2026-01-04T18:22:07.416Z"
-  }
-},
-{
-  "_id": "019905a4-c2e5-41c0-816b-920a1871cbf6",
-  "actual_return_date": {
-    "$date": "2026-01-02T12:13:08.144Z"
-  },
-  "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
-  "created_at": {
-    "$date": "2026-01-02T12:02:08.167Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-01T12:13:04.711Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-02T12:13:04.711Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "RETURNED",
-  "title": "Astrofisica per ansiosi",
-  "updated_at": {
-    "$date": "2026-01-02T12:13:08.144Z"
-  }
-},
-{
-  "_id": "86b7b78e-2296-4131-a658-a5918d0c70fd",
-  "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
-  "created_at": {
-    "$date": "2026-01-02T12:10:48.084Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-04T17:28:11.296Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-05T17:28:11.296Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "ON_LOAN",
-  "title": "Dal big bang ai buchi neri. Breve storia del tempo",
-  "updated_at": {
-    "$date": "2026-01-05T17:28:11.296Z"
-  }
-},
-{
-  "_id": "b9a44869-3848-4406-b1bd-51931c1356f5",
-  "copy_id": "a4965f1d-fb77-428a-8e35-007163106301",
-  "created_at": {
-    "$date": "2026-01-02T12:12:49.685Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-01T12:15:17.919Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-02T12:15:17.919Z"
-  },
-  "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "requester_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "status": "ON_LOAN",
-  "title": "Il ramo d'oro",
-  "updated_at": {
-    "$date": "2026-01-02T12:15:17.919Z"
-  }
-},
-{
-  "_id": "557c0270-f8a3-4b4f-a112-6d4256f5f084",
-  "copy_id": "a4965f1d-fb77-428a-8e35-007163106301",
-  "created_at": {
-    "$date": "2026-01-02T12:13:55.962Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-02T17:58:06.607Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-03T17:58:06.607Z"
-  },
-  "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "status": "ON_LOAN",
-  "title": "Il ramo d'oro",
-  "updated_at": {
-    "$date": "2026-01-03T17:58:06.607Z"
-  }
-},
-{
-  "_id": "b4b439e8-3e5f-4b65-a442-1e8220895ce2",
-  "copy_id": "fafae596-df4c-44a7-b458-9c7cec911472",
-  "created_at": {
-    "$date": "2026-01-02T12:14:23.336Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-04T11:52:37.161Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-05T11:52:37.161Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "status": "ON_LOAN",
-  "title": "Life, the Universe and Everything",
-  "updated_at": {
-    "$date": "2026-01-05T11:52:37.161Z"
-  }
-},
-{
-  "_id": "985a2a8a-bd3b-410e-ae44-4682d51b9035",
-  "actual_return_date": {
-    "$date": "2026-01-05T12:50:29.539Z"
-  },
-  "copy_id": "edd7a63d-36e5-4239-a7f0-6dfe174acd55",
-  "created_at": {
-    "$date": "2025-11-02T15:27:18.654Z"
-  },
-  "expected_return_date": {
-    "$date": "2025-12-04T11:53:41.007Z"
-  },
-  "loan_start_date": {
-    "$date": "2025-11-05T11:53:41.007Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "31191b9e-2ed9-45b2-9edd-361f82392a25",
-  "status": "RETURNED",
-  "title": "The Restaurant at the End of the Universe",
-  "updated_at": {
-    "$date": "2026-01-05T12:50:29.539Z"
-  }
-},
-{
-  "_id": "4d7c8456-897a-473d-b6eb-734292fc278a",
-  "copy_id": "bb04ac8e-8733-43bf-ac72-2a6ebd6c1280",
-  "created_at": {
-    "$date": "2026-01-03T18:25:09.475Z"
-  },
-  "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "status": "ACCEPTED",
-  "title": "Circe (ed.italiana)"
-},
-{
-  "_id": "0538e4f7-0e72-47c7-9818-d9fed1ecfb7e",
-  "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
-  "created_at": {
-    "$date": "2026-01-04T12:31:21.615Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "status": "REJECTED",
-  "title": "Dal big bang ai buchi neri. Breve storia del tempo",
-  "updated_at": {
-    "$date": "2026-01-05T17:28:16.775Z"
-  }
-},
-{
-  "_id": "db85dd82-11db-4974-9191-e9f77112ac0d",
-  "copy_id": "7f6d5754-15e9-4651-a2d9-4b6d897b6680",
-  "created_at": {
-    "$date": "2026-01-04T13:45:41.902Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-05T18:06:03.267Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-06T18:06:03.267Z"
-  },
-  "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "ON_LOAN",
-  "title": "La parabola del seminatore",
-  "updated_at": {
-    "$date": "2026-01-06T18:06:03.267Z"
-  }
-},
-{
-  "_id": "d999e9b2-8c4f-46c7-a868-85d3530053ad",
-  "copy_id": "99c3c968-1044-48e8-a2b2-4b5878cd629b",
-  "created_at": {
-    "$date": "2026-01-04T14:14:39.231Z"
-  },
-  "owner_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "requester_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "status": "REJECTED",
-  "title": "Dal big bang ai buchi neri. Breve storia del tempo",
-  "updated_at": {
-    "$date": "2026-01-05T17:28:21.285Z"
-  }
-},
-{
-  "_id": "ce27056f-fee2-42ff-96fe-9b0ea217b9f7",
-  "copy_id": "70535937-b251-4110-bd38-3fb0b1dbc407",
-  "created_at": {
-    "$date": "2026-01-05T11:44:39.869Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-04T11:51:05.026Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-05T11:51:05.026Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "status": "ON_LOAN",
-  "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)",
-  "updated_at": {
-    "$date": "2026-01-05T11:51:05.026Z"
-  }
-},
-{
-  "_id": "2f834e46-0541-4bef-8fb4-24a547fa69c4",
-  "copy_id": "70535937-b251-4110-bd38-3fb0b1dbc407",
-  "created_at": {
-    "$date": "2026-01-05T11:45:12.538Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "status": "REJECTED",
-  "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)",
-  "updated_at": {
-    "$date": "2026-01-05T11:48:52.539Z"
-  }
-},
-{
-  "_id": "09043f99-7f8d-4694-abc3-32f562c02455",
-  "copy_id": "70535937-b251-4110-bd38-3fb0b1dbc407",
-  "created_at": {
-    "$date": "2026-01-05T11:47:53.079Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "95e37f80-cefa-428f-81ba-3743ee587148",
-  "status": "REJECTED",
-  "title": "Camminando nell'ombra. La mia autobiografia (1949-1962)",
-  "updated_at": {
-    "$date": "2026-01-05T11:48:59.085Z"
-  }
-},
-{
-  "_id": "7fdd4761-c302-4799-b26e-19a4f246751c",
-  "actual_return_date": {
-    "$date": "2026-01-05T12:34:45.794Z"
-  },
-  "copy_id": "acacc564-3041-4b00-bf63-434cd7327ce1",
-  "created_at": {
-    "$date": "2026-01-05T12:27:56.436Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-04T12:33:34.258Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-05T12:33:34.258Z"
-  },
-  "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "owner_notes": "Ciao, cercami su telegram",
-  "requester_id": "31191b9e-2ed9-45b2-9edd-361f82392a25",
-  "status": "RETURNED",
-  "title": "Moby-Dick",
-  "updated_at": {
-    "$date": "2026-01-05T12:34:45.794Z"
-  }
-},
-{
-  "_id": "96f73bfe-d461-4be1-b2e5-9120dd079120",
-  "actual_return_date": {
-    "$date": "2026-01-06T17:57:10.916Z"
-  },
-  "copy_id": "a7d2d7bf-666c-42a5-bd3c-735815d034dc",
-  "created_at": {
-    "$date": "2026-01-05T17:54:30.431Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-05T17:56:30.069Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-06T17:56:30.069Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "RETURNED",
-  "title": "Persuasion",
-  "updated_at": {
-    "$date": "2026-01-06T17:57:10.916Z"
-  }
-},
-{
-  "_id": "3b44041f-d067-4f22-8ce4-e970afe46e7d",
-  "copy_id": "7266cddc-108c-4826-9d13-a8624850a021",
-  "created_at": {
-    "$date": "2026-01-05T17:54:33.125Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "owner_notes": "Copia non più disponibile (richiesta di un altro utente accettata).",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "REJECTED",
-  "title": "Emma",
-  "updated_at": {
-    "$date": "2026-01-06T17:52:09.605Z"
-  }
-},
-{
-  "_id": "a842dac8-63a4-4410-9a0f-8f949f636a9f",
-  "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
-  "created_at": {
-    "$date": "2026-01-05T17:54:38.599Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-05T17:52:52.202Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-06T17:52:52.202Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "ON_LOAN",
-  "title": "Astrofisica per ansiosi",
-  "updated_at": {
-    "$date": "2026-01-06T17:52:52.202Z"
-  }
-},
-{
-  "_id": "491c66b3-6d30-4ca7-95a3-5cc51be340be",
-  "copy_id": "acacc564-3041-4b00-bf63-434cd7327ce1",
-  "created_at": {
-    "$date": "2026-01-05T17:54:40.966Z"
-  },
-  "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "PENDING",
-  "title": "Moby-Dick"
-},
-{
-  "_id": "2a22c368-fa1a-4b43-91c7-4ee30c0c6d8e",
-  "copy_id": "d93e4265-d151-45a7-9a7a-b54915f318c2",
-  "created_at": {
-    "$date": "2026-01-05T17:54:44.146Z"
-  },
-  "owner_id": "97b136d7-b325-418c-852a-79ecc8f58041",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "PENDING",
-  "title": "Typee: A Romance of the South Seas"
-},
-{
-  "_id": "ba815cfe-a112-40fd-a6ff-341a8fffca55",
-  "copy_id": "38ff5066-aca7-47c8-87d0-4537f4773529",
-  "created_at": {
-    "$date": "2026-01-05T17:54:46.172Z"
-  },
-  "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "PENDING",
-  "title": "La strada"
-},
-{
-  "_id": "a3f935f9-9095-42e0-9a8e-c7ad46183e01",
-  "copy_id": "7f6d5754-15e9-4651-a2d9-4b6d897b6680",
-  "created_at": {
-    "$date": "2026-01-05T17:54:49.300Z"
-  },
-  "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "owner_notes": "Copia non più disponibile (richiesta di un altro utente accettata).",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "REJECTED",
-  "title": "La parabola del seminatore",
-  "updated_at": {
-    "$date": "2026-01-06T18:01:52.388Z"
-  }
-},
-{
-  "_id": "40898367-bc08-4603-943a-e609d43e5f99",
-  "copy_id": "af282aff-ad74-42a5-974f-04b479ba2e09",
-  "created_at": {
-    "$date": "2026-01-05T17:54:52.691Z"
-  },
-  "owner_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "PENDING",
-  "title": "No Logo"
-},
-{
-  "_id": "d1fbbc4a-c9cf-4982-8226-0e20345d172c",
-  "copy_id": "f5ce1df2-71d3-4d08-8e89-c84b607cf831",
-  "created_at": {
-    "$date": "2026-01-05T17:54:55.916Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-04T17:57:34.260Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-05T17:57:34.260Z"
-  },
-  "owner_id": "1e496285-8361-4887-b08e-2dff78e391fe",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "ON_LOAN",
-  "title": "So Long, and Thanks for All the Fish",
-  "updated_at": {
-    "$date": "2026-01-05T17:57:34.261Z"
-  }
-},
-{
-  "_id": "e601a47a-6d25-44d2-aa20-4672157e5176",
-  "copy_id": "94de4955-9cc5-4c32-b3fb-5528f772794c",
-  "created_at": {
-    "$date": "2026-01-05T17:54:58.979Z"
-  },
-  "owner_id": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
-  "requester_id": "eefe8c74-ace2-40f6-b877-3f643e056184",
-  "status": "PENDING",
-  "title": "Il signore degli anelli"
-},
-{
-  "_id": "5c106f8e-8151-4fcc-b3f8-daa3da52996a",
-  "copy_id": "791d08a6-2660-4b70-8d69-54c169118849",
-  "created_at": {
-    "$date": "2026-01-06T17:40:54.414Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "owner_notes": "Copia non più disponibile (richiesta di un altro utente accettata).",
-  "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "status": "REJECTED",
-  "title": "Astrofisica per ansiosi",
-  "updated_at": {
-    "$date": "2026-01-06T17:41:33.054Z"
-  }
-},
-{
-  "_id": "58d4b018-c5e8-4378-acea-641e2467c148",
-  "copy_id": "7266cddc-108c-4826-9d13-a8624850a021",
-  "created_at": {
-    "$date": "2026-01-06T17:51:03.003Z"
-  },
-  "expected_return_date": {
-    "$date": "2026-02-12T17:52:18.684Z"
-  },
-  "loan_start_date": {
-    "$date": "2026-01-06T17:52:18.684Z"
-  },
-  "owner_id": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
-  "requester_id": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
-  "status": "ON_LOAN",
-  "title": "Emma",
-  "updated_at": {
-    "$date": "2026-01-06T17:57:36.457Z"
-  }
-}]
+]
