@@ -236,7 +236,7 @@ public class AuthResource {
 
     @POST
     @Path("/login")
-    public Response login(LoginDTO credentials, , @Context HttpHeaders headers) {
+    public Response login(LoginDTO credentials, @Context HttpHeaders headers) {
 
         if (credentials.email() == null || credentials.email().isEmpty() ||
                 credentials.password() == null || credentials.password().isEmpty()) {
