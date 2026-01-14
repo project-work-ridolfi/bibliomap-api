@@ -117,13 +117,18 @@ public class AuthResource {
 
 		// determina se il flag 'Secure' deve essere TRUE (solo se connessione HTTPS).
 		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
-		// setta il cookie per il flusso OTP
-		NewCookie sessionCookie = SessionIDProvider.createSessionCookie(sessionId, isSecure); 
 
+		// GENERA HEADER STRINGA
+        String cookieHeader = SessionIDProvider.buildSetCookieHeader(
+            sessionId, 
+            SessionIDProvider.DEFAULT_MAX_AGE_SECONDS, 
+            isSecure
+        );
 
-		return Response.ok(responseData) // 200 OK
-				.cookie(sessionCookie) 
-				.build();
+        return Response.ok(responseData)
+                .header("Set-Cookie", cookieHeader) 
+                .build();
+    }
 	}
 
 	private boolean validRegistration(RegistrationDTO request) {
@@ -210,11 +215,7 @@ public class AuthResource {
 
 				boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
 
-				NewCookie authCookie = SessionIDProvider.createAuthenticatedSessionCookie(
-						authenticatedSessionId, 
-						isSecure, 
-						durationSeconds
-						);
+				String cookieHeader = SessionIDProvider.buildSetCookieHeader(sessionId, durata, isSecure);
 
 				Map<String, String> responseBody = Map.of(
 						"message", "User created and authenticated.",
@@ -222,6 +223,7 @@ public class AuthResource {
 						);
 
 				return Response.status(Response.Status.CREATED)
+						.header("Set-Cookie", cookieHeader)
 						.entity(responseBody)
 						.cookie(authCookie)  
 						.build();
@@ -286,20 +288,19 @@ public class AuthResource {
 		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
 
 		Map<String, String> responseBody = Map.of(
-				"message", "Accesso effettuato con successo.",
-				"userId", user.getId() 
-				);
+                "message", "Accesso effettuato con successo.",
+                "userId", user.getId() 
+                );
 
-		String setCookieHeader = SessionIDProvider.buildSetCookieHeader(
-		        authenticatedSessionId, 
-		        durationSeconds, 
-		        isSecure, 
-		        true // Partitioned
-		);
+        String cookieHeader = SessionIDProvider.buildSetCookieHeader(
+            authenticatedSessionId, 
+            durationSeconds, 
+            isSecure
+        );
 
-		return Response.ok(responseBody)
-		        .header("Set-Cookie", setCookieHeader)
-		        .build();
+        return Response.ok(responseBody)
+                .header("Set-Cookie", cookieHeader) 
+                .build();
 	}
 
 
@@ -314,11 +315,11 @@ public class AuthResource {
 		}
 
 		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
-		NewCookie expiredCookie = SessionIDProvider.createExpiredSessionCookie(isSecure);
+		String expiredCookieHeader = SessionIDProvider.buildExpiredSetCookieHeader(isSecure);
 
-		return Response.noContent()
-				.cookie(expiredCookie)
-				.build();
+        return Response.noContent()
+                .header("Set-Cookie", expiredCookieHeader)
+                .build();
 	}
 
 	@POST
@@ -360,9 +361,10 @@ public class AuthResource {
 						: Map.of("message", "Codice di verifica inviato.");
 
 		boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
-		NewCookie sessionCookie = SessionIDProvider.createSessionCookie(sessionId, isSecure);
+	
+		String cookieHeader = SessionIDProvider.buildSetCookieHeader(sessionId, durata, isSecure);
 
-		return Response.ok(responseData).cookie(sessionCookie).build();
+		return Response.ok(body).header("Set-Cookie", cookieHeader).build();
 	}
 
 	@POST
