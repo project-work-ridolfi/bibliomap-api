@@ -125,9 +125,17 @@ public class GoogleBooksService {
 			// gestisce copertina
 			String cover = null;
 			if (volumeInfo.has("imageLinks")) {
-				// preferisce thumbnail a smallThumbnail
-				cover = volumeInfo.path("imageLinks").path("thumbnail").asText();
-				// fix per protocollo http vs https
+
+				JsonNode images = volumeInfo.path("imageLinks");
+				//preferenza per una media risoluzione 
+				if(images.has("medium")){
+					cover = images.path("medium").asText();
+				}else if (images.has("small")){
+					cover = images.path("small").asText();
+				}else{
+				cover = images.path("thumbnail").asText();
+				}
+
 				if (cover != null && cover.startsWith("http://")) {
 					cover = cover.replace("http://", "https://");
 				}
