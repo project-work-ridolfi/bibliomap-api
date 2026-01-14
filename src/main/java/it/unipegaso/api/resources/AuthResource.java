@@ -108,7 +108,7 @@ public class AuthResource {
         }
 
         // determina se il flag 'Secure' deve essere TRUE (solo se connessione HTTPS).
-        boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+        boolean isSecure = isRequestSecure(uriInfo, headers);
 
         // GENERA HEADER STRINGA
         // Durata breve per la fase di registrazione (es. 1 ora)
@@ -168,7 +168,7 @@ public class AuthResource {
 
     @POST
     @Path("/register")
-    public Response register(RegistrationDTO request) {
+    public Response register(RegistrationDTO request, @Context HttpHeaders headers) {
 
         // CONTROLLO DI SICUREZZA: tutti i valori devono essere presenti
         if (request.password() == null || request.password().isEmpty() || !request.acceptTerms() || !request.acceptPrivacy()) {
@@ -200,7 +200,7 @@ public class AuthResource {
                         newUser.getUsername(),
                         durationSeconds);
 
-                boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+                boolean isSecure = isRequestSecure(uriInfo, headers);
 
                 String cookieHeader = SessionIDProvider.buildSetCookieHeader(authenticatedSessionId, durationSeconds, isSecure);
 
@@ -236,7 +236,7 @@ public class AuthResource {
 
     @POST
     @Path("/login")
-    public Response login(LoginDTO credentials) {
+    public Response login(LoginDTO credentials, , @Context HttpHeaders headers) {
 
         if (credentials.email() == null || credentials.email().isEmpty() ||
                 credentials.password() == null || credentials.password().isEmpty()) {
@@ -295,7 +295,7 @@ public class AuthResource {
             registrationFlowService.deleteSession(sessionId);
         }
 
-        boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+        boolean isSecure =isRequestSecure(uriInfo, headers);
         String expiredCookieHeader = SessionIDProvider.buildExpiredSetCookieHeader(isSecure);
 
         return Response.noContent()
@@ -339,7 +339,7 @@ public class AuthResource {
                 ? Map.of("message", "OTP inviato (Debug).", "mockOtp", mockOtp)
                 : Map.of("message", "Codice di verifica inviato.");
 
-        boolean isSecure = uriInfo.getBaseUri().getScheme().equals("https");
+        boolean isSecure = isRequestSecure(uriInfo, headers);
         int otpDuration = 3600; // Durata temporanea per OTP
 
         String cookieHeader = SessionIDProvider.buildSetCookieHeader(sessionId, otpDuration, isSecure);
@@ -406,5 +406,19 @@ public class AuthResource {
         userRepository.update(user);
 
         return Response.ok(Map.of("message", "Password aggiornata con successo.")).build();
+    }
+
+    // per capire se siamo davvero in HTTPS 
+    private boolean isRequestSecure(UriInfo uriInfo, HttpHeaders headers) {
+        // controlla se il server vede HTTPS direttamente
+        if (uriInfo.getBaseUri().getScheme().equals("https")) {
+            return true;
+        }
+        // controlla l'header standard dei proxy 
+        String forwardedProto = headers.getHeaderString("X-Forwarded-Proto");
+        if (forwardedProto != null && forwardedProto.equalsIgnoreCase("https")) {
+            return true;
+        }
+        return false;
     }
 }
