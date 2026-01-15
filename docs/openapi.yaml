@@ -8,6 +8,8 @@ info:
     name: Adriana Ridolfi
     email: adriana.ridolfi@studenti.unipegaso.it
 servers:
+  - url: https://bibliomap-api.onrender.com
+    description: Server di produzione
   - url: http://localhost:8080
     description: Server locale di sviluppo
 components:

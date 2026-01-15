@@ -76,7 +76,7 @@ public class EmailService {
 	long otpDurationMinutes;
 
 	@Inject
-	@ConfigProperty(name = "email.base-url", defaultValue = "http://localhost:5173/")
+	@ConfigProperty(name = "email.base-url", defaultValue = "https://bibliomap-ui.onrender.com/")
 	String baseUrl;
 
 	@Inject
