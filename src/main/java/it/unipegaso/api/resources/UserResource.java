@@ -224,7 +224,7 @@ public class UserResource {
 
 			// aggiornamento con nuovo hash
 			user.setHashedPassword(newPwd);
-    		Map<String, Object> historyEntry = getHistoryEntry("password", newPwd, oldPwd, "PASSWORD_CHANGED");
+    		Map<String, Object> historyEntry = getHistoryEntry("password", newPwd, user.getHashedPassword(), "PASSWORD_CHANGED");
 
 			user.addToHistory(historyEntry);
 			userRepository.update(user);

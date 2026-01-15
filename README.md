@@ -397,4 +397,8 @@ mongosh bibliomap-db-populate.js
   - [ ] controlla conf email
   - [ ] controlla swagger
   - [ ] frontend
+- [ ] check numero visualizzazioni come cresce
+- [ ] cambia pwd degli utenti demo
+- [ ] aggiorna json mongo
+- [ ] rel
 
