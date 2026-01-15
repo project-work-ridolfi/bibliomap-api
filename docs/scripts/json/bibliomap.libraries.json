@@ -12,7 +12,7 @@
     "name": "Don't panic",
     "ownerId": "1e496285-8361-4887-b08e-2dff78e391fe",
     "viewsCounter": {
-      "$numberLong": "20"
+      "$numberLong": "26"
     },
     "visibility": "all"
   },
@@ -30,7 +30,7 @@
     "ownerId": "eefe8c74-ace2-40f6-b877-3f643e056184",
     "visibility": "all",
     "viewsCounter": {
-      "$numberLong": "38"
+      "$numberLong": "54"
     }
   },
   {
@@ -47,7 +47,7 @@
     "ownerId": "eefe8c74-ace2-40f6-b877-3f643e056184",
     "visibility": "all",
     "viewsCounter": {
-      "$numberLong": "40"
+      "$numberLong": "56"
     }
   },
   {
@@ -64,7 +64,7 @@
     "ownerId": "97b136d7-b325-418c-852a-79ecc8f58041",
     "visibility": "all",
     "viewsCounter": {
-      "$numberLong": "7"
+      "$numberLong": "15"
     }
   },
   {
@@ -81,7 +81,7 @@
     "ownerId": "97b136d7-b325-418c-852a-79ecc8f58041",
     "visibility": "logged_in",
     "viewsCounter": {
-      "$numberLong": "4"
+      "$numberLong": "5"
     }
   },
   {
@@ -109,14 +109,14 @@
     },
     "locationId": "a1a94c44-3297-4adb-b453-b065d4fda2d1",
     "modifiedAt": {
-      "$date": "2025-12-30T11:15:36.231Z"
+      "$date": "2026-01-14T11:15:43.703Z"
     },
     "name": "La libreria delle sorelle March",
     "ownerId": "95e37f80-cefa-428f-81ba-3743ee587148",
-    "visibility": "logged_in",
     "viewsCounter": {
-      "$numberLong": "14"
-    }
+      "$numberLong": "6"
+    },
+    "visibility": "all"
   },
   {
     "_id": "7725b9d7-1381-4a54-9c1d-da7d00df3b04",
@@ -132,7 +132,7 @@
     "ownerId": "dd18ab2b-a487-40dd-aca2-8fa951bc7c2b",
     "visibility": "all",
     "viewsCounter": {
-      "$numberLong": "16"
+      "$numberLong": "21"
     }
   },
   {
@@ -148,7 +148,7 @@
     "name": "La Tana di Amon",
     "ownerId": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
     "viewsCounter": {
-      "$numberLong": "33"
+      "$numberLong": "62"
     },
     "visibility": "all"
   },
@@ -165,7 +165,7 @@
     "name": "42",
     "ownerId": "1e496285-8361-4887-b08e-2dff78e391fe",
     "viewsCounter": {
-      "$numberLong": "21"
+      "$numberLong": "25"
     },
     "visibility": "all"
   },
@@ -182,7 +182,7 @@
     "name": "The second shelf",
     "ownerId": "95e37f80-cefa-428f-81ba-3743ee587148",
     "viewsCounter": {
-      "$numberLong": "7"
+      "$numberLong": "11"
     },
     "visibility": "all"
   },
@@ -199,7 +199,7 @@
     "name": "Libri contra Panem et Circenses",
     "ownerId": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
     "viewsCounter": {
-      "$numberLong": "34"
+      "$numberLong": "43"
     },
     "visibility": "all"
   },
@@ -216,7 +216,7 @@
     "name": "Nella foresta",
     "ownerId": "44c5d2aa-0ac6-4a5f-948c-65072305ba42",
     "viewsCounter": {
-      "$numberLong": "20"
+      "$numberLong": "31"
     },
     "visibility": "all"
   },
@@ -233,7 +233,24 @@
     "name": "la libreria di poste",
     "ownerId": "9f7fb6cd-03db-493e-baec-c0086a6b9a79",
     "viewsCounter": {
-      "$numberLong": "6"
+      "$numberLong": "19"
+    },
+    "visibility": "all"
+  },
+  {
+    "_id": "ba9f5ef7-f727-444c-9213-0ae0ba683505",
+    "blurRadius": 0,
+    "createdAt": {
+      "$date": "2026-01-14T09:16:05.894Z"
+    },
+    "locationId": "dc71ebbf-1e0d-4e5d-960d-0216ab314c63",
+    "modifiedAt": {
+      "$date": "2026-01-14T09:16:05.894Z"
+    },
+    "name": "La biblioteca di Valinor",
+    "ownerId": "b53f4a78-437b-4657-b9e0-b75b5e05c2c2",
+    "viewsCounter": {
+      "$numberLong": "23"
     },
     "visibility": "all"
   }
