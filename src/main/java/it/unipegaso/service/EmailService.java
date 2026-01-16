@@ -173,7 +173,7 @@ public class EmailService {
 
 	// Invia un'email all'utente con il codice OTP per la verifica.
 	public boolean sendOtpEmail(String recipientEmail, String otpCode, String recipientName, boolean hasForgottenPassword) {
-	    String verificationUrl = baseUrl + "signup?email=" +  recipientEmail; 
+	    String verificationUrl = baseUrl + "signup"; 
 
 	    Map<String, Object> data = new HashMap<>();
 	    data.put("recipientName", recipientName);
