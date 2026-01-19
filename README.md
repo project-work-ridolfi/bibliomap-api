@@ -15,7 +15,7 @@ Questo progetto contiene il backend dell'applicazione Bibliomap. Il codice è sv
 - [Dipendenze](#dipendenze-e-tecnologie)
 - [MongoDB](#mongo-db)
 - [Changelog](./docs/changelog.md)
-- [TODO](#todo)
+- [TODO](./docs/devnotes.md)
 
 ## Documentazione API
 
@@ -519,75 +519,3 @@ mongosh bibliomap-db-init.js
 mongosh bibliomap-db-populate.js
 ```
 
-## TODO
-
-- [x] controllo su click multiplo per get otp
-- [x] accedi
-- [x] controllo visualizzazione messaggio mock
-- [x] email fatta meglio
-  - [x] aggiungi css coerente al fe alle mail
-- [x] reinvio otp
-- [x] salvataggio dati location
-- [x] riorganizza registration dto, usa solo uno con valori nullable
-- [x] usa error message sempre nei casi di errore (no mappa)
-- [x] crea oggetti model per Books, Copies, Locations e Libraries
-- [x] per le cover usiamo anche google books, da togliere com'è ora nel fe
-- [x] definisci flusso di prestito
-- [x] per i prestiti se ce ne sono più pending per la stessa cosa gli altri vengono automaticamente rifiutati
-- [x] pagina aggiunta libro (da finire e testare), deve avere:
-  - [x] controllo su google books
-  - [x] inserimento isbn
-  - [x] sblocco camera per isbn
-  - [x] condizione ma scelta fissa (nuovo/ottima/discreta/usato/pessima)
-  - [x] caricamento copertina (drag or choose, cerca su google, camera, scegli icona)
-  - [x] lista di tag (scegli da lista fissa, suggeriti dal libro o nuovo tag)
-  - [x] da definire logica tag e copertina
-  - [x] GET /api/users/me/libraries
-    - [x] recupera lista librerie dell'utente loggato (id, nome) per menu a tendina
-  - [x] GET /api/books/external/lookup-metadata
-  - [x] GET /api/books/external/search-isbn
-- [x] pagina libro per proprietario con modifiche abilitate (solo proprietà della copia modificabili, copertina forse diventa proprietà copia)
-- [x] gestione libri, sposta da libreria a libreria
-- [x] pagina libro per utente, bottone per richiedere prestito -> manda email
-- [x] libreria: aggiungere gestione location propria
-- [x] libreria: possibilità di visibilità diversa da utente
-- [x] fuzzy location
-- [x] creare Enum LoanStatus: PENDING, ACCEPTED, ON_LOAN, RETURNED, REJECTED, CANCELLED
-- [x] creare Entity Loan nella collection loans
-- [x] creare LoanRepository
-- [x] implementare createLoanRequest(requesterId, copyId):
-  - [x] verifica copia esista e status == 'available'
-  - [x] salva Loan con stato PENDING
-  - [x] invia email notifica al proprietario
-- [x] implementare manageRequest(loanId, ownerId, action):
-  - [x] action ACCEPT: aggiorna stato a ACCEPTED, notifica richiedente
-  - [x] action REJECT: aggiorna stato a REJECTED, notifica richiedente
-- [x] implementare startLoan(loanId, ownerId) (consegna fisica):
-  - [x] verifica stato sia ACCEPTED
-  - [x] aggiorna Loan: stato ON_LOAN, loanStartDate = now, expectedReturnDate = now + 30gg
-  - [x] side effect: aggiorna Copy: status = on_loan
-- [x] implementare closeLoan(loanId, ownerId, conditionEnd) (restituzione):
-  - [x] verifica stato sia ON_LOAN
-  - [x] aggiorna Loan: stato RETURNED, actualReturnDate = now, conditionEnd
-  - [x] side effect: aggiorna Copy: status = available, condition = conditionEnd
-- [x] POST /api/loans/request: Body { copyId }
-- [x] PATCH /api/loans/{id}/status: Body { status: 'ACCEPTED'|'REJECTED' }
-- [x] POST /api/loans/{id}/start: endpoint per segnare inizio prestito
-- [x] POST /api/loans/{id}/return: Body { condition: '...' }
-- [x] GET /api/loans/requests/incoming: richieste da approvare
-- [x] GET /api/loans/active: prestiti in corso (dati ricevuti e dati propri)
-- [x] creare Scheduler @Scheduled(cron = "0 0 9 \* \* ?") (ogni giorno alle 9):
-  - [x] cerca prestiti scaduti (ON_LOAN && expectedReturnDate passata)
-  - [x] per ogni prestito invia email di sollecito al requesterId
-- [x] scarica swagger yaml (http://localhost:8080/q/openapi) per doc
-- [x] documentazione
-- [x] documentazione docker
-- [x] script mongo
-- [x] COOKIE PARTITIONED controllo anche su mobile e altri browser
-- [x] url reali ovunque
-  - [x] controlla conf email
-  - [x] controlla swagger
-  - [x] frontend
-- [x] cambia pwd degli utenti demo
-- [x] aggiorna json mongo
-- [ ] rel
