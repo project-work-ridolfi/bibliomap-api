@@ -2,9 +2,11 @@
 
 Tutte le modifiche rilevanti al progetto sono documentate in questo file.
 
-## [1.0.0] - **IN CORSO**
+## [1.0.0] - **19/01/2026**
 
-Prima release.
+Primo rilascio.
+
+Questa versione rappresenta la prima release stabile del sistema e include le funzionalità progettate e implementate durante il lavoro sul project work.
 
 ### Funzionalità principali
 - Autenticazione utenti: login, logout, registrazione con verifica email, reset password
@@ -14,4 +16,4 @@ Prima release.
 - Gestione librerie: creazione, aggiornamento, visualizzazione, cancellazione; gestione visibilità e posizione
 - Gestione prestiti: richiesta, avvio, restituzione, estensione; accettazione/rifiuto richieste; notifiche via email; visualizzazione prestiti attivi e richieste in ingresso
 - Statistiche: contatori globali e per utente, statistiche dettagliate
-- Altre funzionalità: esportazione OpenAPI/Swagger, supporto tag e copertine, fuzzy location, visibilità librerie, gestione cookie partitioned per mobile e browser
+- Funzionalità accessorie: supporto tag e copertine, fuzzy location, visibilità librerie, gestione cookie partitioned per mobile e browser
