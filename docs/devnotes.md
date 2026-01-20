@@ -69,4 +69,4 @@
   - [x] frontend
 - [x] cambia pwd degli utenti demo
 - [x] aggiorna json mongo
-- [ ] rilascio
+- [x] rilascio

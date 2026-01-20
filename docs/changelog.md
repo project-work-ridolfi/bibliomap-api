@@ -2,7 +2,7 @@
 
 Tutte le modifiche rilevanti al progetto sono documentate in questo file.
 
-## [1.0.0] - **19/01/2026**
+## [1.0.0] - **20/01/2026**
 
 Primo rilascio.
 
