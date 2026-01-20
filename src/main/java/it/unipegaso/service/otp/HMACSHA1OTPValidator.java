@@ -76,7 +76,7 @@ public class HMACSHA1OTPValidator {
 
     }
 
-    // Calcola il checksum usando l'algoritmo delle carte di credito.
+    // Calcola il checksum
     private int calcChecksum(long num, int digits) {
         boolean doubleDigit = true;
         int total = 0;

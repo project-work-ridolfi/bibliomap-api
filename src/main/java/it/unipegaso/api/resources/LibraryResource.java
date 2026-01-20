@@ -16,7 +16,6 @@ import it.unipegaso.database.CopiesRepository;
 import it.unipegaso.database.LibrariesRepository;
 import it.unipegaso.database.UsersRepository;
 import it.unipegaso.database.model.Library;
-import it.unipegaso.database.model.Location;
 import it.unipegaso.database.model.User;
 import it.unipegaso.service.BookService;
 import it.unipegaso.service.LibraryService;

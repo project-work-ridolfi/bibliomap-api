@@ -25,8 +25,8 @@ public class PdfGenerator {
 
     public static byte[] generateUserExportPdf(Map<String, Object> allData) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            // Aggiunti margini più ampi (50 unità)
-            Document document = new Document(PageSize.A4, 50, 50, 50, 50);
+
+        	Document document = new Document(PageSize.A4, 50, 50, 50, 50);
             PdfWriter.getInstance(document, out);
             document.open();
 

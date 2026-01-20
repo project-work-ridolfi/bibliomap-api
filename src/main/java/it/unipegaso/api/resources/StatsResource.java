@@ -23,9 +23,6 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-/**
- * Endpoint per statistiche utente.
- */
 @Path("/api/stats")
 @Produces(MediaType.APPLICATION_JSON)
 public class StatsResource {

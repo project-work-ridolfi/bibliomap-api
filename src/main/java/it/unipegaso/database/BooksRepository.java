@@ -5,7 +5,6 @@ import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Sorts.descending;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

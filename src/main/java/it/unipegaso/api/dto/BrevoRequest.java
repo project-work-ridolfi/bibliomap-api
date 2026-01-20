@@ -1,8 +1,9 @@
 package it.unipegaso.api.dto;
 
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record BrevoRequest(

@@ -1,29 +1,26 @@
 package it.unipegaso.service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import it.unipegaso.service.client.BrevoClient;
-import it.unipegaso.api.dto.BrevoRequest;
-import it.unipegaso.api.dto.BrevoContact;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
+import it.unipegaso.api.dto.BrevoAttachment;
+import it.unipegaso.api.dto.BrevoContact;
+import it.unipegaso.api.dto.BrevoRequest;
 import it.unipegaso.database.model.Loan;
 import it.unipegaso.database.model.User;
+import it.unipegaso.service.client.BrevoClient;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import java.util.Base64;
-import it.unipegaso.api.dto.BrevoAttachment; 
+import jakarta.inject.Inject; 
 
 @ApplicationScoped
 public class EmailService {

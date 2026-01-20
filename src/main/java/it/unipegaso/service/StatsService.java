@@ -77,25 +77,25 @@ public class StatsService {
 		String topTag = copiesRepository.findTopTagByLibraryIds(userLibIds);
 
 		String bffId = loansRepository.findTopPartnerId(userId);
-		
+
 		String partner = "nessuno";
-		
+
 		if(bffId != null) {
-			
+
 			Optional<User> op = usersRepository.get(bffId);
-			
+
 			if(op.isPresent()) {
-				
+
 				User user = op.get();
-				
+
 				partner = user.getUsername() + "_" + user.getId();
 			}
-			
+
 		}
 
 		// Calcolo Distanza Massima Geografica
 		double maxDist = calculateRealMaxDistance(userId);
-		
+
 		// Preparazione Grafici
 		ChartData trend = mapToChartData(loansRepository.getMonthlyTrend(userId));
 		ChartData tags = mapToChartData(copiesRepository.getTags(userLibIds));
@@ -113,34 +113,34 @@ public class StatsService {
 	}
 
 	private Map<String, Long> calculateMostViewedBooks(List<String> libIds) {
-	    Map<String, Long> rawViews = copiesRepository.getViews(libIds);
+		Map<String, Long> rawViews = copiesRepository.getViews(libIds);
 
-	    List<String> isbns = rawViews.keySet().stream()
-	            .map(k -> {
-	            	LOG.debug("KEY RAW VIEWS " + k );
-	                String[] parts = k.split("_");
-	                return (parts.length > 1) ? parts[1] : null; 
-	            })
-	            .filter(isbn -> isbn != null && !isbn.equals("null"))
-	            .distinct()
-	            .toList();
+		List<String> isbns = rawViews.keySet().stream()
+				.map(k -> {
+					LOG.debug("KEY RAW VIEWS " + k );
+					String[] parts = k.split("_");
+					return (parts.length > 1) ? parts[1] : null; 
+				})
+				.filter(isbn -> isbn != null && !isbn.equals("null"))
+				.distinct()
+				.toList();
 
-	    Map<String, String> titlesMap = booksRepository.getTitlesMap(isbns);
+		Map<String, String> titlesMap = booksRepository.getTitlesMap(isbns);
 
-	    Map<String, Long> mostViewedBooks = new LinkedHashMap<>();
+		Map<String, Long> mostViewedBooks = new LinkedHashMap<>();
 
-	    rawViews.forEach((key, views) -> {
-	        String[] parts = key.split("_");
-	        String copyId = parts[0];
-	        String isbn = (parts.length > 1) ? parts[1] : "unknown";
+		rawViews.forEach((key, views) -> {
+			String[] parts = key.split("_");
+			String copyId = parts[0];
+			String isbn = (parts.length > 1) ? parts[1] : "unknown";
 
-	        String title = titlesMap.getOrDefault(isbn, isbn);
-	        String finalKey = copyId + "_" + title;
+			String title = titlesMap.getOrDefault(isbn, isbn);
+			String finalKey = copyId + "_" + title;
 
-	        mostViewedBooks.put(finalKey, views);
-	    });
+			mostViewedBooks.put(finalKey, views);
+		});
 
-	    return mostViewedBooks;
+		return mostViewedBooks;
 	}
 
 	private double calculateRealMaxDistance(String userId) {
@@ -197,7 +197,7 @@ public class StatsService {
 		String topLoaner = findTopUser(logged, true, userId);
 
 		List<String> visibleLibraryIds = librariesRepository.getVisibleLibraryIds(logged, userId);
-		
+
 		// calcolo Distanza Massima Globale (viaggio piu' lungo mai fatto)
 		double maxDistGlobal = calculateGlobalMaxDistance();
 
@@ -233,44 +233,45 @@ public class StatsService {
 	}
 
 	public String findTopUser(boolean logged, boolean owner, String userId) {
-	    
+
 		MongoDatabase mongoDatabase = mongoClient.getDatabase("bibliomap");
-	    MongoCollection<Document> loans = mongoDatabase.getCollection("loans");
+		MongoCollection<Document> loans = mongoDatabase.getCollection("loans");
 
-	    List<Bson> pipeline = new ArrayList<>();
+		List<Bson> pipeline = new ArrayList<>();
 
-	    // prende utente
-	    pipeline.add(Aggregates.lookup("users", owner ? "owner_id" : "requester_id", "_id", "user"));
-	    pipeline.add(Aggregates.unwind("$user"));
+		// prende utente
+		pipeline.add(Aggregates.lookup("users", owner ? "owner_id" : "requester_id", "_id", "user"));
+		pipeline.add(Aggregates.unwind("$user"));
 
-	    //filtra in base alla visibilità
-	    List<Bson> visibilityFilters = new ArrayList<>();
-	    if (logged) {
-	        // se loggato, vedo pubblici, registrati e me stesso
-	        visibilityFilters.add(Filters.in("user.visibility", List.of("all", "logged_in")));
-	        if (userId != null) {
-	            visibilityFilters.add(Filters.eq("user._id", userId));
-	        }
-	    } else {
-	        // se guest, vedo solo i pubblici
-	        visibilityFilters.add(Filters.eq("user.visibility", "all"));
-	    }
-	    pipeline.add(Aggregates.match(Filters.or(visibilityFilters)));
+		//filtra in base alla visibilità
+		List<Bson> visibilityFilters = new ArrayList<>();
+		if (logged) {
+			// se loggato, vedo pubblici, registrati e me stesso
+			visibilityFilters.add(Filters.in("user.visibility", List.of("all", "logged_in")));
+			if (userId != null) {
+				visibilityFilters.add(Filters.eq("user._id", userId));
+			}
+		} else {
+			// se guest, vedo solo i pubblici
+			visibilityFilters.add(Filters.eq("user.visibility", "all"));
+		}
+		pipeline.add(Aggregates.match(Filters.or(visibilityFilters)));
 
-	    // raggruppa per contare i prestiti/richieste degli utenti visibili
-	    pipeline.add(Aggregates.group("$_id_dell_utente_o_username", 
-	        Accumulators.first("username", "$user.username"),
-	        Accumulators.sum("count", 1)));
+		// raggruppa per contare i prestiti/richieste degli utenti visibili
+		pipeline.add(Aggregates.group("$_id_dell_utente_o_username", 
+				Accumulators.first("username", "$user.username"),
+				Accumulators.sum("count", 1)));
 
-	    // sort
-	    pipeline.add(Aggregates.sort(Sorts.descending("count")));
+		// sort
+		pipeline.add(Aggregates.sort(Sorts.descending("count")));
 
-	    // prende il primo
-	    pipeline.add(Aggregates.limit(1));
+		// prende il primo
+		pipeline.add(Aggregates.limit(1));
 
-	    Document result = loans.aggregate(pipeline).first();
-	    return result != null ? result.getString("username") : null;
+		Document result = loans.aggregate(pipeline).first();
+		return result != null ? result.getString("username") : null;
 	}
+
 	private double calculateGlobalMaxDistance() {
 		List<Loan> finishedLoans = loansRepository.findFinished();
 		double max = 0.0;

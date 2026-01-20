@@ -1,12 +1,9 @@
 package it.unipegaso.api.util;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+
 import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.NewCookie;
 
 public final class SessionIDProvider {
 
@@ -14,7 +11,6 @@ public final class SessionIDProvider {
 
     private static final String SESSION_COOKIE_NAME = "SESSION_ID";
     private static final Duration DEFAULT_SESSION_DURATION = Duration.ofDays(7);
-    private static final int DEFAULT_MAX_AGE_SECONDS = (int) TimeUnit.DAYS.toSeconds(DEFAULT_SESSION_DURATION.toDays());
 
     // Legge la Session ID dalla richiesta
     public static Optional<String> getSessionId(HttpHeaders headers) {
