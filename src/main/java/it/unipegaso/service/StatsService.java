@@ -258,7 +258,7 @@ public class StatsService {
 	    pipeline.add(Aggregates.match(Filters.or(visibilityFilters)));
 
 	    // raggruppa per contare i prestiti/richieste degli utenti visibili
-	    pipeline.add(Aggregates.group("$_id_dell_utente_o_username", 
+	    pipeline.add(Aggregates.group("$_id_dell_utente", 
 	        Accumulators.first("username", "$user.username"),
 	        Accumulators.sum("count", 1)));
 
