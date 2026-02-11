@@ -7,14 +7,15 @@ public record BookMapDTO(
     String title,       // Titolo Libro
     String author,      // Autore
     String libraryName, // Nome Libreria
-    String libraryId,
-    String status,
-    long views,
+    String libraryId,   // Id Libreria
+    String status,      // Status del libro
+    long views,         // Numero visualizzazioni
     double lat,         // Latitudine
     double lng,         // Longitudine
     double distance,    // Distanza in km
     boolean isFuzzed,   // Flag privacy
-    String cover,       // Base 64 della cover
+    String cover,       // Url della cover
+    String customCover, // Cover in b64 della copia
     String ownerId,     // Proprietario della copia
     String username,    // Nome da mostrare
     List<String> tags	// Lista dei tag

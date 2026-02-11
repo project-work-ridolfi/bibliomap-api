@@ -161,6 +161,8 @@ public class BookService {
 				List<String> tags = copy.getList("tags", String.class);
 				if (tags == null) tags = new ArrayList<>();
 
+				String customCoverB64 = copy.getString("custom_cover");
+
 				results.add(new BookMapDTO(
 						copy.getString("_id"),
 						book.getString("title"),
@@ -174,6 +176,7 @@ public class BookService {
 						doc.getDouble("distance") / 1000.0,
 						isFuzzed,
 						book.getString("cover"),
+						customCoverB64,
 						lib.getString("ownerId"),
 						ownerUsername,
 						tags));
