@@ -70,3 +70,4 @@
 - [x] cambia pwd degli utenti demo
 - [x] aggiorna json mongo
 - [x] rilascio
+- [ ] analisi possibile download img da google (limita get)
