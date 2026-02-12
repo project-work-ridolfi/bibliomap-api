@@ -70,4 +70,5 @@
 - [x] cambia pwd degli utenti demo
 - [x] aggiorna json mongo
 - [x] rilascio
-- [ ] analisi possibile download img da google (limita get)
+- [x] analisi possibile download img da google (limita get)
+- [x] lazy migration per le cover (da url a b64)

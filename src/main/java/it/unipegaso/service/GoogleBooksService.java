@@ -6,6 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.unipegaso.api.dto.BookDetailDTO;
+import it.unipegaso.api.util.ImageUtils;
 import it.unipegaso.api.util.StringUtils;
 import it.unipegaso.database.model.Book;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,8 +38,10 @@ public class GoogleBooksService {
 	@ConfigProperty(name = "book-api.url")
 	String url;
 
-	HttpClient client = HttpClient.newHttpClient();
-
+	private final HttpClient client = HttpClient.newBuilder()
+			.connectTimeout(Duration.ofSeconds(10)) 
+			.followRedirects(HttpClient.Redirect.NORMAL) 
+			.build();
 
 	public BookDetailDTO lookupBookMetadata(String isbn) {
 		try {
@@ -133,11 +137,11 @@ public class GoogleBooksService {
 				}else if (images.has("small")){
 					cover = images.path("small").asText();
 				}else{
-				cover = images.path("thumbnail").asText();
+					cover = images.path("thumbnail").asText();
 				}
 
 				if (cover != null && cover.startsWith("http://")) {
-					cover = cover.replace("http://", "https://");
+					cover = downloadImageAsBase64(cover);
 				}
 			}
 
@@ -175,52 +179,52 @@ public class GoogleBooksService {
 
 
 	public List<Book> lookUpIsbn(String title, String author, String publisher, int year) {
-	    
+
 		List<Book> books = new ArrayList<>();
-	    String query = buildGoogleBooksQuery(title, author, publisher, year);
-	    String reqUrl = String.format("%s?q=%s&key=%s", url, query, apiKey);
+		String query = buildGoogleBooksQuery(title, author, publisher, year);
+		String reqUrl = String.format("%s?q=%s&key=%s", url, query, apiKey);
 
-	    HttpRequest request = HttpRequest.newBuilder()
-	            .uri(URI.create(reqUrl))
-	            .GET()
-	            .build();
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(reqUrl))
+				.GET()
+				.build();
 
-	    try {
-	        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		try {
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-	        if (response.statusCode() != 200) {
-	            LOG.error("error fetching from google books: " + response.statusCode());
-	            return books;
-	        }
+			if (response.statusCode() != 200) {
+				LOG.error("error fetching from google books: " + response.statusCode());
+				return books;
+			}
 
-	        JsonNode root = objectMapper.readTree(response.body());
-	        JsonNode items = root.path("items");
+			JsonNode root = objectMapper.readTree(response.body());
+			JsonNode items = root.path("items");
 
-	        if (items.isMissingNode() || !items.isArray()) {
-	            return books;
-	        }
+			if (items.isMissingNode() || !items.isArray()) {
+				return books;
+			}
 
-	        // ci fermiamo non appena ne abbiamo trovati 5 validi
-	        for (int i = 0; i < items.size(); i++) {
-	            if (books.size() >= 5) break; 
+			// ci fermiamo non appena ne abbiamo trovati 5 validi
+			for (int i = 0; i < items.size(); i++) {
+				if (books.size() >= 5) break; 
 
-	            Book book = extractBook(root, i);
-	            
-	            // Verifichiamo che il libro estratto abbia un ISBN valido
-	            if (book != null && book.getIsbn() != null && !book.getIsbn().isEmpty()) {
-	                books.add(book);
-	                LOG.debug("Aggiunto libro valido: " + book.getTitle() + " ISBN: " + book.getIsbn());
-	            } else {
-	                LOG.debug("Scartato risultato all'indice " + i + " perché privo di ISBN_13");
-	            }
-	        }
+				Book book = extractBook(root, i);
 
-	        return books;
+				// Verifichiamo che il libro estratto abbia un ISBN valido
+				if (book != null && book.getIsbn() != null && !book.getIsbn().isEmpty()) {
+					books.add(book);
+					LOG.debug("Aggiunto libro valido: " + book.getTitle() + " ISBN: " + book.getIsbn());
+				} else {
+					LOG.debug("Scartato risultato all'indice " + i + " perché privo di ISBN_13");
+				}
+			}
 
-	    } catch (Exception e) {
-	        LOG.error("eccezione durante lookup google books", e);
-	        return books;
-	    }
+			return books;
+
+		} catch (Exception e) {
+			LOG.error("eccezione durante lookup google books", e);
+			return books;
+		}
 	}
 
 
@@ -242,7 +246,7 @@ public class GoogleBooksService {
 				isbn = node.get("identifier").asText(null);
 			}
 		}
-		
+
 		if (isbn == null) {
 			return null;
 		}
@@ -273,7 +277,7 @@ public class GoogleBooksService {
 			cover = volumeInfo.path("imageLinks").path("thumbnail").asText();
 			// fix per protocollo http vs https
 			if (cover != null && cover.startsWith("http://")) {
-				cover = cover.replace("http://", "https://");
+				cover = downloadImageAsBase64(cover);
 			}
 		}
 
@@ -282,11 +286,11 @@ public class GoogleBooksService {
 		book.setAuthor(author);
 		book.setCover(cover);
 		book.setLanguage(StringUtils.getFullLanguage(language));
-		
+
 		if(publicationYear != null) {
 			book.setPublication_year(publicationYear);
 		}
-		
+
 		book.setPublisher(publisher);
 		book.setTitle(title);
 
@@ -319,5 +323,37 @@ public class GoogleBooksService {
 
 
 		return qParam.toString();
+	}
+
+	public String downloadImageAsBase64(String imageUrl) {
+		
+		if (imageUrl == null || !imageUrl.startsWith("http")) {
+			return null;
+		}
+
+		try {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create(imageUrl))
+					.header("User-Agent", "bibliomap-api/1.0 (Render-Deployment)") //test
+					.timeout(Duration.ofSeconds(10))
+					.GET()
+					.build();
+
+			// download byte 
+			HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+			if (response.statusCode() != 200) {
+				LOG.warn("Fallito download immagine Google. Status: " + response.statusCode());
+				return null;
+			}
+
+			String b64Content = ImageUtils.resizeAndConvertToBase64(response.body(), 400);
+
+			return b64Content != null ? "data:image/jpeg;base64," + b64Content : null;
+
+		} catch (Exception e) {
+			LOG.error("Errore durante il download/conversione dell'immagine: " + imageUrl, e);
+			return null;
+		}
 	}
 }

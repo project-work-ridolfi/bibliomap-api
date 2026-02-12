@@ -14,8 +14,7 @@ public record BookMapDTO(
     double lng,         // Longitudine
     double distance,    // Distanza in km
     boolean isFuzzed,   // Flag privacy
-    String cover,       // Url della cover
-    String customCover, // Cover in b64 della copia
+    String cover,      
     String ownerId,     // Proprietario della copia
     String username,    // Nome da mostrare
     List<String> tags	// Lista dei tag

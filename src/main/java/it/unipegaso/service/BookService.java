@@ -51,6 +51,9 @@ public class BookService {
 
 	@Inject
 	LibrariesRepository librariesRepository; 
+	
+	@Inject
+	GoogleBooksService googleBooksService;
 
 
 	@Inject
@@ -161,8 +164,15 @@ public class BookService {
 				List<String> tags = copy.getList("tags", String.class);
 				if (tags == null) tags = new ArrayList<>();
 
-				String customCoverB64 = copy.getString("custom_cover");
+				
+				String finalCover = copy.getString("custom_cover");
 
+				// se non e' presente la cover personalizzata, si prende e bonifica quella del libro)
+		        if (finalCover == null || finalCover.isBlank()) {
+		            String rawBookCover = book.getString("cover");
+		            finalCover = updateAndDownloadCoverFromUrl(rawBookCover, book.getString("_id"));
+		        }
+				
 				results.add(new BookMapDTO(
 						copy.getString("_id"),
 						book.getString("title"),
@@ -175,8 +185,7 @@ public class BookService {
 						finalLng,
 						doc.getDouble("distance") / 1000.0,
 						isFuzzed,
-						book.getString("cover"),
-						customCoverB64,
+						finalCover,
 						lib.getString("ownerId"),
 						ownerUsername,
 						tags));
@@ -186,6 +195,24 @@ public class BookService {
 			}
 		}
 		return results;
+	}
+
+	protected String updateAndDownloadCoverFromUrl(String oldCoverString, String bookId) {
+
+		if(oldCoverString == null || !oldCoverString.startsWith("http")) {
+			return oldCoverString;
+		}
+		
+		String cover = googleBooksService.downloadImageAsBase64(oldCoverString);
+		
+		if(cover != null) {
+			
+			booksRepository.updateCover(bookId, cover);
+			return cover;
+			
+		}
+		
+		return oldCoverString;
 	}
 
 	public BookDetailDTO getBookDetails(String copyId, double distance) {
@@ -238,11 +265,9 @@ public class BookService {
 
 		// gestione Cover Ufficiale (dal libro)
 		String rawBookCover = book.getString("cover");
-		String bookCoverUrl = null;
-		if (rawBookCover != null && rawBookCover.startsWith("http")) {
-			bookCoverUrl = rawBookCover;
-		}
-
+		String bookCover = updateAndDownloadCoverFromUrl(rawBookCover, book.getString("_id"));
+		
+	
 		// gestione Custom Cover (dalla copia)
 		// Il campo nel DB della copia è "custom_cover"
 		String rawCustomCover = doc.getString("custom_cover");
@@ -263,7 +288,7 @@ public class BookService {
 				book.getString("_id"),        // isbn
 				book.getString("title"),
 				book.getString("author"),
-				bookCoverUrl,                 // coverUrl (Google)
+				bookCover,                 // cover
 				finalCustomCover,             // customCover (Base64)
 				book.getInteger("publication_year", 0),
 				book.getString("language"),
@@ -582,4 +607,5 @@ public class BookService {
 
         return null;
     }
+	
 }

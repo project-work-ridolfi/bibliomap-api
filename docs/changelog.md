@@ -2,6 +2,12 @@
 
 Tutte le modifiche rilevanti al progetto sono documentate in questo file.
 
+## [1.1.0] - 12/02/2026
+
+- Copertine ora persistite in Base64: nuove salvate automaticamente, esistenti migrate al primo accesso.
+- Migliorata resilienza verso Google Books API.
+- Ridotte le richieste HTTP esterne dal frontend.
+
 ## [1.0.0] - **20/01/2026**
 
 Primo rilascio.

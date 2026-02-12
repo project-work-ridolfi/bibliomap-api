@@ -20,7 +20,9 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.result.UpdateResult;
 
 import it.unipegaso.database.model.Book;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -86,6 +88,15 @@ public class BooksRepository implements IRepository<Book> {
 	public boolean update(Book book) throws MongoWriteException {
 		LOG.error(" IL LIBRO NON DOVREBBE MAI ESSERE MODIFICATO");
 		return false;
+	}
+	
+	public boolean updateCover(String id, String coverB64) {
+		
+		Bson update = Updates.set("cover", coverB64);
+		Bson filter = Filters.eq(ID, id);
+		UpdateResult result = books.updateOne(filter, update);
+		
+		return result.wasAcknowledged();
 	}
 
 	@Override
