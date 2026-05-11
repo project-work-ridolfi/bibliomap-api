@@ -1,0 +1,42 @@
+name: Keep Bibliomap Alive
+
+on:
+  schedule:
+    # Ogni lunedì e giovedì alle 10:00 UTC
+    - cron: "0 10 * * 1,4"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sveglia FE e BE in parallelo
+        # Render può impiegare fino a 50s per uscire dal sleep.
+        # Lanciamo entrambi in background e aspettiamo che finiscano.
+        # "|| true" garantisce che il job non fallisca se uno dei due non risponde in tempo.
+        run: |
+          echo "Ping backend..."
+          curl --max-time 60 --silent --output /dev/null \
+               https://bibliomap-api.onrender.com/q/health &
+          PID_BE=$!
+
+          echo "Ping frontend..."
+          curl --max-time 60 --silent --output /dev/null \
+               https://bibliomap-ui.onrender.com &
+          PID_FE=$!
+
+          wait $PID_BE || echo "BE: timeout o errore, ma proseguiamo"
+          wait $PID_FE || echo "FE: timeout o errore, ma proseguiamo"
+
+          echo "Sveglia completata."
+
+      - name: Login gandalf (fire and forget)
+        # Mandiamo la richiesta e non aspettiamo risposta.
+        # --max-time 5 evita che resti appeso; non ci interessa l'esito.
+        run: |
+          curl --max-time 5 --silent --output /dev/null \
+               -X POST https://bibliomap-api.onrender.com/api/auth/login \
+               -H "Content-Type: application/json" \
+               -d '{"email":"gandalf@middlearth.com","password":"Bibliomap2026!"}' \
+          || true
+          echo "Login inviato."
